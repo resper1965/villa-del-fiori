@@ -52,15 +52,21 @@ class ProcessService:
         self.db.flush()
 
         # Criar versão inicial
+        content = {
+            "description": process_data.description or "",
+            "workflow": process_data.workflow or [],
+            "entities": process_data.entities or [],
+            "variables": process_data.variables or [],
+        }
+        
+        # Adicionar diagrama Mermaid se fornecido
+        if hasattr(process_data, "mermaid_diagram") and process_data.mermaid_diagram:
+            content["mermaid_diagram"] = process_data.mermaid_diagram
+        
         version = ProcessVersion(
             process_id=process.id,
             version_number=1,
-            content={
-                "description": process_data.description or "",
-                "workflow": process_data.workflow or [],
-                "entities": process_data.entities or [],
-                "variables": process_data.variables or [],
-            },
+            content=content,
             content_text=process_data.description or "",
             entities_involved=process_data.entities or [],
             variables_applied={var: None for var in (process_data.variables or [])},

@@ -53,6 +53,7 @@ const processSchema = z.object({
   workflow: z.array(z.string()).optional(),
   entities: z.array(z.string()).optional(),
   variables: z.array(z.string()).optional(),
+  mermaid_diagram: z.string().optional(),
 })
 
 type ProcessFormData = z.infer<typeof processSchema>
@@ -105,6 +106,7 @@ export function ProcessForm({ open, onOpenChange, process, onSubmit }: ProcessFo
       workflow: [],
       entities: [],
       variables: [],
+      mermaid_diagram: "",
     },
   })
 
@@ -122,6 +124,7 @@ export function ProcessForm({ open, onOpenChange, process, onSubmit }: ProcessFo
         workflow: process.workflow || [],
         entities: process.entities || [],
         variables: process.variables || [],
+        mermaid_diagram: (process as any).mermaid_diagram || "",
       })
     } else if (open) {
       reset({
@@ -132,6 +135,7 @@ export function ProcessForm({ open, onOpenChange, process, onSubmit }: ProcessFo
         workflow: [],
         entities: [],
         variables: [],
+        mermaid_diagram: "",
       })
     }
   }, [process, open, reset])
@@ -243,6 +247,34 @@ export function ProcessForm({ open, onOpenChange, process, onSubmit }: ProcessFo
               placeholder="Descreva o processo..."
               rows={4}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mermaid_diagram">Diagrama Mermaid</Label>
+            <Textarea
+              id="mermaid_diagram"
+              {...register("mermaid_diagram")}
+              placeholder={`Exemplo de diagrama de fluxo:
+flowchart TD
+    A[Início] --> B{Decisão}
+    B -->|Sim| C[Ação 1]
+    B -->|Não| D[Ação 2]
+    C --> E[Fim]
+    D --> E`}
+              rows={8}
+              className="font-mono text-sm"
+            />
+            <p className="text-xs text-muted-foreground">
+              Use a sintaxe Mermaid para criar diagramas de fluxo, sequência, etc.
+              <a
+                href="https://mermaid.js.org/intro/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#00ade8] hover:underline ml-1"
+              >
+                Documentação Mermaid
+              </a>
+            </p>
           </div>
 
           <DialogFooter>
