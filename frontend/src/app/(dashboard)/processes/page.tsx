@@ -16,7 +16,6 @@ import { Plus, Search, X, Loader2, FileText } from "lucide-react"
 import { useProcesses, useCreateProcess } from "@/lib/hooks/useProcesses"
 import { processesData } from "@/data/processes" // Fallback para dados mock
 import { ProcessForm } from "@/components/processes/ProcessForm"
-import { useState } from "react"
 
 const categoryColors: Record<string, string> = {
   "Governança": "bg-blue-500/10 text-blue-400 border-blue-500/20",
@@ -217,26 +216,18 @@ export default function ProcessesPage() {
                 {category}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categoryProcesses.map((process) => {
-                  const Icon = process.icon
-          return (
-            <div key={category} className="mb-6">
-              <h2 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                {category}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categoryProcesses.map((process: any) => {
                   return (
                     <Card 
                       key={process.id} 
-                      className="hover:border-primary/50 transition-colors cursor-pointer"
+                      className="bg-gray-800/50 border-gray-700/50 hover:bg-gray-800/70 hover:border-primary/50 transition-all cursor-pointer"
                       onClick={() => router.push(`/processes/${process.id}`)}
                     >
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-3">
                             <div className="p-2 rounded-md bg-muted">
-                              <FileText className="h-4 w-4 text-foreground" />
+                              <FileText className="h-4 w-4 text-foreground stroke-1" />
                             </div>
                             <div className="flex-1">
                               <CardTitle className="text-sm font-light text-gray-200 line-clamp-2">
@@ -251,7 +242,7 @@ export default function ProcessesPage() {
                           <span className={`text-xs px-2 py-1 rounded border ${categoryColors[category]}`}>
                             {category}
                           </span>
-                          <span className="text-xs text-muted-foreground capitalize">
+                          <span className="text-xs text-gray-400 font-light capitalize">
                             {process.status?.replace("_", " ") || "rascunho"}
                           </span>
                         </div>
