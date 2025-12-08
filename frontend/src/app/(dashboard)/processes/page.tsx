@@ -1,9 +1,18 @@
 "use client"
 
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Plus, Search, X } from "lucide-react"
 import { processesData } from "@/data/processes"
 
 const categoryColors: Record<string, string> = {
@@ -18,8 +27,52 @@ const categoryColors: Record<string, string> = {
 
 export default function ProcessesPage() {
   const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [selectedStatus, setSelectedStatus] = useState<string>("all")
+
   const categories = Array.from(new Set(processesData.map(p => p.category)))
-  
+  const statuses = Array.from(new Set(processesData.map(p => p.status)))
+
+  // Filtrar processos
+  const filteredProcesses = useMemo(() => {
+    return processesData.filter((process) => {
+      // Filtro de busca (nome ou descrição)
+      const matchesSearch =
+        searchQuery === "" ||
+        process.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        process.description?.toLowerCase().includes(searchQuery.toLowerCase())
+
+      // Filtro de categoria
+      const matchesCategory = selectedCategory === "all" || process.category === selectedCategory
+
+      // Filtro de status
+      const matchesStatus = selectedStatus === "all" || process.status === selectedStatus
+
+      return matchesSearch && matchesCategory && matchesStatus
+    })
+  }, [searchQuery, selectedCategory, selectedStatus])
+
+  // Agrupar por categoria
+  const groupedProcesses = useMemo(() => {
+    const grouped: Record<string, typeof processesData> = {}
+    filteredProcesses.forEach((process) => {
+      if (!grouped[process.category]) {
+        grouped[process.category] = []
+      }
+      grouped[process.category].push(process)
+    })
+    return grouped
+  }, [filteredProcesses])
+
+  const hasFilters = searchQuery !== "" || selectedCategory !== "all" || selectedStatus !== "all"
+
+  const clearFilters = () => {
+    setSearchQuery("")
+    setSelectedCategory("all")
+    setSelectedStatus("all")
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="h-[73px] border-b border-border flex items-center justify-between px-6">
@@ -32,8 +85,88 @@ export default function ProcessesPage() {
         </Button>
       </div>
       <div className="p-6">
-        {categories.map((category) => {
-          const categoryProcesses = processesData.filter(p => p.category === category)
+        {/* Filtros */}
+        <div className="mb-6 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Busca */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar processos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {/* Filtro de Categoria */}
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Todas as categorias" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as categorias</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Filtro de Status */}
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Todos os status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os status</SelectItem>
+                {statuses.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {status.charAt(0).toUpperCase() + status.slice(1).replace("_", " ")}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Botão limpar filtros */}
+          {hasFilters && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearFilters}
+                className="text-xs"
+              >
+                <X className="h-3 w-3 mr-1" />
+                Limpar Filtros
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                {filteredProcesses.length} processo(s) encontrado(s)
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Lista de processos */}
+        {Object.keys(groupedProcesses).length === 0 ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <p className="text-muted-foreground">
+                Nenhum processo encontrado com os filtros aplicados.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          Object.entries(groupedProcesses).map(([category, categoryProcesses]) => (
+            <div key={category} className="mb-6">
+              <h2 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+                {category}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {categoryProcesses.map((process) => {
+                  const Icon = process.icon
           return (
             <div key={category} className="mb-6">
               <h2 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
@@ -77,8 +210,8 @@ export default function ProcessesPage() {
                 })}
               </div>
             </div>
-          )
-        })}
+          ))
+        )}
       </div>
     </div>
   )
