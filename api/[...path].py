@@ -17,5 +17,5 @@ from app.main import app
 from mangum import Mangum
 
 # Create ASGI adapter for Vercel
-# The handler will automatically handle the path from Vercel
-handler = Mangum(app, lifespan="off", api_gateway_base_path="/api")
+# Vercel passes the path after /api/, so we need to handle it correctly
+handler = Mangum(app, lifespan="off")
