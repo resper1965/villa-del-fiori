@@ -128,9 +128,9 @@ export default function ProcessesPage() {
           Novo Processo
         </Button>
       </div>
-      <div className="p-3">
+      <div className="p-2">
         {/* Filtros */}
-        <div className="mb-3 space-y-2">
+        <div className="mb-2 space-y-2">
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Busca */}
             <div className="flex-1 relative">
@@ -211,11 +211,11 @@ export default function ProcessesPage() {
           </Card>
         ) : (
           Object.entries(groupedProcesses).map(([category, categoryProcesses]) => (
-            <div key={category} className="mb-3">
-              <h2 className="text-sm font-light text-gray-400 mb-2 uppercase tracking-wide">
+            <div key={category} className="mb-2">
+              <h2 className="text-xs font-light text-gray-400 mb-1.5 uppercase tracking-wide">
                 {category}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {categoryProcesses.map((process: any) => {
                   return (
                     <Card 

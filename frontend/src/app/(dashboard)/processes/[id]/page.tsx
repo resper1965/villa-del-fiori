@@ -90,8 +90,8 @@ export default function ProcessDetailPage() {
         <div className="h-[73px] border-b border-border flex items-center px-4">
           <h1 className="text-lg font-semibold text-foreground">Carregando...</h1>
         </div>
-        <div className="p-6 flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <div className="p-2 flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground stroke-1" />
         </div>
       </div>
     )
@@ -103,7 +103,7 @@ export default function ProcessDetailPage() {
         <div className="h-[73px] border-b border-border flex items-center px-4">
           <h1 className="text-lg font-light text-gray-200">Processo não encontrado</h1>
         </div>
-        <div className="p-6">
+        <div className="p-2">
           <Button onClick={() => router.push("/processes")} variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2 stroke-1" />
             Voltar para Processos
@@ -138,19 +138,19 @@ export default function ProcessDetailPage() {
           {displayProcess.name}
         </h1>
       </div>
-      <div className="p-3">
-        <div className="max-w-4xl mx-auto space-y-3">
+      <div className="p-2">
+        <div className="max-w-4xl mx-auto space-y-2">
           {/* Header Card */}
           <Card>
             <CardHeader>
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-muted">
-                    <FileText className="h-6 w-6 text-foreground stroke-1" />
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-muted">
+                    <FileText className="h-5 w-5 text-foreground stroke-1" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl mb-2">{displayProcess.name}</CardTitle>
-                    <div className="flex items-center gap-3">
+                    <CardTitle className="text-lg mb-1">{displayProcess.name}</CardTitle>
+                    <div className="flex items-center gap-2">
                       <span className="text-sm text-muted-foreground">{displayProcess.category}</span>
                       <span className="text-muted-foreground">•</span>
                       <span className="text-sm text-muted-foreground">{displayProcess.document_type}</span>
@@ -170,24 +170,29 @@ export default function ProcessDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Mermaid Diagram Card */}
-          {(process?.current_version?.content?.mermaid_diagram || displayProcess?.current_version?.content?.mermaid_diagram) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GitBranch className="h-5 w-5 text-muted-foreground stroke-1" />
-                  Diagrama do Processo
-                </CardTitle>
-                <CardDescription>Visualização do fluxo do processo em diagrama</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <MermaidDiagram
-                  diagram={process?.current_version?.content?.mermaid_diagram || displayProcess?.current_version?.content?.mermaid_diagram || ""}
-                  id={`process-${displayProcess.id}-diagram`}
-                />
-              </CardContent>
-            </Card>
-          )}
+          {/* Mermaid Diagram Card - Sempre mostrar se houver diagrama */}
+          {(() => {
+            const diagram = process?.current_version?.content?.mermaid_diagram || 
+                           displayProcess?.current_version?.content?.mermaid_diagram ||
+                           (initialProcess?.mermaid_diagram || "");
+            return diagram ? (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <GitBranch className="h-4 w-4 text-muted-foreground stroke-1" />
+                    Diagrama do Processo
+                  </CardTitle>
+                  <CardDescription className="text-xs">Visualização do fluxo do processo em diagrama</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <MermaidDiagram
+                    diagram={diagram}
+                    id={`process-${displayProcess.id}-diagram`}
+                  />
+                </CardContent>
+              </Card>
+            ) : null;
+          })()}
 
           {/* Workflow Card */}
           {displayProcess.workflow && displayProcess.workflow.length > 0 && (
@@ -197,13 +202,13 @@ export default function ProcessDetailPage() {
                 <CardDescription className="text-gray-400 font-light">Etapas sequenciais para execução deste processo</CardDescription>
               </CardHeader>
               <CardContent>
-                <ol className="space-y-3">
+                <ol className="space-y-2">
                   {displayProcess.workflow.map((step, index) => (
-                  <li key={index} className="flex gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
+                  <li key={index} className="flex gap-2">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
                       {index + 1}
                     </span>
-                    <span className="text-foreground pt-0.5">{step}</span>
+                    <span className="text-sm text-foreground pt-0.5">{step}</span>
                   </li>
                   ))}
                 </ol>
@@ -219,11 +224,11 @@ export default function ProcessDetailPage() {
                 <CardDescription>Pessoas, sistemas ou infraestrutura que participam deste processo</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {displayProcess.entities.map((entity, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1.5 rounded-md bg-muted text-foreground text-sm border border-border"
+                    className="px-2 py-1 rounded-md bg-muted text-foreground text-xs border border-border"
                   >
                     {entity}
                   </span>
@@ -241,11 +246,11 @@ export default function ProcessDetailPage() {
                 <CardDescription className="text-gray-400 font-light">Parâmetros configuráveis aplicados neste processo</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {displayProcess.variables.map((variable, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1.5 rounded-md bg-accent text-accent-foreground text-sm border border-border"
+                    className="px-2 py-1 rounded-md bg-accent text-accent-foreground text-xs border border-border"
                   >
                     {variable}
                   </span>
@@ -265,67 +270,57 @@ export default function ProcessDetailPage() {
               <CardDescription>Versões anteriores e histórico de alterações</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {/* Versão Atual */}
-                <div className="flex items-start gap-4 p-4 rounded-lg border border-[#00ade8]/30 bg-[#00ade8]/5">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00ade8] text-white flex items-center justify-center text-sm font-medium">
-                    v1
+                <div className="flex items-start gap-2 p-2 rounded-lg border border-[#00ade8]/30 bg-[#00ade8]/5">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#00ade8] text-white flex items-center justify-center text-xs font-medium">
+                    v{displayProcess.current_version_number || 1}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-foreground">
-                        Versão Atual
+                      <span className="text-xs font-medium text-foreground">
+                        Versão {displayProcess.current_version_number || 1} - {statusInfo.label}
                       </span>
-                      <span className="text-xs px-2 py-1 rounded bg-[#00ade8]/20 text-[#00ade8] border border-[#00ade8]/30">
-                        Atual
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${
+                        displayProcess.status === "aprovado" 
+                          ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                          : displayProcess.status === "em_revisao"
+                          ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                          : displayProcess.status === "rejeitado"
+                          ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                          : "bg-[#00ade8]/20 text-[#00ade8] border border-[#00ade8]/30"
+                      }`}>
+                        {statusInfo.label}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      Criada em {new Date().toLocaleDateString("pt-BR")}
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Criada em {new Date(displayProcess.created_at).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                      })}
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <User className="h-3 w-3 stroke-1" />
-                      <span>Síndico</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Versões Anteriores (Mock) */}
-                {[1, 2].map((version) => (
-                  <div key={version} className="flex items-start gap-4 p-4 rounded-lg border border-border bg-muted/30">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted text-foreground flex items-center justify-center text-sm font-medium">
-                      v{version}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-foreground">
-                          Versão {version}
-                        </span>
-                        <span className="text-xs px-2 py-1 rounded bg-green-500/10 text-green-400 border border-green-500/20">
-                          Aprovada
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mb-2">
-                        Criada em {new Date(Date.now() - version * 30 * 24 * 60 * 60 * 1000).toLocaleDateString("pt-BR")}
+                    {displayProcess.current_version?.change_summary && (
+                      <p className="text-xs text-muted-foreground italic mt-1">
+                        {displayProcess.current_version.change_summary}
                       </p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                        <User className="h-3 w-3 stroke-1" />
-                        <span>Síndico</span>
-                      </div>
-                      {version === 2 && (
-                        <p className="text-xs text-muted-foreground italic">
-                          Correções baseadas em feedback: ajustes na descrição do fluxo
-                        </p>
-                      )}
-                    </div>
+                    )}
                   </div>
-                ))}
-
-                {/* Mensagem se não houver histórico */}
-                <div className="text-center py-4 text-sm text-muted-foreground">
-                  <History className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>Esta é a primeira versão do processo</p>
                 </div>
+
+                {/* Mensagem se não houver histórico de aprovações */}
+                {displayProcess.status === "rascunho" && (
+                  <div className="text-center py-3 text-xs text-muted-foreground">
+                    <History className="h-6 w-6 mx-auto mb-1 opacity-50 stroke-1" />
+                    <p>Processo em rascunho - aguardando revisão e aprovação</p>
+                  </div>
+                )}
+                {displayProcess.status === "em_revisao" && (
+                  <div className="text-center py-3 text-xs text-muted-foreground">
+                    <Clock className="h-6 w-6 mx-auto mb-1 opacity-50 stroke-1" />
+                    <p>Processo em revisão pelo conselho consultivo</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
