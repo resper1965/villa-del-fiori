@@ -1,0 +1,831 @@
+openapi: 3.0.3
+info:
+  title: Gestão de Processos Condominiais API
+  description: API para gestão de processos condominiais com workflow de aprovação
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@condominio.com
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development server
+  - url: https://api.condominio.com/api/v1
+    description: Production server
+
+tags:
+  - name: auth
+    description: Autenticação e autorização
+  - name: processes
+    description: Gestão de processos
+  - name: approvals
+    description: Aprovações e rejeições
+  - name: stakeholders
+    description: Gestão de stakeholders
+  - name: notifications
+    description: Notificações
+  - name: dashboard
+    description: Dashboard e estatísticas
+  - name: history
+    description: Histórico e rastreabilidade
+
+paths:
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login bem-sucedido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/refresh:
+    post:
+      tags: [auth]
+      summary: Refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Token renovado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+
+  /processes:
+    get:
+      tags: [processes]
+      summary: Listar processos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [governanca, acesso_seguranca, operacao, areas_comuns, convivencia, eventos, emergencias]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [rascunho, em_revisao, aprovado, rejeitado]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Lista de processos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessListResponse'
+    post:
+      tags: [processes]
+      summary: Criar processo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessCreate'
+      responses:
+        '201':
+          description: Processo criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+
+  /processes/{process_id}:
+    get:
+      tags: [processes]
+      summary: Obter processo por ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Detalhes do processo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [processes]
+      summary: Atualizar processo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessUpdate'
+      responses:
+        '200':
+          description: Processo atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /processes/{process_id}/submit:
+    post:
+      tags: [processes]
+      summary: Enviar processo para aprovação
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Processo enviado para aprovação
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /processes/{process_id}/refactor:
+    post:
+      tags: [processes]
+      summary: Refazer processo baseado em feedback
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessRefactor'
+      responses:
+        '200':
+          description: Nova versão criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessVersion'
+
+  /processes/{process_id}/versions:
+    get:
+      tags: [processes]
+      summary: Listar versões do processo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de versões
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessVersion'
+
+  /processes/{process_id}/versions/{version_id}/compare:
+    get:
+      tags: [processes]
+      summary: Comparar duas versões
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: version_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: compare_with
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Comparação de versões
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionComparison'
+
+  /processes/{process_id}/approve:
+    post:
+      tags: [approvals]
+      summary: Aprovar processo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalRequest'
+      responses:
+        '200':
+          description: Processo aprovado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Approval'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /processes/{process_id}/reject:
+    post:
+      tags: [approvals]
+      summary: Rejeitar processo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectionRequest'
+      responses:
+        '200':
+          description: Processo rejeitado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rejection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /stakeholders:
+    get:
+      tags: [stakeholders]
+      summary: Listar stakeholders
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de stakeholders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stakeholder'
+    post:
+      tags: [stakeholders]
+      summary: Criar stakeholder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StakeholderCreate'
+      responses:
+        '201':
+          description: Stakeholder criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stakeholder'
+
+  /notifications:
+    get:
+      tags: [notifications]
+      summary: Listar notificações do usuário
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: unread_only
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Lista de notificações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+
+  /notifications/{notification_id}/read:
+    post:
+      tags: [notifications]
+      summary: Marcar notificação como lida
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: notification_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Notificação marcada como lida
+
+  /dashboard:
+    get:
+      tags: [dashboard]
+      summary: Obter dados do dashboard
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dados do dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+
+  /processes/{process_id}/history:
+    get:
+      tags: [history]
+      summary: Obter histórico do processo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Histórico do processo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/History'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        token_type:
+          type: string
+          default: bearer
+        user:
+          $ref: '#/components/schemas/User'
+
+    RefreshRequest:
+      type: object
+      required: [refresh_token]
+      properties:
+        refresh_token:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [aprovador, visualizador, editor]
+
+    Process:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        category:
+          type: string
+          enum: [governanca, acesso_seguranca, operacao, areas_comuns, convivencia, eventos, emergencias]
+        subcategory:
+          type: string
+          nullable: true
+        document_type:
+          type: string
+          enum: [pop, manual, regulamento, fluxograma, aviso, comunicado, checklist, formulario, politica]
+        status:
+          type: string
+          enum: [rascunho, em_revisao, aprovado, rejeitado]
+        current_version_number:
+          type: integer
+        creator_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ProcessCreate:
+      type: object
+      required: [name, category, document_type]
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        subcategory:
+          type: string
+        document_type:
+          type: string
+        content:
+          type: object
+
+    ProcessUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        content:
+          type: object
+
+    ProcessDetail:
+      allOf:
+        - $ref: '#/components/schemas/Process'
+        - type: object
+          properties:
+            current_version:
+              $ref: '#/components/schemas/ProcessVersion'
+            approvals:
+              type: array
+              items:
+                $ref: '#/components/schemas/Approval'
+            rejections:
+              type: array
+              items:
+                $ref: '#/components/schemas/Rejection'
+
+    ProcessListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Process'
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+
+    ProcessVersion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        process_id:
+          type: string
+          format: uuid
+        version_number:
+          type: integer
+        content:
+          type: object
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    ProcessRefactor:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: object
+        change_summary:
+          type: string
+
+    VersionComparison:
+      type: object
+      properties:
+        version1:
+          $ref: '#/components/schemas/ProcessVersion'
+        version2:
+          $ref: '#/components/schemas/ProcessVersion'
+        differences:
+          type: object
+
+    ApprovalRequest:
+      type: object
+      properties:
+        comments:
+          type: string
+        approval_type:
+          type: string
+          enum: [aprovado, aprovado_com_ressalvas]
+        ressalvas:
+          type: string
+
+    Approval:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        process_id:
+          type: string
+          format: uuid
+        version_id:
+          type: string
+          format: uuid
+        stakeholder_id:
+          type: string
+          format: uuid
+        approved_at:
+          type: string
+          format: date-time
+        comments:
+          type: string
+
+    RejectionRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+        additional_comments:
+          type: string
+
+    Rejection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        process_id:
+          type: string
+          format: uuid
+        version_id:
+          type: string
+          format: uuid
+        stakeholder_id:
+          type: string
+          format: uuid
+        rejected_at:
+          type: string
+          format: date-time
+        reason:
+          type: string
+
+    Stakeholder:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        type:
+          type: string
+          enum: [sindico, conselheiro, administradora, morador, outro]
+        role:
+          type: string
+          enum: [aprovador, visualizador, editor]
+        is_active:
+          type: boolean
+
+    StakeholderCreate:
+      type: object
+      required: [name, email, type, role]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        type:
+          type: string
+        role:
+          type: string
+        password:
+          type: string
+          format: password
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [approval_pending, approved, rejected, reminder, process_refactored]
+        title:
+          type: string
+        message:
+          type: string
+        is_read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        process_id:
+          type: string
+          format: uuid
+          nullable: true
+
+    Dashboard:
+      type: object
+      properties:
+        pending_approvals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Process'
+        statistics:
+          type: object
+          properties:
+            total_processes:
+              type: integer
+            approved:
+              type: integer
+            rejected:
+              type: integer
+            in_review:
+              type: integer
+        recent_activity:
+          type: array
+          items:
+            $ref: '#/components/schemas/History'
+
+    History:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum: [created, edited, approved, rejected, refactored, status_changed]
+        description:
+          type: string
+        stakeholder_name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Requisição inválida
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+
+    Unauthorized:
+      description: Não autorizado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+
+    Forbidden:
+      description: Acesso negado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+
