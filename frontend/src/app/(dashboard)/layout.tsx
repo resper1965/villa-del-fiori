@@ -43,16 +43,16 @@ export default function DashboardLayout({
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside
         className={`${
           sidebarOpen ? "w-64" : "w-20"
-        } bg-white border-r border-gray-200 transition-all duration-300 flex flex-col`}
+        } bg-card border-r border-border transition-all duration-300 flex flex-col`}
       >
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="p-4 border-b border-border flex items-center justify-between">
           {sidebarOpen && (
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-foreground">
               Gestão de Processos
             </h2>
           )}
@@ -76,8 +76,8 @@ export default function DashboardLayout({
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
                   isActive
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground hover:bg-accent hover:text-accent-foreground"
                 }`}
               >
                 <Icon className="h-5 w-5 flex-shrink-0" />
@@ -87,11 +87,11 @@ export default function DashboardLayout({
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-border">
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="w-full justify-start text-gray-700 hover:bg-gray-100"
+            className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground"
           >
             <LogOut className="h-5 w-5 mr-3" />
             {sidebarOpen && <span>Sair</span>}

@@ -17,13 +17,13 @@ export default function DashboardPage() {
   }, [router])
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Dashboard
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Gestão de Processos Condominiais
           </p>
         </div>
@@ -31,53 +31,53 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
                 Total de Processos
               </CardTitle>
-              <FileText className="h-4 w-4 text-gray-400" />
+              <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-900">0</div>
-              <p className="text-xs text-gray-500 mt-1">Processos cadastrados</p>
+              <div className="text-2xl font-bold text-foreground">0</div>
+              <p className="text-xs text-muted-foreground mt-1">Processos cadastrados</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
                 Aprovados
               </CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-600" />
+              <CheckCircle className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-900">0</div>
-              <p className="text-xs text-gray-500 mt-1">Processos aprovados</p>
+              <div className="text-2xl font-bold text-foreground">0</div>
+              <p className="text-xs text-muted-foreground mt-1">Processos aprovados</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
                 Em Revisão
               </CardTitle>
-              <Clock className="h-4 w-4 text-yellow-600" />
+              <Clock className="h-4 w-4 text-yellow-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-900">0</div>
-              <p className="text-xs text-gray-500 mt-1">Aguardando aprovação</p>
+              <div className="text-2xl font-bold text-foreground">0</div>
+              <p className="text-xs text-muted-foreground mt-1">Aguardando aprovação</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
                 Rejeitados
               </CardTitle>
-              <XCircle className="h-4 w-4 text-red-600" />
+              <XCircle className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-900">0</div>
-              <p className="text-xs text-gray-500 mt-1">Processos rejeitados</p>
+              <div className="text-2xl font-bold text-foreground">0</div>
+              <p className="text-xs text-muted-foreground mt-1">Processos rejeitados</p>
             </CardContent>
           </Card>
         </div>
@@ -90,7 +90,7 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Use o menu lateral para navegar pelas funcionalidades do sistema.
             </p>
           </CardContent>

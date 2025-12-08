@@ -23,40 +23,47 @@ export default function LoginPage() {
       const { access_token, refresh_token } = response.data
 
       // Salvar tokens
-      localStorage.setItem("access_token", access_token)
-      localStorage.setItem("refresh_token", refresh_token)
+      if (typeof window !== "undefined") {
+        localStorage.setItem("access_token", access_token)
+        localStorage.setItem("refresh_token", refresh_token)
+      }
 
       // Redirecionar para dashboard
       router.push("/dashboard")
+      router.refresh()
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Erro ao fazer login")
+      console.error("Login error:", err)
+      setError(err.response?.data?.detail || "Erro ao fazer login. Verifique a senha.")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <div className="rounded-full bg-gray-900 p-3">
-              <Lock className="h-6 w-6 text-white" />
+            <div className="rounded-full bg-primary p-3">
+              <Lock className="h-6 w-6 text-primary-foreground" />
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-center">
-            Acesso ao Sistema
+            Villa del Fiori
           </CardTitle>
           <CardDescription className="text-center">
-            Digite a senha para continuar
+            Gestão de Processos Condominiais
           </CardDescription>
+          <p className="text-sm text-muted-foreground text-center mt-2">
+            Digite a senha para continuar
+          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-foreground"
               >
                 Senha
               </label>
@@ -65,7 +72,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full px-3 py-2 bg-background border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-foreground"
                 placeholder="Digite sua senha"
                 required
                 autoFocus
@@ -73,14 +80,14 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+              <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
                 {error}
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full bg-gray-900 hover:bg-gray-800 text-white"
+              className="w-full"
               disabled={loading}
             >
               {loading ? "Entrando..." : "Entrar"}

@@ -29,9 +29,11 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized - redirect to login
-      localStorage.removeItem("access_token")
-      localStorage.removeItem("refresh_token")
-      window.location.href = "/login"
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("access_token")
+        localStorage.removeItem("refresh_token")
+        window.location.href = "/login"
+      }
     }
     return Promise.reject(error)
   }
