@@ -25,30 +25,30 @@ export default function ProcessDetailPage() {
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false)
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false)
 
-  // Fallback para dados mock se API não disponível
-  const mockProcess = processesData.find(p => p.id === parseInt(processId))
-  const displayProcess = process || (mockProcess ? {
-    id: mockProcess.id.toString(),
-    name: mockProcess.name,
-    category: mockProcess.category,
-    status: mockProcess.status,
-    document_type: mockProcess.documentType,
-    description: mockProcess.description,
-    workflow: mockProcess.workflow,
-    entities: mockProcess.entities,
-    variables: mockProcess.variables,
+  // Fallback para dados iniciais se API não disponível
+  const initialProcess = processesData.find(p => p.id === parseInt(processId))
+  const displayProcess = process || (initialProcess ? {
+    id: initialProcess.id.toString(),
+    name: initialProcess.name,
+    category: initialProcess.category,
+    status: initialProcess.status,
+    document_type: initialProcess.documentType,
+    description: initialProcess.description,
+    workflow: initialProcess.workflow,
+    entities: initialProcess.entities,
+    variables: initialProcess.variables,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     current_version_number: 1,
     creator_id: "1",
-    current_version: mockProcess.mermaid_diagram ? {
+    current_version: initialProcess.mermaid_diagram ? {
       id: "1",
-      process_id: mockProcess.id.toString(),
+      process_id: initialProcess.id.toString(),
       version_number: 1,
       content: {
-        mermaid_diagram: mockProcess.mermaid_diagram,
+        mermaid_diagram: initialProcess.mermaid_diagram,
       },
-      status: mockProcess.status,
+      status: initialProcess.status,
       created_by: "1",
       created_at: new Date().toISOString(),
     } : undefined,
@@ -138,8 +138,8 @@ export default function ProcessDetailPage() {
           {displayProcess.name}
         </h1>
       </div>
-      <div className="p-4">
-        <div className="max-w-4xl mx-auto space-y-4">
+      <div className="p-3">
+        <div className="max-w-4xl mx-auto space-y-3">
           {/* Header Card */}
           <Card>
             <CardHeader>

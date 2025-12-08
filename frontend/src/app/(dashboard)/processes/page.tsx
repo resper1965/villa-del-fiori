@@ -119,7 +119,7 @@ export default function ProcessesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="h-[73px] border-b border-border flex items-center justify-between px-6">
+      <div className="h-[73px] border-b border-border flex items-center justify-between px-4">
         <h1 className="text-lg font-semibold text-foreground">
           Processos
         </h1>
@@ -128,9 +128,9 @@ export default function ProcessesPage() {
           Novo Processo
         </Button>
       </div>
-      <div className="p-4">
+      <div className="p-3">
         {/* Filtros */}
-        <div className="mb-4 space-y-3">
+        <div className="mb-3 space-y-2">
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Busca */}
             <div className="flex-1 relative">
@@ -211,7 +211,7 @@ export default function ProcessesPage() {
           </Card>
         ) : (
           Object.entries(groupedProcesses).map(([category, categoryProcesses]) => (
-            <div key={category} className="mb-4">
+            <div key={category} className="mb-3">
               <h2 className="text-sm font-light text-gray-400 mb-2 uppercase tracking-wide">
                 {category}
               </h2>
