@@ -177,7 +177,7 @@ export default function ProcessDetailPage() {
                 {/* Versão Atual */}
                 <div className="flex items-start gap-4 p-4 rounded-lg border border-[#00ade8]/30 bg-[#00ade8]/5">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00ade8] text-white flex items-center justify-center text-sm font-medium">
-                    {process.id}
+                    v1
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
