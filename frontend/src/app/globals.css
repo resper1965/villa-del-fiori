@@ -4,49 +4,49 @@
 
 @layer base {
   :root {
-    /* Tema Dark - Escala de Cinza */
-    --background: 0 0% 3.9%;        /* slate-950 - fundo principal */
-    --foreground: 0 0% 98%;         /* slate-50 - texto principal */
-    --card: 0 0% 7.8%;              /* slate-900 - cards */
-    --card-foreground: 0 0% 98%;    /* slate-50 */
-    --popover: 0 0% 7.8%;           /* slate-900 */
-    --popover-foreground: 0 0% 98%; /* slate-50 */
-    --primary: 0 0% 98%;            /* slate-50 - elementos primários */
-    --primary-foreground: 0 0% 9%;  /* slate-950 */
-    --secondary: 0 0% 14.9%;        /* slate-800 - elementos secundários */
-    --secondary-foreground: 0 0% 98%; /* slate-50 */
-    --muted: 0 0% 14.9%;            /* slate-800 - elementos muted */
-    --muted-foreground: 0 0% 63.9%; /* slate-400 - texto muted */
-    --accent: 0 0% 14.9%;           /* slate-800 - elementos de destaque */
-    --accent-foreground: 0 0% 98%;  /* slate-50 */
+    /* Tema Dark - Escala Gray do shadcn */
+    --background: 0 0% 3.9%;        /* gray-950 - fundo principal */
+    --foreground: 0 0% 98%;         /* gray-50 - texto principal */
+    --card: 0 0% 3.9%;              /* gray-950 - cards */
+    --card-foreground: 0 0% 98%;    /* gray-50 */
+    --popover: 0 0% 3.9%;           /* gray-950 */
+    --popover-foreground: 0 0% 98%; /* gray-50 */
+    --primary: 0 0% 98%;            /* gray-50 - elementos primários */
+    --primary-foreground: 0 0% 9%;  /* gray-950 */
+    --secondary: 0 0% 14.9%;        /* gray-800 - elementos secundários */
+    --secondary-foreground: 0 0% 98%; /* gray-50 */
+    --muted: 0 0% 14.9%;            /* gray-800 - elementos muted */
+    --muted-foreground: 0 0% 63.9%; /* gray-400 - texto muted */
+    --accent: 0 0% 14.9%;           /* gray-800 - elementos de destaque */
+    --accent-foreground: 0 0% 98%;  /* gray-50 */
     --destructive: 0 62.8% 30.6%;   /* vermelho para erros */
-    --destructive-foreground: 0 0% 98%; /* slate-50 */
-    --border: 0 0% 14.9%;           /* slate-800 - bordas */
-    --input: 0 0% 14.9%;            /* slate-800 - inputs */
-    --ring: 0 0% 83.1%;             /* slate-200 - anel de foco */
+    --destructive-foreground: 0 0% 98%; /* gray-50 */
+    --border: 0 0% 14.9%;           /* gray-800 - bordas */
+    --input: 0 0% 14.9%;            /* gray-800 - inputs */
+    --ring: 0 0% 83.1%;             /* gray-200 - anel de foco */
     --radius: 0.5rem;
   }
 
   .light {
     --background: 0 0% 100%;        /* branco */
-    --foreground: 0 0% 3.9%;        /* slate-950 */
+    --foreground: 0 0% 3.9%;        /* gray-950 */
     --card: 0 0% 100%;              /* branco */
-    --card-foreground: 0 0% 3.9%;   /* slate-950 */
+    --card-foreground: 0 0% 3.9%;   /* gray-950 */
     --popover: 0 0% 100%;           /* branco */
-    --popover-foreground: 0 0% 3.9%; /* slate-950 */
-    --primary: 0 0% 9%;             /* slate-950 */
-    --primary-foreground: 0 0% 98%; /* slate-50 */
-    --secondary: 0 0% 96.1%;        /* slate-100 */
-    --secondary-foreground: 0 0% 9%; /* slate-950 */
-    --muted: 0 0% 96.1%;            /* slate-100 */
-    --muted-foreground: 0 0% 45.1%; /* slate-500 */
-    --accent: 0 0% 96.1%;           /* slate-100 */
-    --accent-foreground: 0 0% 9%;   /* slate-950 */
+    --popover-foreground: 0 0% 3.9%; /* gray-950 */
+    --primary: 0 0% 9%;             /* gray-950 */
+    --primary-foreground: 0 0% 98%; /* gray-50 */
+    --secondary: 0 0% 96.1%;        /* gray-100 */
+    --secondary-foreground: 0 0% 9%; /* gray-950 */
+    --muted: 0 0% 96.1%;            /* gray-100 */
+    --muted-foreground: 0 0% 45.1%; /* gray-500 */
+    --accent: 0 0% 96.1%;           /* gray-100 */
+    --accent-foreground: 0 0% 9%;   /* gray-950 */
     --destructive: 0 84.2% 60.2%;   /* vermelho */
-    --destructive-foreground: 0 0% 98%; /* slate-50 */
-    --border: 0 0% 89.8%;           /* slate-200 */
-    --input: 0 0% 89.8%;            /* slate-200 */
-    --ring: 0 0% 3.9%;              /* slate-950 */
+    --destructive-foreground: 0 0% 98%; /* gray-50 */
+    --border: 0 0% 89.8%;           /* gray-200 */
+    --input: 0 0% 89.8%;            /* gray-200 */
+    --ring: 0 0% 3.9%;              /* gray-950 */
   }
 }
 
