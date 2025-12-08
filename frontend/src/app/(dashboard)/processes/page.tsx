@@ -125,7 +125,7 @@ export default function ProcessesPage() {
           Processos
         </h1>
         <Button onClick={() => setFormOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 mr-2 stroke-1" />
           Novo Processo
         </Button>
       </div>
@@ -135,7 +135,7 @@ export default function ProcessesPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Busca */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground stroke-1" />
               <Input
                 placeholder="Buscar processos..."
                 value={searchQuery}
@@ -239,7 +239,7 @@ export default function ProcessesPage() {
                               <FileText className="h-4 w-4 text-foreground" />
                             </div>
                             <div className="flex-1">
-                              <CardTitle className="text-sm font-medium text-foreground line-clamp-2">
+                              <CardTitle className="text-sm font-light text-gray-200 line-clamp-2">
                                 {process.name}
                               </CardTitle>
                             </div>

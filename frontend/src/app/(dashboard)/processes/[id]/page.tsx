@@ -101,11 +101,11 @@ export default function ProcessDetailPage() {
     return (
       <div className="min-h-screen bg-background">
         <div className="h-[73px] border-b border-border flex items-center px-6">
-          <h1 className="text-lg font-semibold text-foreground">Processo não encontrado</h1>
+          <h1 className="text-lg font-light text-gray-200">Processo não encontrado</h1>
         </div>
         <div className="p-6">
           <Button onClick={() => router.push("/processes")} variant="outline">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4 mr-2 stroke-1" />
             Voltar para Processos
           </Button>
         </div>
@@ -134,7 +134,7 @@ export default function ProcessDetailPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar
         </Button>
-        <h1 className="text-lg font-semibold text-foreground">
+        <h1 className="text-lg font-light text-gray-200">
           {displayProcess.name}
         </h1>
       </div>
@@ -146,7 +146,7 @@ export default function ProcessDetailPage() {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-lg bg-muted">
-                    <Icon className="h-6 w-6 text-foreground" />
+                    <Icon className="h-6 w-6 text-foreground stroke-1" />
                   </div>
                   <div>
                     <CardTitle className="text-xl mb-2">{displayProcess.name}</CardTitle>
@@ -158,7 +158,7 @@ export default function ProcessDetailPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <StatusIcon className={`h-5 w-5 ${statusInfo.color}`} />
+                  <StatusIcon className={`h-5 w-5 ${statusInfo.color} stroke-1`} />
                   <span className={`text-sm font-medium ${statusInfo.color}`}>
                     {statusInfo.label}
                   </span>
@@ -175,7 +175,7 @@ export default function ProcessDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <GitBranch className="h-5 w-5 text-muted-foreground" />
+                  <GitBranch className="h-5 w-5 text-muted-foreground stroke-1" />
                   Diagrama do Processo
                 </CardTitle>
                 <CardDescription>Visualização do fluxo do processo em diagrama</CardDescription>
@@ -191,10 +191,10 @@ export default function ProcessDetailPage() {
 
           {/* Workflow Card */}
           {displayProcess.workflow && displayProcess.workflow.length > 0 && (
-            <Card>
+            <Card className="bg-gray-800/50 border-gray-700/50">
               <CardHeader>
-                <CardTitle>Fluxo do Processo</CardTitle>
-                <CardDescription>Etapas sequenciais para execução deste processo</CardDescription>
+                <CardTitle className="text-xl font-light text-gray-200">Fluxo do Processo</CardTitle>
+                <CardDescription className="text-gray-400 font-light">Etapas sequenciais para execução deste processo</CardDescription>
               </CardHeader>
               <CardContent>
                 <ol className="space-y-3">
@@ -235,10 +235,10 @@ export default function ProcessDetailPage() {
 
           {/* Variables Card */}
           {displayProcess.variables && displayProcess.variables.length > 0 && (
-            <Card>
+            <Card className="bg-gray-800/50 border-gray-700/50">
               <CardHeader>
-                <CardTitle>Variáveis do Sistema</CardTitle>
-                <CardDescription>Parâmetros configuráveis aplicados neste processo</CardDescription>
+                <CardTitle className="text-xl font-light text-gray-200">Variáveis do Sistema</CardTitle>
+                <CardDescription className="text-gray-400 font-light">Parâmetros configuráveis aplicados neste processo</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -259,7 +259,7 @@ export default function ProcessDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <History className="h-5 w-5 text-muted-foreground" />
+                <History className="h-5 w-5 text-muted-foreground stroke-1" />
                 Histórico de Versões
               </CardTitle>
               <CardDescription>Versões anteriores e histórico de alterações</CardDescription>
@@ -284,7 +284,7 @@ export default function ProcessDetailPage() {
                       Criada em {new Date().toLocaleDateString("pt-BR")}
                     </p>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <User className="h-3 w-3" />
+                      <User className="h-3 w-3 stroke-1" />
                       <span>Síndico</span>
                     </div>
                   </div>
@@ -309,7 +309,7 @@ export default function ProcessDetailPage() {
                         Criada em {new Date(Date.now() - version * 30 * 24 * 60 * 60 * 1000).toLocaleDateString("pt-BR")}
                       </p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                        <User className="h-3 w-3" />
+                        <User className="h-3 w-3 stroke-1" />
                         <span>Síndico</span>
                       </div>
                       {version === 2 && (
@@ -343,7 +343,7 @@ export default function ProcessDetailPage() {
                     onClick={() => setApprovalDialogOpen(true)}
                     className="bg-green-600 hover:bg-green-700 text-white"
                   >
-                    <CheckCircle className="h-4 w-4 mr-2" />
+                    <CheckCircle className="h-4 w-4 mr-2 stroke-1" />
                     Aprovar Processo
                   </Button>
                   <Button
@@ -351,7 +351,7 @@ export default function ProcessDetailPage() {
                     variant="outline"
                     className="border-red-500/50 text-red-400 hover:bg-red-500/10"
                   >
-                    <XCircle className="h-4 w-4 mr-2" />
+                    <XCircle className="h-4 w-4 mr-2 stroke-1" />
                     Rejeitar Processo
                   </Button>
                 </div>

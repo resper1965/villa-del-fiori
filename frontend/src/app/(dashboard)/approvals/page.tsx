@@ -93,7 +93,7 @@ export default function ApprovalsPage() {
         {isLoading ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground stroke-1" />
               <p className="text-muted-foreground">Carregando processos pendentes...</p>
             </CardContent>
           </Card>
@@ -107,7 +107,7 @@ export default function ApprovalsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-center py-12 text-muted-foreground">
-                <Clock className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <Clock className="h-12 w-12 mx-auto mb-4 text-muted-foreground stroke-1" />
                 <p>Nenhum processo pendente de aprovação.</p>
               </div>
             </CardContent>
@@ -133,12 +133,12 @@ export default function ApprovalsPage() {
                 : 0
               
               return (
-                <Card key={process.id} className="hover:border-[#00ade8]/50 transition-colors">
+                <Card key={process.id} className="bg-gray-800/50 border-gray-700/50 hover:bg-gray-800/70 hover:border-[#00ade8]/50 transition-all">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4 flex-1">
                         <div className="p-3 rounded-lg bg-muted">
-                          <FileText className="h-5 w-5 text-foreground" />
+                          <FileText className="h-5 w-5 text-foreground stroke-1" />
                         </div>
                         <div className="flex-1">
                           <CardTitle className="text-base mb-2">{process.name}</CardTitle>
@@ -165,7 +165,7 @@ export default function ApprovalsPage() {
                         variant="outline"
                         size="sm"
                       >
-                        <Eye className="h-4 w-4 mr-2" />
+                        <Eye className="h-4 w-4 mr-2 stroke-1" />
                         Ver Detalhes
                       </Button>
                       <Button

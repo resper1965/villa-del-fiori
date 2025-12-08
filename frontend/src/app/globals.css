@@ -58,6 +58,16 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  
+  /* Gradiente de background global (opcional, pode ser aplicado em containers específicos) */
+  .bg-gradient-global {
+    @apply bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900;
+  }
+  
+  /* Títulos com gradiente de texto */
+  .text-gradient-title {
+    @apply bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 bg-clip-text text-transparent;
+  }
 }
 
 

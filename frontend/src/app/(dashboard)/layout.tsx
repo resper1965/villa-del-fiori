@@ -39,7 +39,7 @@ export default function DashboardLayout({
       >
         <div className="h-[73px] p-4 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-[#00ade8]" />
+            <Building2 className="h-5 w-5 text-[#00ade8] stroke-1" />
             {sidebarOpen && (
               <h2 className="text-lg font-semibold text-foreground">
                 Condomínio Villa Dei Fiori
@@ -52,7 +52,7 @@ export default function DashboardLayout({
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="ml-auto"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-5 w-5 stroke-1" />
           </Button>
         </div>
 
@@ -70,8 +70,8 @@ export default function DashboardLayout({
                     : "text-foreground hover:bg-accent hover:text-accent-foreground"
                 }`}
               >
-                <Icon className="h-5 w-5 flex-shrink-0" />
-                {sidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
+                <Icon className="h-5 w-5 flex-shrink-0 stroke-1" />
+                {sidebarOpen && <span className="text-sm font-light">{item.label}</span>}
               </Link>
             )
           })}
