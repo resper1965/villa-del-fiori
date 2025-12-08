@@ -6,18 +6,17 @@ import { FileText, CheckCircle, XCircle, Clock } from "lucide-react"
 export default function DashboardPage() {
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
+    <div className="min-h-screen bg-background">
+      <div className="h-[73px] border-b border-border flex items-center px-6">
+        <div>
+          <h1 className="text-lg font-semibold text-foreground">
             Dashboard
           </h1>
-          <p className="text-muted-foreground">
-            Gestão de Processos Condominiais
-          </p>
         </div>
+      </div>
+      <div className="p-6">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">

@@ -36,7 +36,7 @@ export default function DashboardLayout({
           sidebarOpen ? "w-64" : "w-20"
         } bg-card border-r border-border transition-all duration-300 flex flex-col`}
       >
-        <div className="p-4 border-b border-border flex items-center justify-between">
+        <div className="h-[73px] p-4 border-b border-border flex items-center justify-between">
           {sidebarOpen && (
             <h2 className="text-lg font-semibold text-foreground">
               Gestão de Processos

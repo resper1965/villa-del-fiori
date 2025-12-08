@@ -5,16 +5,13 @@ import { Clock } from "lucide-react"
 
 export default function ApprovalsPage() {
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Aprovações
-          </h1>
-          <p className="text-muted-foreground">
-            Processos pendentes de sua aprovação
-          </p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <div className="h-[73px] border-b border-border flex items-center px-6">
+        <h1 className="text-lg font-semibold text-foreground">
+          Aprovações
+        </h1>
+      </div>
+      <div className="p-6">
 
         <Card>
           <CardHeader>
