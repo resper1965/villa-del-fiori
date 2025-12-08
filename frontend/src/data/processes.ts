@@ -2502,17 +2502,99 @@ export const processesData: Process[] = [
     variables: ["telefone_bombeiros", "ponto_encontro_incendio"],
     documentType: "Procedimento de Emergência",
     mermaid_diagram: `flowchart TD
-    A[Identificação do Incêndio] --> B[Acionamento Bombeiros 193]
-    B --> C[Acionamento do Alarme]
-    C --> D[Evacuação Ordenada]
-    D --> E[Ponto de Encontro]
-    E --> F[Verificação de Presença]
-    F --> G[Aguardar Bombeiros]
-    G --> H[Fornecer Informações]
+    A["Identificação do Incêndio<br/>(Moradores)"] --> B["Acionamento Bombeiros 193<br/>(Moradores/Portaria)"]
+    B --> C["Acionamento do Alarme<br/>(Portaria Online)"]
+    C --> D["Evacuação Ordenada<br/>(Moradores)"]
+    D --> E["Ponto de Encontro<br/>(Síndico)"]
+    E --> F["Verificação de Presença<br/>(Síndico)"]
+    F --> G["Aguardar Bombeiros<br/>(Todos)"]
+    G --> H["Fornecer Informações<br/>(Síndico)"]
     H --> I{Autorização?}
-    I -->|Sim| J[Retorno ao Prédio]
+    I -->|Sim| J["Retorno ao Prédio<br/>(Bombeiros)"]
     I -->|Não| G
-    J --> K[Registro do Incidente]`
+    J --> K["Registro do Incidente<br/>(Portaria Online)"]
+    style A fill:#dc2626,stroke:#ef4444,color:#fff
+    style B fill:#dc2626,stroke:#ef4444,color:#fff
+    style C fill:#dc2626,stroke:#ef4444,color:#fff
+    style D fill:#dc2626,stroke:#ef4444,color:#fff
+    style E fill:#166534,stroke:#22c55e,color:#fff
+    style F fill:#166534,stroke:#22c55e,color:#fff
+    style G fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff
+    style K fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Identificação do incêndio",
+        responsible: ["Moradores", "Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "2. Acionamento imediato dos bombeiros (193)",
+        responsible: ["Moradores", "Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Bombeiros"],
+      },
+      {
+        step: "3. Acionamento do alarme de incêndio",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Evacuação ordenada do prédio",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "5. Direcionamento para ponto de encontro",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "6. Verificação de presença de moradores",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "7. Aguardar chegada dos bombeiros",
+        responsible: ["Todos"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "8. Fornecer informações aos bombeiros",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "9. Retorno ao prédio apenas após autorização",
+        responsible: ["Bombeiros"],
+        accountable: ["Bombeiros"],
+        consulted: [],
+        informed: ["Síndico", "Moradores"],
+      },
+      {
+        step: "10. Registro do incidente e lições aprendidas",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   {
     id: 30,
@@ -2537,20 +2619,103 @@ export const processesData: Process[] = [
     variables: ["telefone_bombeiros", "empresa_gas"],
     documentType: "Procedimento de Emergência",
     mermaid_diagram: `flowchart TD
-    A[Identificação do Vazamento] --> B[NÃO Acionar Interruptores]
+    A["Identificação do Vazamento<br/>(Moradores)"] --> B["NÃO Acionar Interruptores<br/>(Moradores)"]
     B --> C{Ventilar Seguro?}
-    C -->|Sim| D[Ventilar Ambiente]
-    C -->|Não| E[Evacuar Imediatamente]
+    C -->|Sim| D["Ventilar Ambiente<br/>(Moradores)"]
+    C -->|Não| E["Evacuar Imediatamente<br/>(Moradores)"]
     D --> E
-    E --> F[Acionar Bombeiros 193]
-    F --> G[Acionar Empresa de Gás]
-    G --> H[Isolar a Área]
-    H --> I[Aguardar Profissionais]
+    E --> F["Acionar Bombeiros 193<br/>(Moradores)"]
+    F --> G["Acionar Empresa de Gás<br/>(Síndico)"]
+    G --> H["Isolar a Área<br/>(Portaria Online)"]
+    H --> I["Aguardar Profissionais<br/>(Todos)"]
     I --> J{Liberação?}
-    J -->|Sim| K[Retorno]
+    J -->|Sim| K["Retorno<br/>(Bombeiros)"]
     J -->|Não| I
-    K --> L[Verificação e Reparo]
-    L --> M[Registro do Incidente]`
+    K --> L["Verificação e Reparo<br/>(Empresa de Gás)"]
+    L --> M["Registro do Incidente<br/>(Portaria Online)"]
+    style A fill:#dc2626,stroke:#ef4444,color:#fff
+    style B fill:#dc2626,stroke:#ef4444,color:#fff
+    style D fill:#dc2626,stroke:#ef4444,color:#fff
+    style E fill:#dc2626,stroke:#ef4444,color:#fff
+    style F fill:#dc2626,stroke:#ef4444,color:#fff
+    style G fill:#dc2626,stroke:#ef4444,color:#fff
+    style H fill:#dc2626,stroke:#ef4444,color:#fff
+    style I fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style K fill:#166534,stroke:#22c55e,color:#fff
+    style L fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style M fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Identificação do vazamento",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "2. Não acionar interruptores ou equipamentos elétricos",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Ventilar o ambiente se seguro",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "4. Evacuar a área imediatamente",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "5. Acionar bombeiros (193) e empresa de gás",
+        responsible: ["Moradores", "Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Bombeiros", "Empresa de Gás"],
+      },
+      {
+        step: "6. Isolar a área",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "7. Aguardar chegada dos profissionais",
+        responsible: ["Todos"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "8. Retorno apenas após liberação",
+        responsible: ["Bombeiros"],
+        accountable: ["Bombeiros"],
+        consulted: [],
+        informed: ["Síndico", "Moradores"],
+      },
+      {
+        step: "9. Verificação e reparo",
+        responsible: ["Empresa de Gás"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "10. Registro do incidente",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   {
     id: 31,
@@ -2574,18 +2739,92 @@ export const processesData: Process[] = [
     variables: ["telefone_concessionaria"],
     documentType: "Procedimento de Emergência",
     mermaid_diagram: `flowchart TD
-    A[Identificação da Falta] --> B{Problema Local ou Geral?}
-    B -->|Local| C[Verificação de Disjuntores]
-    B -->|Geral| D[Comunicação à Portaria]
+    A["Identificação da Falta<br/>(Moradores)"] --> B{Problema Local ou Geral?}
+    B -->|Local| C["Verificação de Disjuntores<br/>(Moradores)"]
+    B -->|Geral| D["Comunicação à Portaria<br/>(Moradores)"]
     C --> E{Resolvido?}
-    E -->|Sim| F[Verificação de Funcionamento]
+    E -->|Sim| F["Verificação de Funcionamento<br/>(Moradores)"]
     E -->|Não| D
-    D --> G[Acionamento Concessionária]
-    G --> H[Comunicação aos Moradores]
-    H --> I[Acompanhamento]
-    I --> J[Retorno da Energia]
+    D --> G["Acionamento Concessionária<br/>(Síndico)"]
+    G --> H["Comunicação aos Moradores<br/>(Portaria Online)"]
+    H --> I["Acompanhamento<br/>(Síndico)"]
+    I --> J["Retorno da Energia<br/>(Concessionária)"]
     J --> F
-    F --> K[Registro do Incidente]`
+    F --> K["Registro do Incidente<br/>(Portaria Online)"]
+    style A fill:#dc2626,stroke:#ef4444,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style G fill:#dc2626,stroke:#ef4444,color:#fff
+    style H fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style I fill:#166534,stroke:#22c55e,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff
+    style F fill:#166534,stroke:#22c55e,color:#fff
+    style K fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Identificação da falta de energia",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "2. Verificação se é problema local ou geral",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Comunicação à portaria/síndico",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "4. Verificação de disjuntores e sistema elétrico",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "5. Acionamento da concessionária se necessário",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Concessionária de Energia"],
+      },
+      {
+        step: "6. Comunicação aos moradores",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "7. Acompanhamento até resolução",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "8. Verificação de funcionamento após retorno",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "9. Registro do incidente",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   {
     id: 32,
@@ -2610,19 +2849,103 @@ export const processesData: Process[] = [
     variables: ["empresa_elevador", "telefone_samu"],
     documentType: "Procedimento de Emergência",
     mermaid_diagram: `flowchart TD
-    A[Identificação de Pessoas Presas] --> B[Botão de Emergência]
-    B --> C[Comunicação Portaria/Síndico]
-    C --> D[Acionamento Empresa Manutenção]
-    D --> E[Tranquilização das Pessoas]
-    E --> F[Acompanhamento]
-    F --> G[Resgate]
+    A["Identificação de Pessoas Presas<br/>(Moradores)"] --> B["Botão de Emergência<br/>(Pessoas Presas)"]
+    B --> C["Comunicação Portaria/Síndico<br/>(Pessoas Presas)"]
+    C --> D["Acionamento Empresa Manutenção<br/>(Portaria Online)"]
+    D --> E["Tranquilização das Pessoas<br/>(Portaria Online)"]
+    E --> F["Acompanhamento<br/>(Síndico)"]
+    F --> G["Resgate<br/>(Empresa de Manutenção)"]
     G --> H{Necessita Atendimento Médico?}
-    H -->|Sim| I[Acionamento SAMU]
-    H -->|Não| J[Verificação de Condições]
+    H -->|Sim| I["Acionamento SAMU<br/>(Síndico)"]
+    H -->|Não| J["Verificação de Condições<br/>(Síndico)"]
     I --> J
-    J --> K[Bloqueio do Elevador]
-    K --> L[Reparo]
-    L --> M[Registro do Incidente]`
+    J --> K["Bloqueio do Elevador<br/>(Portaria Online)"]
+    K --> L["Reparo<br/>(Empresa de Manutenção)"]
+    L --> M["Registro do Incidente<br/>(Portaria Online)"]
+    style A fill:#dc2626,stroke:#ef4444,color:#fff
+    style B fill:#dc2626,stroke:#ef4444,color:#fff
+    style C fill:#dc2626,stroke:#ef4444,color:#fff
+    style D fill:#dc2626,stroke:#ef4444,color:#fff
+    style E fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#166534,stroke:#22c55e,color:#fff
+    style G fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style I fill:#dc2626,stroke:#ef4444,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff
+    style K fill:#dc2626,stroke:#ef4444,color:#fff
+    style L fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style M fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Identificação de pessoas presas no elevador",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "2. Acionamento do botão de emergência",
+        responsible: ["Pessoas Presas"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Comunicação com portaria/síndico",
+        responsible: ["Pessoas Presas"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "4. Acionamento imediato da empresa de manutenção",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Empresa de Manutenção dos Elevadores"],
+      },
+      {
+        step: "5. Tranquilização das pessoas presas",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "6. Acompanhamento até resgate",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "7. Verificação de condições das pessoas resgatadas",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "8. Acionamento de serviços médicos se necessário",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["SAMU"],
+      },
+      {
+        step: "9. Bloqueio do elevador até reparo",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "10. Registro do incidente",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   {
     id: 33,
@@ -2648,20 +2971,110 @@ export const processesData: Process[] = [
     variables: ["telefone_policia", "empresa_seguranca_rua"],
     documentType: "Procedimento de Emergência",
     mermaid_diagram: `flowchart TD
-    A[Identificação da Ameaça] --> B[Acionamento Polícia 190]
-    B --> C[Acionamento Segurança]
+    A["Identificação da Ameaça<br/>(Moradores)"] --> B["Acionamento Polícia 190<br/>(Moradores/Portaria)"]
+    B --> C["Acionamento Segurança<br/>(Portaria Online)"]
     C --> D{Isolar Área Possível?}
-    D -->|Sim| E[Isolamento]
-    D -->|Não| F[Proteção de Evidências]
+    D -->|Sim| E["Isolamento<br/>(Portaria Online)"]
+    D -->|Não| F["Proteção de Evidências<br/>(Portaria Online)"]
     E --> F
-    F --> G[Comunicação ao Síndico]
-    G --> H[Aguardar Polícia]
-    H --> I[Fornecer Informações]
-    I --> J[Acompanhamento do Caso]
+    F --> G["Comunicação ao Síndico<br/>(Portaria Online)"]
+    G --> H["Aguardar Polícia<br/>(Todos)"]
+    H --> I["Fornecer Informações<br/>(Síndico)"]
+    I --> J["Acompanhamento do Caso<br/>(Síndico)"]
     J --> K{Reforço Necessário?}
-    K -->|Sim| L[Reforço de Segurança]
-    K -->|Não| M[Registro Detalhado]
-    L --> M`
+    K -->|Sim| L["Reforço de Segurança<br/>(Empresa de Segurança)"]
+    K -->|Não| M["Registro Detalhado<br/>(Portaria Online)"]
+    L --> M
+    style A fill:#dc2626,stroke:#ef4444,color:#fff
+    style B fill:#dc2626,stroke:#ef4444,color:#fff
+    style C fill:#dc2626,stroke:#ef4444,color:#fff
+    style E fill:#dc2626,stroke:#ef4444,color:#fff
+    style F fill:#dc2626,stroke:#ef4444,color:#fff
+    style G fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style H fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style I fill:#166534,stroke:#22c55e,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff
+    style L fill:#dc2626,stroke:#ef4444,color:#fff
+    style M fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Identificação da ameaça",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "2. Acionamento imediato da polícia (190)",
+        responsible: ["Moradores", "Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Polícia"],
+      },
+      {
+        step: "3. Acionamento da empresa de segurança",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Empresa de Segurança"],
+      },
+      {
+        step: "4. Isolamento da área se possível",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "5. Proteção de evidências",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "6. Comunicação ao síndico",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "7. Aguardar chegada da polícia",
+        responsible: ["Todos"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "8. Fornecer informações e evidências",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "9. Acompanhamento do caso",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "10. Reforço de medidas de segurança se necessário",
+        responsible: ["Empresa de Segurança"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "11. Registro detalhado do incidente",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   {
     id: 34,
@@ -2685,16 +3098,90 @@ export const processesData: Process[] = [
     variables: ["telefone_samu", "ponto_encontro_ambulancia"],
     documentType: "Procedimento de Emergência",
     mermaid_diagram: `flowchart TD
-    A[Identificação da Emergência] --> B[Acionamento SAMU 192]
+    A["Identificação da Emergência<br/>(Moradores)"] --> B["Acionamento SAMU 192<br/>(Moradores)"]
     B --> C{Capacitado para Primeiros Socorros?}
-    C -->|Sim| D[Prestação de Primeiros Socorros]
-    C -->|Não| E[Comunicação Portaria/Síndico]
+    C -->|Sim| D["Prestação de Primeiros Socorros<br/>(Moradores)"]
+    C -->|Não| E["Comunicação Portaria/Síndico<br/>(Moradores)"]
     D --> E
-    E --> F[Preparação do Acesso]
-    F --> G[Aguardar SAMU]
-    G --> H[Fornecimento de Informações]
-    H --> I[Apoio e Acompanhamento]
-    I --> J[Registro do Incidente]`
+    E --> F["Preparação do Acesso<br/>(Portaria Online)"]
+    F --> G["Aguardar SAMU<br/>(Todos)"]
+    G --> H["Fornecimento de Informações<br/>(Síndico)"]
+    H --> I["Apoio e Acompanhamento<br/>(Síndico)"]
+    I --> J["Registro do Incidente<br/>(Portaria Online)"]
+    style A fill:#dc2626,stroke:#ef4444,color:#fff
+    style B fill:#dc2626,stroke:#ef4444,color:#fff
+    style D fill:#dc2626,stroke:#ef4444,color:#fff
+    style E fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style G fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff
+    style I fill:#166534,stroke:#22c55e,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Identificação da emergência médica",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "2. Acionamento imediato do SAMU (192)",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["SAMU"],
+      },
+      {
+        step: "3. Prestação de primeiros socorros se capacitado",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "4. Comunicação à portaria/síndico",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "5. Preparação do acesso para ambulância",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "6. Acompanhamento até chegada do SAMU",
+        responsible: ["Todos"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "7. Fornecimento de informações aos paramédicos",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "8. Apoio e acompanhamento conforme necessário",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "9. Registro do incidente",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   {
     id: 35,
@@ -2719,20 +3206,103 @@ export const processesData: Process[] = [
     variables: ["telefone_emergencia"],
     documentType: "Procedimento de Emergência",
     mermaid_diagram: `flowchart TD
-    A[Identificação do Alagamento] --> B[Proteção de Equipamentos Elétricos]
+    A["Identificação do Alagamento<br/>(Moradores)"] --> B["Proteção de Equipamentos Elétricos<br/>(Moradores)"]
     B --> C{Isolar Área Possível?}
-    C -->|Sim| D[Isolamento]
-    C -->|Não| E[Acionamento Drenagem]
+    C -->|Sim| D["Isolamento<br/>(Moradores)"]
+    C -->|Não| E["Acionamento Drenagem<br/>(Síndico)"]
     D --> E
-    E --> F[Comunicação Síndico/Administradora]
-    F --> G[Documentação Fotográfica]
-    G --> H[Limpeza e Secagem]
-    H --> I[Verificação de Danos]
+    E --> F["Comunicação Síndico/Administradora<br/>(Moradores)"]
+    F --> G["Documentação Fotográfica<br/>(Síndico)"]
+    G --> H["Limpeza e Secagem<br/>(Empresa de Manutenção)"]
+    H --> I["Verificação de Danos<br/>(Síndico)"]
     I --> J{Danos Estruturais?}
-    J -->|Sim| K[Reparos]
-    J -->|Não| L[Registro do Incidente]
-    K --> M[Medidas Preventivas]
-    M --> L`
+    J -->|Sim| K["Reparos<br/>(Empresa de Manutenção)"]
+    J -->|Não| L["Registro do Incidente<br/>(Administradora)"]
+    K --> M["Medidas Preventivas<br/>(Síndico)"]
+    M --> L
+    style A fill:#dc2626,stroke:#ef4444,color:#fff
+    style B fill:#dc2626,stroke:#ef4444,color:#fff
+    style D fill:#dc2626,stroke:#ef4444,color:#fff
+    style E fill:#dc2626,stroke:#ef4444,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style I fill:#166534,stroke:#22c55e,color:#fff
+    style K fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style L fill:#166534,stroke:#22c55e,color:#fff
+    style M fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Identificação do alagamento",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "2. Proteção de equipamentos elétricos",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Isolamento da área se possível",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "4. Acionamento de serviços de drenagem se necessário",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Empresa de Manutenção"],
+      },
+      {
+        step: "5. Comunicação ao síndico/administradora",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+      {
+        step: "6. Documentação fotográfica do dano",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "7. Limpeza e secagem",
+        responsible: ["Empresa de Manutenção"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "8. Verificação de danos estruturais",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "9. Reparos necessários",
+        responsible: ["Empresa de Manutenção"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "10. Registro do incidente e medidas preventivas",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
 ]
 
