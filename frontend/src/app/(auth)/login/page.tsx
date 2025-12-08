@@ -26,15 +26,14 @@ export default function LoginPage() {
       if (typeof window !== "undefined") {
         localStorage.setItem("access_token", access_token)
         localStorage.setItem("refresh_token", refresh_token)
+        
+        // Redirecionar para dashboard usando window.location para garantir
+        window.location.href = "/dashboard"
       }
-
-      // Redirecionar para dashboard
-      router.push("/dashboard")
-      router.refresh()
     } catch (err: any) {
       console.error("Login error:", err)
-      setError(err.response?.data?.detail || "Erro ao fazer login. Verifique a senha.")
-    } finally {
+      const errorMessage = err.response?.data?.detail || err.message || "Erro ao fazer login. Verifique a senha e se o backend está rodando."
+      setError(errorMessage)
       setLoading(false)
     }
   }
