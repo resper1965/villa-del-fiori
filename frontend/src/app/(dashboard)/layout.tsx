@@ -10,6 +10,7 @@ import {
   Menu,
   Building2,
   LogOut,
+  Users,
 } from "lucide-react"
 import { useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
@@ -55,6 +56,7 @@ export default function DashboardLayout({
   const menuItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/processes", label: "Processos", icon: FileText },
+    { href: "/entities", label: "Entidades", icon: Users },
   ]
 
   return (

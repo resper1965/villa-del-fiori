@@ -3,6 +3,7 @@ from app.models.process import Process, ProcessCategory, DocumentType, ProcessSt
 from app.models.version import ProcessVersion
 from app.models.approval import Approval, ApprovalType
 from app.models.rejection import Rejection
+from app.models.entity import Entity, EntityType, EntityCategory
 
 __all__ = [
     "Stakeholder",
@@ -16,5 +17,8 @@ __all__ = [
     "Approval",
     "ApprovalType",
     "Rejection",
+    "Entity",
+    "EntityType",
+    "EntityCategory",
 ]
 
