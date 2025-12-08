@@ -215,7 +215,7 @@ export default function ProcessesPage() {
               <h2 className="text-xs font-light text-gray-400 mb-1.5 uppercase tracking-wide">
                 {category}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                 {categoryProcesses.map((process: any) => {
                   return (
                     <Card 
