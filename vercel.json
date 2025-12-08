@@ -9,11 +9,13 @@
       "runtime": "python3.9"
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/[...path].py"
-    },
+      "source": "/api/:path*",
+      "destination": "/api/[...path]"
+    }
+  ],
+  "routes": [
     {
       "src": "/(.*)",
       "dest": "/frontend/$1"

@@ -19,3 +19,7 @@ from mangum import Mangum
 # Create ASGI adapter for Vercel
 handler = Mangum(app, lifespan="off")
 
+# Export handler for Vercel
+def handler_wrapper(event, context):
+    """Wrapper for Vercel serverless function"""
+    return handler(event, context)
