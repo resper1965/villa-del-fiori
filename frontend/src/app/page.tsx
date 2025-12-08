@@ -17,6 +17,13 @@ export default function Home() {
     }
   }
 
+  // Redirecionar se autenticado (deve estar antes dos returns condicionais)
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      router.push("/dashboard")
+    }
+  }, [isAuthenticated, isLoading, router])
+
   // Mostrar loading enquanto verifica autenticação
   if (isLoading) {
     return (
@@ -31,13 +38,7 @@ export default function Home() {
     return <Login onLogin={handleLogin} />
   }
 
-  // Se autenticado, redirecionar para dashboard
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/dashboard")
-    }
-  }, [isAuthenticated, router])
-
+  // Se autenticado, mostrar mensagem de redirecionamento
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-gray-400 font-light">Redirecionando...</div>
