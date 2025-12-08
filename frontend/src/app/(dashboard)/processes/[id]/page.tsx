@@ -1,16 +1,33 @@
 "use client"
 
+import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle } from "lucide-react"
+import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle, XCircle } from "lucide-react"
 import { processesData } from "@/data/processes"
+import { ApprovalDialog } from "@/components/approvals/ApprovalDialog"
+import { RejectionDialog } from "@/components/approvals/RejectionDialog"
 
 export default function ProcessDetailPage() {
   const params = useParams()
   const router = useRouter()
   const processId = parseInt(params.id as string)
   const process = processesData.find(p => p.id === processId)
+  const [approvalDialogOpen, setApprovalDialogOpen] = useState(false)
+  const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false)
+
+  const handleApprove = async (comment?: string) => {
+    if (!process) return
+    console.log("Aprovando processo:", process.id, "Comentário:", comment)
+    alert(`Processo "${process.name}" aprovado com sucesso!`)
+  }
+
+  const handleReject = async (reason: string) => {
+    if (!process) return
+    console.log("Rejeitando processo:", process.id, "Motivo:", reason)
+    alert(`Processo "${process.name}" rejeitado.\n\nMotivo: ${reason}`)
+  }
 
   if (!process) {
     return (
@@ -145,8 +162,54 @@ export default function ProcessDetailPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Actions Card - Mostrar apenas se processo está em revisão ou rascunho */}
+          {(process.status === "em_revisao" || process.status === "rascunho") && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Ações</CardTitle>
+                <CardDescription>Revisar e aprovar ou rejeitar este processo</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-3">
+                  <Button
+                    onClick={() => setApprovalDialogOpen(true)}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Aprovar Processo
+                  </Button>
+                  <Button
+                    onClick={() => setRejectionDialogOpen(true)}
+                    variant="outline"
+                    className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                  >
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Rejeitar Processo
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
+
+      {process && (
+        <>
+          <ApprovalDialog
+            open={approvalDialogOpen}
+            onOpenChange={setApprovalDialogOpen}
+            processName={process.name}
+            onApprove={handleApprove}
+          />
+          <RejectionDialog
+            open={rejectionDialogOpen}
+            onOpenChange={setRejectionDialogOpen}
+            processName={process.name}
+            onReject={handleReject}
+          />
+        </>
+      )}
     </div>
   )
 }

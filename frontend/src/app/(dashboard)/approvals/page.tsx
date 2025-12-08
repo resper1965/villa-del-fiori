@@ -1,10 +1,13 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Clock, CheckCircle, XCircle, Eye } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { processesData } from "@/data/processes"
+import { ApprovalDialog } from "@/components/approvals/ApprovalDialog"
+import { RejectionDialog } from "@/components/approvals/RejectionDialog"
 
 // Simulando processos pendentes de aprovação
 const pendingProcesses = processesData
@@ -19,6 +22,39 @@ const pendingProcesses = processesData
 
 export default function ApprovalsPage() {
   const router = useRouter()
+  const [approvalDialogOpen, setApprovalDialogOpen] = useState(false)
+  const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false)
+  const [selectedProcess, setSelectedProcess] = useState<typeof pendingProcesses[0] | null>(null)
+
+  const handleApproveClick = (process: typeof pendingProcesses[0]) => {
+    setSelectedProcess(process)
+    setApprovalDialogOpen(true)
+  }
+
+  const handleRejectClick = (process: typeof pendingProcesses[0]) => {
+    setSelectedProcess(process)
+    setRejectionDialogOpen(true)
+  }
+
+  const handleApprove = async (comment?: string) => {
+    if (!selectedProcess) return
+    
+    // TODO: Integrar com API
+    console.log("Aprovando processo:", selectedProcess.id, "Comentário:", comment)
+    
+    // Simular atualização
+    alert(`Processo "${selectedProcess.name}" aprovado com sucesso!`)
+  }
+
+  const handleReject = async (reason: string) => {
+    if (!selectedProcess) return
+    
+    // TODO: Integrar com API
+    console.log("Rejeitando processo:", selectedProcess.id, "Motivo:", reason)
+    
+    // Simular atualização
+    alert(`Processo "${selectedProcess.name}" rejeitado.\n\nMotivo: ${reason}`)
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,6 +142,7 @@ export default function ApprovalsPage() {
                         variant="default"
                         size="sm"
                         className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => handleApproveClick(process)}
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
                         Aprovar
@@ -114,6 +151,7 @@ export default function ApprovalsPage() {
                         variant="outline"
                         size="sm"
                         className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                        onClick={() => handleRejectClick(process)}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
                         Rejeitar
@@ -124,6 +162,23 @@ export default function ApprovalsPage() {
               )
             })}
           </div>
+        )}
+
+        {selectedProcess && (
+          <>
+            <ApprovalDialog
+              open={approvalDialogOpen}
+              onOpenChange={setApprovalDialogOpen}
+              processName={selectedProcess.name}
+              onApprove={handleApprove}
+            />
+            <RejectionDialog
+              open={rejectionDialogOpen}
+              onOpenChange={setRejectionDialogOpen}
+              processName={selectedProcess.name}
+              onReject={handleReject}
+            />
+          </>
         )}
       </div>
     </div>
