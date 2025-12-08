@@ -185,14 +185,13 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
             <div className="space-y-2">
               <Label htmlFor="category">Categoria</Label>
               <Select
-                value={watch("category") || ""}
-                onValueChange={(value) => setValue("category", value as EntityCategory)}
+                value={watch("category") || undefined}
+                onValueChange={(value) => setValue("category", value ? (value as EntityCategory) : undefined)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a categoria (opcional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhuma</SelectItem>
                   {CategoriesByType[selectedType].map((cat) => (
                     <SelectItem key={cat} value={cat}>
                       {EntityCategoryLabels[cat]}

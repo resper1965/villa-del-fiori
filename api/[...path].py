@@ -21,4 +21,4 @@ from mangum import Mangum
 # Vercel passes the path after /api/ as the path parameter
 # So /api/v1/auth/login becomes "v1/auth/login" in the handler
 # We need to ensure the path is correctly processed
-handler = Mangum(app, lifespan="off")
+handler = Mangum(app, lifespan="off", api_gateway_base_path="/api")
