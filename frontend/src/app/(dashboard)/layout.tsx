@@ -71,7 +71,7 @@ export default function DashboardLayout({
           <div className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-[#00ade8] stroke-1" />
             {sidebarOpen && (
-              <h2 className="text-lg font-semibold text-foreground">
+              <h2 className="text-sm font-medium text-foreground tracking-wide">
                 Condomínio Villa Dei Fiori
               </h2>
             )}
