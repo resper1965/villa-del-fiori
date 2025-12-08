@@ -277,7 +277,20 @@ export const processesData: Process[] = [
     ],
     entities: ["Portaria Online", "Moradores", "Visitantes", "Entregadores"],
     variables: ["portaria_online_contato", "portaria_funcionamento"],
-    documentType: "POP"
+    documentType: "POP",
+    mermaid_diagram: `flowchart TD
+    A[Atendimento via Sistema] --> B[Verificação de Autorização]
+    B --> C{Tipo de Solicitação}
+    C -->|Acesso| D[Processamento de Acesso]
+    C -->|Entrega| E[Processamento de Entrega]
+    C -->|Outro| F[Processamento Específico]
+    D --> G[Registro no Sistema]
+    E --> G
+    F --> G
+    G --> H[Comunicação]
+    H --> I{Sistema Online?}
+    I -->|Não| J[Atuação em Contingência]
+    I -->|Sim| K[Concluído]`
   },
   {
     id: 11,
