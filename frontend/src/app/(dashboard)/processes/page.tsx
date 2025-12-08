@@ -91,7 +91,7 @@ export default function ProcessesPage() {
 
       return matchesSearch && matchesCategory && matchesStatus
     })
-  }, [searchQuery, selectedCategory, selectedStatus])
+  }, [allProcesses, searchQuery, selectedCategory, selectedStatus])
 
   // Agrupar por categoria
   const groupedProcesses = useMemo(() => {
