@@ -61,7 +61,19 @@ export const processesData: Process[] = [
     ],
     entities: ["Síndico", "Conselho Consultivo", "Administradora"],
     variables: ["prazo_aprovacao", "quorum_minimo"],
-    documentType: "Regulamento"
+    documentType: "Regulamento",
+    mermaid_diagram: `flowchart TD
+    A[Submissão do Processo] --> B[Distribuição ao Conselho]
+    B --> C[Revisão Individual]
+    C --> D[Reunião de Deliberação]
+    D --> E{Votação}
+    E -->|Aprovado| F[Comunicação da Decisão]
+    E -->|Rejeitado| G[Ajustes Necessários]
+    E -->|Ajustes| H[Aplicação de Ajustes]
+    G --> I[Refazer Processo]
+    H --> I
+    I --> A
+    F --> J[Publicação]`
   },
   {
     id: 3,
@@ -110,7 +122,16 @@ export const processesData: Process[] = [
     ],
     entities: ["Moradores", "Portaria Online", "Sistema de Biometria"],
     variables: ["tipo_acesso_portas", "horario_funcionamento"],
-    documentType: "POP"
+    documentType: "POP",
+    mermaid_diagram: `flowchart TD
+    A[Solicitação de Cadastro] --> B[Verificação de Identidade]
+    B --> C[Cadastro no Sistema]
+    C --> D[Teste de Funcionamento]
+    D --> E{Ativado?}
+    E -->|Sim| F[Orientação de Uso]
+    E -->|Não| G[Correção]
+    G --> D
+    F --> H[Monitoramento]`
   },
   {
     id: 5,
