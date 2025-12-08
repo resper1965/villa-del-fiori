@@ -16,5 +16,6 @@ os.environ.setdefault("DEBUG", "False")
 from app.main import app
 from mangum import Mangum
 
-# Create ASGI adapter for Vercel - this is the handler that Vercel will call
-handler = Mangum(app, lifespan="off")
+# Create ASGI adapter for Vercel
+# The handler will automatically handle the path from Vercel
+handler = Mangum(app, lifespan="off", api_gateway_base_path="/api")
