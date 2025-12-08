@@ -778,18 +778,71 @@ export const processesData: Process[] = [
     variables: ["portaria_online_contato", "portaria_funcionamento"],
     documentType: "POP",
     mermaid_diagram: `flowchart TD
-    A[Atendimento via Sistema] --> B[Verificação de Autorização]
+    A["Atendimento via Sistema<br/>(Portaria Online)"] --> B["Verificação de Autorização<br/>(Portaria Online)"]
     B --> C{Tipo de Solicitação}
-    C -->|Acesso| D[Processamento de Acesso]
-    C -->|Entrega| E[Processamento de Entrega]
-    C -->|Outro| F[Processamento Específico]
-    D --> G[Registro no Sistema]
+    C -->|Acesso| D["Processamento de Acesso<br/>(Portaria Online)"]
+    C -->|Entrega| E["Processamento de Entrega<br/>(Portaria Online)"]
+    C -->|Outro| F["Processamento Específico<br/>(Portaria Online)"]
+    D --> G["Registro no Sistema<br/>(Portaria Online)"]
     E --> G
     F --> G
-    G --> H[Comunicação]
+    G --> H["Comunicação<br/>(Portaria Online)"]
     H --> I{Sistema Online?}
-    I -->|Não| J[Atuação em Contingência]
-    I -->|Sim| K[Concluído]`
+    I -->|Não| J["Atuação em Contingência<br/>(Portaria Online)"]
+    I -->|Sim| K["Concluído<br/>(Portaria Online)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style E fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style J fill:#dc2626,stroke:#ef4444,color:#fff
+    style K fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Atendimento de solicitações via sistema/app",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "2. Verificação de autorização e identidade",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Processamento da solicitação (acesso, entrega, etc.)",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Registro no sistema de ocorrências",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "5. Comunicação com morador quando necessário",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "6. Atuação em contingência quando sistema offline",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+    ],
   },
   {
     id: 11,
@@ -1689,17 +1742,70 @@ export const processesData: Process[] = [
     variables: ["possui_vagas_visitantes", "limite_vagas_visitantes", "tempo_maximo_estacionamento"],
     documentType: "Regulamento",
     mermaid_diagram: `flowchart TD
-    A[Solicitação de Autorização] --> B[Verificação de Vagas]
+    A["Solicitação de Autorização<br/>(Moradores)"] --> B["Verificação de Vagas<br/>(Portaria Online)"]
     B --> C{Disponível?}
-    C -->|Sim| D[Autorização e Registro]
-    C -->|Não| E[Negado]
-    D --> F[Estacionamento]
-    F --> G[Monitoramento de Tempo]
+    C -->|Sim| D["Autorização e Registro<br/>(Portaria Online)"]
+    C -->|Não| E["Negado<br/>(Portaria Online)"]
+    D --> F["Estacionamento<br/>(Visitantes)"]
+    F --> G["Monitoramento de Tempo<br/>(Portaria Online)"]
     G --> H{Excedeu Tempo?}
-    H -->|Sim| I[Notificação]
-    H -->|Não| J[Saída]
+    H -->|Sim| I["Notificação<br/>(Portaria Online)"]
+    H -->|Não| J["Saída<br/>(Visitantes)"]
     I --> J
-    J --> K[Liberação da Vaga]`
+    J --> K["Liberação da Vaga<br/>(Portaria Online)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#166534,stroke:#22c55e,color:#fff
+    style E fill:#dc2626,stroke:#ef4444,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style G fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style I fill:#dc2626,stroke:#ef4444,color:#fff
+    style J fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style K fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Solicitação de autorização de estacionamento pelo morador",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "2. Verificação de disponibilidade de vagas",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Autorização e registro do veículo",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Estacionamento na vaga designada",
+        responsible: ["Visitantes"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "5. Monitoramento de tempo de permanência",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "6. Saída e liberação da vaga",
+        responsible: ["Visitantes", "Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+    ],
   },
   
   // Convivência
@@ -1723,15 +1829,73 @@ export const processesData: Process[] = [
     variables: ["permite_pets", "restricoes_pets"],
     documentType: "Regulamento",
     mermaid_diagram: `flowchart TD
-    A[Cadastro do Pet] --> B[Apresentação de Documentação]
-    B --> C[Orientação sobre Regras]
-    C --> D[Uso das Áreas Comuns]
-    D --> E[Limpeza de Dejetos]
-    E --> F[Respeito às Regras]
+    A["Cadastro do Pet<br/>(Moradores)"] --> B["Apresentação de Documentação<br/>(Moradores)"]
+    B --> C["Orientação sobre Regras<br/>(Administradora)"]
+    C --> D["Uso das Áreas Comuns<br/>(Moradores)"]
+    D --> E["Limpeza de Dejetos<br/>(Moradores)"]
+    E --> F["Respeito às Regras<br/>(Moradores)"]
     F --> G{Revisão Periódica?}
-    G -->|Sim| H[Atualização de Cadastro]
+    G -->|Sim| H["Atualização de Cadastro<br/>(Moradores)"]
     G -->|Não| D
-    H --> D`
+    H --> D
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#166534,stroke:#22c55e,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style E fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Cadastro do pet no sistema do condomínio",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+      {
+        step: "2. Apresentação de documentação (vacinação, etc.)",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+      {
+        step: "3. Orientação sobre regras de circulação",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Uso das áreas comuns com pet conforme regras",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "5. Limpeza imediata de dejetos",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "6. Respeito às regras de segurança e convivência",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "7. Revisão periódica de cadastro e documentação",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+    ],
   },
   {
     id: 23,
@@ -1752,16 +1916,68 @@ export const processesData: Process[] = [
     variables: ["horario_silencio_dias_uteis", "horario_silencio_fds"],
     documentType: "Regulamento",
     mermaid_diagram: `flowchart TD
-    A[Conhecimento das Regras] --> B[Respeito aos Horários]
+    A["Conhecimento das Regras<br/>(Moradores)"] --> B["Respeito aos Horários<br/>(Moradores)"]
     B --> C{Perturbação?}
-    C -->|Sim| D[Comunicação ao Síndico]
-    C -->|Não| E[Convivência Normal]
-    D --> F[Verificação]
-    F --> G[Orientação]
+    C -->|Sim| D["Comunicação ao Síndico<br/>(Moradores)"]
+    C -->|Não| E["Convivência Normal<br/>(Moradores)"]
+    D --> F["Verificação<br/>(Síndico)"]
+    F --> G["Orientação<br/>(Síndico)"]
     G --> H{Reincidência?}
-    H -->|Sim| I[Medidas]
+    H -->|Sim| I["Medidas<br/>(Síndico)"]
     H -->|Não| E
-    I --> J[Registro de Ocorrência]`
+    I --> J["Registro de Ocorrência<br/>(Portaria Online)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#dc2626,stroke:#ef4444,color:#fff
+    style E fill:#166534,stroke:#22c55e,color:#fff
+    style F fill:#166534,stroke:#22c55e,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style I fill:#dc2626,stroke:#ef4444,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Conhecimento das regras de silêncio pelos moradores",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "2. Respeito aos horários estabelecidos",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Em caso de perturbação: comunicação ao síndico/portaria",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "4. Verificação e orientação ao morador responsável",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "5. Aplicação de medidas se necessário",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "6. Registro de ocorrência se reincidente",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   {
     id: 24,
@@ -1784,20 +2000,89 @@ export const processesData: Process[] = [
     variables: ["politica_obras", "horario_obras"],
     documentType: "Regulamento",
     mermaid_diagram: `flowchart TD
-    A[Solicitação de Obra] --> B[Apresentação de Documentação]
-    B --> C[Aprovação pelo Síndico]
+    A["Solicitação de Obra<br/>(Moradores)"] --> B["Apresentação de Documentação<br/>(Moradores)"]
+    B --> C["Aprovação pelo Síndico<br/>(Síndico)"]
     C --> D{Aprovado?}
-    D -->|Sim| E[Definição de Horários]
-    D -->|Não| F[Correções]
+    D -->|Sim| E["Definição de Horários<br/>(Síndico)"]
+    D -->|Não| F["Correções<br/>(Moradores)"]
     F --> B
-    E --> G[Notificação aos Vizinhos]
-    G --> H[Execução da Obra]
-    H --> I[Vistoria]
+    E --> G["Notificação aos Vizinhos<br/>(Síndico)"]
+    G --> H["Execução da Obra<br/>(Moradores)"]
+    H --> I["Vistoria<br/>(Síndico)"]
     I --> J{Aprovado?}
-    J -->|Sim| K[Limpeza]
-    J -->|Não| L[Correções]
+    J -->|Sim| K["Limpeza<br/>(Moradores)"]
+    J -->|Não| L["Correções<br/>(Moradores)"]
     L --> H
-    K --> M[Concluído]`
+    K --> M["Concluído<br/>(Síndico)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#166534,stroke:#22c55e,color:#fff
+    style E fill:#166534,stroke:#22c55e,color:#fff
+    style F fill:#dc2626,stroke:#ef4444,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style I fill:#166534,stroke:#22c55e,color:#fff
+    style K fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style L fill:#dc2626,stroke:#ef4444,color:#fff
+    style M fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Solicitação de obra pelo morador",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Conselho Consultivo"],
+      },
+      {
+        step: "2. Apresentação de documentação (projeto, ART, etc.)",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Aprovação pelo síndico/conselho",
+        responsible: ["Síndico", "Conselho Consultivo"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Definição de horários e regras de execução",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "5. Notificação aos moradores vizinhos",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "6. Execução da obra conforme aprovado",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "7. Vistoria e aprovação final",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "8. Limpeza e organização do espaço comum utilizado",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   
   // Eventos
@@ -1822,17 +2107,86 @@ export const processesData: Process[] = [
     variables: ["prazo_convocacao", "quorum_minimo"],
     documentType: "Manual",
     mermaid_diagram: `flowchart TD
-    A[Definição de Pauta] --> B[Convocacao Formal]
-    B --> C[Distribuição de Material]
-    C --> D[Realização da Assembleia]
-    D --> E[Registro de Presença]
-    E --> F[Verificação de Quórum]
+    A["Definição de Pauta<br/>(Síndico)"] --> B["Convocação Formal<br/>(Administradora)"]
+    B --> C["Distribuição de Material<br/>(Administradora)"]
+    C --> D["Realização da Assembleia<br/>(Síndico)"]
+    D --> E["Registro de Presença<br/>(Administradora)"]
+    E --> F["Verificação de Quórum<br/>(Conselho Consultivo)"]
     F --> G{Quórum Atingido?}
-    G -->|Sim| H[Deliberações e Votações]
-    G -->|Não| I[Adiamento]
-    H --> J[Elaboração da Ata]
-    J --> K[Aprovação da Ata]
-    K --> L[Distribuição aos Moradores]`
+    G -->|Sim| H["Deliberações e Votações<br/>(Conselho Consultivo)"]
+    G -->|Não| I["Adiamento<br/>(Síndico)"]
+    H --> J["Elaboração da Ata<br/>(Administradora)"]
+    J --> K["Aprovação da Ata<br/>(Conselho Consultivo)"]
+    K --> L["Distribuição aos Moradores<br/>(Administradora)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style E fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff
+    style I fill:#dc2626,stroke:#ef4444,color:#fff
+    style J fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style K fill:#166534,stroke:#22c55e,color:#fff
+    style L fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Definição de pauta e data pela administradora/síndico",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: ["Conselho Consultivo"],
+        informed: ["Administradora"],
+      },
+      {
+        step: "2. Convocação formal com antecedência mínima",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "3. Distribuição de material e documentação",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Realização da assembleia",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: ["Conselho Consultivo"],
+        informed: ["Moradores"],
+      },
+      {
+        step: "5. Registro de presença e quórum",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Conselho Consultivo"],
+      },
+      {
+        step: "6. Deliberações e votações",
+        responsible: ["Conselho Consultivo"],
+        accountable: ["Conselho Consultivo"],
+        consulted: ["Síndico"],
+        informed: ["Moradores"],
+      },
+      {
+        step: "7. Elaboração e aprovação da ata",
+        responsible: ["Administradora"],
+        accountable: ["Conselho Consultivo"],
+        consulted: ["Síndico"],
+        informed: [],
+      },
+      {
+        step: "8. Distribuição da ata aos moradores",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+    ],
   },
   {
     id: 26,
@@ -1855,16 +2209,83 @@ export const processesData: Process[] = [
     variables: ["calendario_manutencoes"],
     documentType: "Manual",
     mermaid_diagram: `flowchart TD
-    A[Planejamento Anual] --> B[Agendamento com Fornecedores]
-    B --> C[Comunicação aos Moradores]
-    C --> D[Preparação do Local]
-    D --> E[Execução da Manutenção]
-    E --> F[Verificação e Testes]
+    A["Planejamento Anual<br/>(Síndico)"] --> B["Agendamento com Fornecedores<br/>(Administradora)"]
+    B --> C["Comunicação aos Moradores<br/>(Administradora)"]
+    C --> D["Preparação do Local<br/>(Administradora)"]
+    D --> E["Execução da Manutenção<br/>(Fornecedores)"]
+    E --> F["Verificação e Testes<br/>(Síndico)"]
     F --> G{Sucesso?}
-    G -->|Sim| H[Comunicação de Conclusão]
-    G -->|Não| I[Correções]
+    G -->|Sim| H["Comunicação de Conclusão<br/>(Administradora)"]
+    G -->|Não| I["Correções<br/>(Fornecedores)"]
     I --> E
-    H --> J[Registro no Histórico]`
+    H --> J["Registro no Histórico<br/>(Administradora)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style E fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff
+    style I fill:#dc2626,stroke:#ef4444,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Planejamento anual de manutenções",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: ["Conselho Consultivo"],
+        informed: ["Administradora"],
+      },
+      {
+        step: "2. Agendamento com fornecedores",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Fornecedores"],
+      },
+      {
+        step: "3. Comunicação prévia aos moradores afetados",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Preparação do local e equipamentos",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "5. Execução da manutenção",
+        responsible: ["Fornecedores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+      {
+        step: "6. Verificação e testes",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+      {
+        step: "7. Comunicação de conclusão",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "8. Registro no histórico de manutenções",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   {
     id: 27,
@@ -1887,16 +2308,84 @@ export const processesData: Process[] = [
     variables: ["politica_eventos", "horario_eventos"],
     documentType: "Regulamento",
     mermaid_diagram: `flowchart TD
-    A[Solicitação de Reserva] --> B[Verificação de Disponibilidade]
+    A["Solicitação de Reserva<br/>(Moradores)"] --> B["Verificação de Disponibilidade<br/>(Administradora)"]
     B --> C{Aprovado?}
-    C -->|Sim| D[Confirmação]
-    C -->|Não| E[Negado]
-    D --> F[Pagamento de Taxa]
-    F --> G[Uso do Espaço]
-    G --> H[Limpeza Completa]
-    H --> I[Vistoria]
-    I --> J[Liberação]
-    J --> K[Registro de Uso]`
+    C -->|Sim| D["Confirmação<br/>(Administradora)"]
+    C -->|Não| E["Negado<br/>(Administradora)"]
+    D --> F["Pagamento de Taxa<br/>(Moradores)"]
+    F --> G["Uso do Espaço<br/>(Moradores)"]
+    G --> H["Limpeza Completa<br/>(Moradores)"]
+    H --> I["Vistoria<br/>(Administradora)"]
+    I --> J["Liberação<br/>(Administradora)"]
+    J --> K["Registro de Uso<br/>(Administradora)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#166534,stroke:#22c55e,color:#fff
+    style E fill:#dc2626,stroke:#ef4444,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style G fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style H fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style I fill:#166534,stroke:#22c55e,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff
+    style K fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Solicitação de reserva com antecedência",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+      {
+        step: "2. Verificação de disponibilidade",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Aprovação e confirmação da reserva",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Pagamento de taxa se aplicável",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+      {
+        step: "5. Uso do espaço no horário reservado",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "6. Limpeza completa após o evento",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "7. Vistoria e liberação",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "8. Registro de uso",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   {
     id: 28,
@@ -1918,15 +2407,75 @@ export const processesData: Process[] = [
     variables: ["politica_reservas_areas_comuns", "prazo_cancelamento"],
     documentType: "Regulamento",
     mermaid_diagram: `flowchart TD
-    A[Consulta de Disponibilidade] --> B[Solicitação de Reserva]
-    B --> C[Verificação]
-    C --> D[Confirmação]
-    D --> E[Uso da Área]
-    E --> F[Limpeza]
-    F --> G[Encerramento]
+    A["Consulta de Disponibilidade<br/>(Moradores)"] --> B["Solicitação de Reserva<br/>(Moradores)"]
+    B --> C["Verificação<br/>(Administradora)"]
+    C --> D["Confirmação<br/>(Administradora)"]
+    D --> E["Uso da Área<br/>(Moradores)"]
+    E --> F["Limpeza<br/>(Moradores)"]
+    F --> G["Encerramento<br/>(Administradora)"]
     G --> H{Cancelamento?}
-    H -->|Sim| I[Comunicação com Antecedência]
-    H -->|Não| J[Concluído]`
+    H -->|Sim| I["Comunicação com Antecedência<br/>(Moradores)"]
+    H -->|Não| J["Concluído<br/>(Administradora)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#166534,stroke:#22c55e,color:#fff
+    style E fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style I fill:#dc2626,stroke:#ef4444,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Consulta de disponibilidade no sistema",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "2. Solicitação de reserva",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+      {
+        step: "3. Verificação e confirmação",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Uso da área no horário reservado",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "5. Limpeza e organização",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "6. Encerramento da reserva",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "7. Em caso de cancelamento: comunicação com antecedência",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+    ],
   },
   
   // Emergências
