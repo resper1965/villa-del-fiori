@@ -210,49 +210,68 @@ export default function ProcessesPage() {
             </CardContent>
           </Card>
         ) : (
-          Object.entries(groupedProcesses).map(([category, categoryProcesses]) => (
-            <div key={category} className="mb-2">
-              <h2 className="text-xs font-light text-gray-400 mb-1.5 uppercase tracking-wide">
-                {category}
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-                {categoryProcesses.map((process: any) => {
-                  return (
-                    <Card 
-                      key={process.id} 
-                      className="bg-gray-800/50 border-gray-700/50 hover:bg-gray-800/70 hover:border-primary/50 transition-all cursor-pointer"
-                      onClick={() => router.push(`/processes/${process.id}`)}
-                    >
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-md bg-muted">
-                              <FileText className="h-4 w-4 text-foreground stroke-1" />
-                            </div>
-                            <div className="flex-1">
-                              <CardTitle className="text-sm font-light text-gray-200 line-clamp-2">
-                                {process.name}
-                              </CardTitle>
+          (() => {
+            // Criar índice global sequencial baseado na lista completa de processos (não filtrada)
+            const allProcessesFlat = processesData.map((p) => ({
+              id: p.id.toString(),
+              name: p.name,
+              category: categoryMap[p.category.toLowerCase().replace(/\s+/g, "_")] || p.category,
+              status: p.status,
+            }))
+            
+            return Object.entries(groupedProcesses).map(([category, categoryProcesses]) => (
+              <div key={category} className="mb-2">
+                <h2 className="text-xs font-light text-gray-400 mb-1.5 uppercase tracking-wide">
+                  {category}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+                  {categoryProcesses.map((process: any) => {
+                    // Encontrar número do processo na lista completa (baseado no ID original)
+                    const originalId = typeof process.id === 'string' ? parseInt(process.id) : process.id
+                    const processNumber = processesData.findIndex(p => p.id === originalId) + 1
+                    
+                    return (
+                      <Card 
+                        key={process.id} 
+                        className="bg-gray-800/50 border-gray-700/50 hover:bg-gray-800/70 hover:border-primary/50 transition-all cursor-pointer"
+                        onClick={() => router.push(`/processes/${process.id}`)}
+                      >
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="flex flex-col items-center gap-1">
+                                <div className="p-2 rounded-md bg-muted">
+                                  <FileText className="h-4 w-4 text-foreground stroke-1" />
+                                </div>
+                                <span className="text-[10px] font-medium text-[#00ade8] bg-[#00ade8]/10 px-1.5 py-0.5 rounded">
+                                  #{processNumber}
+                                </span>
+                              </div>
+                              <div className="flex-1">
+                                <CardTitle className="text-sm font-light text-gray-200 line-clamp-2">
+                                  {process.name}
+                                </CardTitle>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="flex items-center justify-between">
-                          <span className={`text-xs px-2 py-1 rounded border ${categoryColors[category]}`}>
-                            {category}
-                          </span>
-                          <span className="text-xs text-gray-400 font-light capitalize">
-                            {process.status?.replace("_", " ") || "rascunho"}
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )
-                })}
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="flex items-center justify-between">
+                            <span className={`text-xs px-2 py-1 rounded border ${categoryColors[category]}`}>
+                              {category}
+                            </span>
+                            <span className="text-xs text-gray-400 font-light capitalize">
+                              {process.status?.replace("_", " ") || "rascunho"}
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          ))
+            ))
+          })()
         )}
 
         <ProcessForm

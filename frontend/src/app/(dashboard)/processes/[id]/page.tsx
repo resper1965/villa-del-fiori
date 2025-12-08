@@ -124,6 +124,9 @@ export default function ProcessDetailPage() {
   const statusInfo = statusConfig[displayProcess.status as keyof typeof statusConfig] || statusConfig.aprovado
   const StatusIcon = statusInfo.icon
 
+  // Encontrar número do processo na lista completa
+  const processNumber = processesData.findIndex(p => p.id === parseInt(processId)) + 1
+
   return (
     <div className="min-h-screen bg-background">
       <div className="h-[73px] border-b border-border flex items-center px-4">
@@ -136,9 +139,14 @@ export default function ProcessDetailPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar
         </Button>
-        <h1 className="text-lg font-light text-gray-200">
-          {displayProcess.name}
-        </h1>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-[#00ade8] bg-[#00ade8]/10 px-2 py-1 rounded">
+            #{processNumber}
+          </span>
+          <h1 className="text-lg font-light text-gray-200">
+            {displayProcess.name}
+          </h1>
+        </div>
       </div>
       <div className="px-1 sm:px-2 md:px-3 py-2">
         <div className="w-full space-y-2">
