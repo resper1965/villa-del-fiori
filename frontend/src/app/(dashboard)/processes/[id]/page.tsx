@@ -146,7 +146,7 @@ export default function ProcessDetailPage() {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-lg bg-muted">
-                    <Icon className="h-6 w-6 text-foreground stroke-1" />
+                    <FileText className="h-6 w-6 text-foreground stroke-1" />
                   </div>
                   <div>
                     <CardTitle className="text-xl mb-2">{displayProcess.name}</CardTitle>
