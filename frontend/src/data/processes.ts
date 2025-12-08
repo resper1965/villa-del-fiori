@@ -1083,7 +1083,21 @@ export const processesData: Process[] = [
     entities: ["Moradores", "Polícia", "Empresa de Segurança", "Síndico", "Portaria Online"],
     variables: ["telefone_policia", "empresa_seguranca_rua"],
     documentType: "Procedimento de Emergência",
-    mermaid_diagram: 
+    mermaid_diagram: `flowchart TD
+    A[Identificação da Ameaça] --> B[Acionamento Polícia 190]
+    B --> C[Acionamento Segurança]
+    C --> D{Isolar Área Possível?}
+    D -->|Sim| E[Isolamento]
+    D -->|Não| F[Proteção de Evidências]
+    E --> F
+    F --> G[Comunicação ao Síndico]
+    G --> H[Aguardar Polícia]
+    H --> I[Fornecer Informações]
+    I --> J[Acompanhamento do Caso]
+    J --> K{Reforço Necessário?}
+    K -->|Sim| L[Reforço de Segurança]
+    K -->|Não| M[Registro Detalhado]
+    L --> M`
   },
   {
     id: 34,
