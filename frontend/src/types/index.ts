@@ -1,5 +1,7 @@
 // Types for the application
 
+import { RACIEntry } from "./raci"
+
 export interface Process {
   id: string
   name: string
@@ -15,6 +17,7 @@ export interface Process {
   workflow?: string[]
   entities?: string[]
   variables?: string[]
+  raci?: RACIEntry[]
 }
 
 export interface ProcessVersion {

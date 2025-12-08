@@ -1,4 +1,5 @@
 import { FileText, Shield, Lock, Wrench, Building2, Users, Calendar, AlertTriangle, LucideIcon } from "lucide-react"
+import { RACIEntry } from "@/types/raci"
 
 export interface Process {
   id: number
@@ -12,6 +13,7 @@ export interface Process {
   variables: string[]
   documentType: string
   mermaid_diagram?: string
+  raci?: RACIEntry[] // Matriz RACI para o processo
 }
 
 export const processesData: Process[] = [

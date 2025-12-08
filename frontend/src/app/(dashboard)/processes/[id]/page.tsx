@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle, XCircle, History, User, Loader2, GitBranch } from "lucide-react"
 import { MermaidDiagram } from "@/components/processes/MermaidDiagram"
+import { RACIMatrix } from "@/components/processes/RACIMatrix"
 import { useProcess } from "@/lib/hooks/useProcesses"
 import { useApproveProcess, useRejectProcess } from "@/lib/hooks/useApprovals"
 import { ApprovalDialog } from "@/components/approvals/ApprovalDialog"
@@ -236,6 +237,11 @@ export default function ProcessDetailPage() {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* RACI Matrix Card */}
+          {displayProcess.raci && displayProcess.raci.length > 0 && (
+            <RACIMatrix raci={displayProcess.raci} entities={displayProcess.entities || []} />
           )}
 
           {/* Variables Card */}
