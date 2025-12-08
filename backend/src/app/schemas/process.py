@@ -15,6 +15,7 @@ class ProcessBase(BaseModel):
     workflow: Optional[List[str]] = None
     entities: Optional[List[str]] = None
     variables: Optional[List[str]] = None
+    mermaid_diagram: Optional[str] = None
 
 
 class ProcessCreate(ProcessBase):

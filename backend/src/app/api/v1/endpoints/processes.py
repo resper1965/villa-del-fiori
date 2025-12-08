@@ -70,6 +70,7 @@ async def get_process(
             response.workflow = current_version.content.get("workflow", [])
             response.entities = current_version.content.get("entities", [])
             response.variables = list(current_version.content.get("variables_applied", {}).keys())
+            # mermaid_diagram está no content, será acessado via current_version.content.mermaid_diagram
 
     return response
 
