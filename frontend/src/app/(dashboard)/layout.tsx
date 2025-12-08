@@ -26,7 +26,6 @@ export default function DashboardLayout({
   const menuItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/processes", label: "Processos", icon: FileText },
-    { href: "/approvals", label: "Aprovações", icon: CheckCircle },
   ]
 
   return (
