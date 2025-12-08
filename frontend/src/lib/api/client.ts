@@ -11,12 +11,12 @@ const getApiUrl = () => {
   if (typeof window !== "undefined") {
     // Em produção na Vercel, usar URL relativa
     if (window.location.hostname !== "localhost") {
-      return "/api/v1"
+      return "/v1"
     }
   }
   
   // Desenvolvimento local
-  return "http://localhost:8000/api/v1"
+  return "http://localhost:8000/v1"
 }
 
 const API_URL = getApiUrl()

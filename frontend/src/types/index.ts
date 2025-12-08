@@ -1,45 +1,46 @@
-export type ProcessStatus = "rascunho" | "em_revisao" | "aprovado" | "rejeitado"
-
-export type ProcessCategory =
-  | "governanca"
-  | "acesso_seguranca"
-  | "operacao"
-  | "areas_comuns"
-  | "convivencia"
-  | "eventos"
-  | "emergencias"
-
-export type DocumentType =
-  | "pop"
-  | "manual"
-  | "regulamento"
-  | "fluxograma"
-  | "aviso"
-  | "comunicado"
-  | "checklist"
-  | "formulario"
-  | "politica"
+// Types for the application
 
 export interface Process {
   id: string
   name: string
-  category: ProcessCategory
+  category: string
   subcategory?: string
-  document_type: DocumentType
-  status: ProcessStatus
+  document_type: string
+  status: string
   current_version_number: number
   creator_id: string
   created_at: string
   updated_at: string
+  description?: string
+  workflow?: string[]
+  entities?: string[]
+  variables?: string[]
 }
 
 export interface ProcessVersion {
   id: string
   process_id: string
   version_number: number
-  content: Record<string, unknown>
-  status: ProcessStatus
+  content: Record<string, any>
+  content_text?: string
+  variables_applied?: Record<string, any>
+  entities_involved?: string[]
+  status: string
+  created_by: string
   created_at: string
+  change_summary?: string
+}
+
+export interface ProcessDetailResponse extends Process {
+  current_version?: ProcessVersion
+}
+
+export interface ProcessListResponse {
+  items: Process[]
+  total: number
+  page: number
+  page_size: number
+  total_pages: number
 }
 
 export interface Stakeholder {
@@ -49,25 +50,6 @@ export interface Stakeholder {
   type: string
   role: string
   is_active: boolean
+  created_at: string
+  updated_at: string
 }
-
-export interface Approval {
-  id: string
-  process_id: string
-  version_id: string
-  stakeholder_id: string
-  approved_at: string
-  comments?: string
-}
-
-export interface Rejection {
-  id: string
-  process_id: string
-  version_id: string
-  stakeholder_id: string
-  rejected_at: string
-  reason: string
-  additional_comments?: string
-}
-
-
