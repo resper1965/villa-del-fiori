@@ -60,7 +60,7 @@ class ProcessService:
         }
         
         # Adicionar diagrama Mermaid se fornecido
-        if hasattr(process_data, "mermaid_diagram") and process_data.mermaid_diagram:
+        if process_data.mermaid_diagram:
             content["mermaid_diagram"] = process_data.mermaid_diagram
         
         version = ProcessVersion(
