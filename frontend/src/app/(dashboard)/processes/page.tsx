@@ -52,15 +52,15 @@ export default function ProcessesPage() {
   const createMutation = useCreateProcess()
 
   // Tentar buscar da API, usar dados mock como fallback
-  const { data: apiData, isLoading, error } = useProcesses({
+  const { data: apiData, isLoading, error, isError } = useProcesses({
     category: selectedCategory !== "all" ? reverseCategoryMap[selectedCategory] || selectedCategory : undefined,
     status: selectedStatus !== "all" ? selectedStatus : undefined,
     page: 1,
     page_size: 100,
   })
 
-  // Usar dados da API ou fallback para mock
-  const allProcesses = apiData?.items || processesData.map((p) => ({
+  // Usar dados da API ou fallback para mock (usar mock imediatamente se houver erro ou se não houver dados)
+  const allProcesses = (apiData?.items && !isError) ? apiData.items : processesData.map((p) => ({
     id: p.id.toString(),
     name: p.name,
     category: categoryMap[p.category.toLowerCase().replace(/\s+/g, "_")] || p.category,

@@ -11,6 +11,9 @@ export const useProcesses = (params?: {
   return useQuery({
     queryKey: ["processes", params],
     queryFn: () => processesApi.list(params),
+    retry: 1, // Tentar apenas 1 vez
+    retryDelay: 1000, // Esperar 1 segundo antes de tentar novamente
+    staleTime: 5 * 60 * 1000, // Cache por 5 minutos
   })
 }
 
