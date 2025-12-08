@@ -138,8 +138,8 @@ export default function ProcessDetailPage() {
           {displayProcess.name}
         </h1>
       </div>
-      <div className="p-2">
-        <div className="max-w-4xl mx-auto space-y-2">
+      <div className="px-1 sm:px-2 md:px-3 py-2">
+        <div className="w-full space-y-2">
           {/* Header Card */}
           <Card>
             <CardHeader>

@@ -128,7 +128,7 @@ export default function ProcessesPage() {
           Novo Processo
         </Button>
       </div>
-      <div className="p-2">
+      <div className="px-1 sm:px-2 md:px-3 py-2">
         {/* Filtros */}
         <div className="mb-2 space-y-2">
           <div className="flex flex-col sm:flex-row gap-4">
