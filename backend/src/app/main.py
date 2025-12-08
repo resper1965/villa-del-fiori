@@ -23,7 +23,15 @@ app.add_middleware(
 )
 
 # Include API router
-app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+# On Vercel, /api is handled by routing, so we use /v1
+# But we need to handle both cases: local (/api/v1) and Vercel (/v1)
+import os
+if os.environ.get("VERCEL"):
+    # On Vercel, the /api prefix is already in the path
+    app.include_router(api_router, prefix="/v1")
+else:
+    # Local development
+    app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")
