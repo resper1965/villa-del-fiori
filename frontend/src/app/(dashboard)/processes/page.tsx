@@ -33,7 +33,7 @@ export default function ProcessesPage() {
       </div>
       <div className="p-6">
         {categories.map((category) => {
-          const categoryProcesses = processes.filter(p => p.category === category)
+          const categoryProcesses = processesData.filter(p => p.category === category)
           return (
             <div key={category} className="mb-6">
               <h2 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
