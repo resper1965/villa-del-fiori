@@ -68,6 +68,7 @@ class ProcessResponse(ProcessBase):
 
     class Config:
         from_attributes = True
+        use_enum_values = True
 
 
 class ProcessListResponse(BaseModel):

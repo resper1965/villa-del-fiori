@@ -24,6 +24,7 @@ class ApprovalResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        use_enum_values = True
 
 
 class RejectionCreate(BaseModel):
@@ -43,4 +44,5 @@ class RejectionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        use_enum_values = True
 
