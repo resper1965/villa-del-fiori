@@ -41,6 +41,17 @@ export default function ProcessDetailPage() {
     updated_at: new Date().toISOString(),
     current_version_number: 1,
     creator_id: "1",
+    current_version: mockProcess.mermaid_diagram ? {
+      id: "1",
+      process_id: mockProcess.id.toString(),
+      version_number: 1,
+      content: {
+        mermaid_diagram: mockProcess.mermaid_diagram,
+      },
+      status: mockProcess.status,
+      created_by: "1",
+      created_at: new Date().toISOString(),
+    } : undefined,
   } : null)
 
   const handleApprove = async (comment?: string) => {
@@ -160,7 +171,7 @@ export default function ProcessDetailPage() {
           </Card>
 
           {/* Mermaid Diagram Card */}
-          {process?.current_version?.content?.mermaid_diagram && (
+          {(process?.current_version?.content?.mermaid_diagram || displayProcess?.current_version?.content?.mermaid_diagram) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -171,7 +182,7 @@ export default function ProcessDetailPage() {
               </CardHeader>
               <CardContent>
                 <MermaidDiagram
-                  diagram={process.current_version.content.mermaid_diagram}
+                  diagram={process?.current_version?.content?.mermaid_diagram || displayProcess?.current_version?.content?.mermaid_diagram || ""}
                   id={`process-${displayProcess.id}-diagram`}
                 />
               </CardContent>
