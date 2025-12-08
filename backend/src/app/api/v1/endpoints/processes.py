@@ -32,7 +32,7 @@ async def list_processes(
     total_pages = (total + page_size - 1) // page_size
 
     return ProcessListResponse(
-        items=[ProcessResponse.from_orm(p) for p in processes],
+        items=[ProcessResponse.model_validate(p) for p in processes],
         total=total,
         page=page,
         page_size=page_size,
