@@ -2,8 +2,13 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, CheckCircle, XCircle, Clock } from "lucide-react"
+import { processesData } from "@/data/processes"
 
 export default function DashboardPage() {
+  const totalProcesses = processesData.length
+  const approvedProcesses = processesData.filter(p => p.status === "aprovado").length
+  const pendingProcesses = processesData.filter(p => p.status === "em_revisao" || p.status === "rascunho").length
+  const rejectedProcesses = processesData.filter(p => p.status === "rejeitado").length
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,7 +30,7 @@ export default function DashboardPage() {
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">0</div>
+              <div className="text-2xl font-bold text-foreground">{totalProcesses}</div>
               <p className="text-xs text-muted-foreground mt-1">Processos cadastrados</p>
             </CardContent>
           </Card>
@@ -38,7 +43,7 @@ export default function DashboardPage() {
               <CheckCircle className="h-4 w-4 text-green-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">0</div>
+              <div className="text-2xl font-bold text-foreground">{approvedProcesses}</div>
               <p className="text-xs text-muted-foreground mt-1">Processos aprovados</p>
             </CardContent>
           </Card>
@@ -51,7 +56,7 @@ export default function DashboardPage() {
               <Clock className="h-4 w-4 text-yellow-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">0</div>
+              <div className="text-2xl font-bold text-foreground">{pendingProcesses}</div>
               <p className="text-xs text-muted-foreground mt-1">Aguardando aprovação</p>
             </CardContent>
           </Card>
@@ -64,7 +69,7 @@ export default function DashboardPage() {
               <XCircle className="h-4 w-4 text-red-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">0</div>
+              <div className="text-2xl font-bold text-foreground">{rejectedProcesses}</div>
               <p className="text-xs text-muted-foreground mt-1">Processos rejeitados</p>
             </CardContent>
           </Card>
