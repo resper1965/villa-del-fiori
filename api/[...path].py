@@ -3,6 +3,7 @@ Vercel Serverless Function Handler for FastAPI - Catch-all route
 """
 import sys
 import os
+import json
 from pathlib import Path
 
 # Add backend to path
@@ -17,5 +18,6 @@ from app.main import app
 from mangum import Mangum
 
 # Create ASGI adapter for Vercel
-# Vercel routes /api/* to this handler, so we need to add /api prefix
+# The path from Vercel will be like "v1/auth/login" when accessing "/api/v1/auth/login"
+# Mangum with api_gateway_base_path="/api" will prepend "/api" to make it "/api/v1/auth/login"
 handler = Mangum(app, lifespan="off", api_gateway_base_path="/api")
