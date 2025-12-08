@@ -9,6 +9,7 @@ import {
   FileText,
   CheckCircle,
   Menu,
+  Building2,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -37,11 +38,14 @@ export default function DashboardLayout({
         } bg-card border-r border-border transition-all duration-300 flex flex-col`}
       >
         <div className="h-[73px] p-4 border-b border-border flex items-center justify-between">
-          {sidebarOpen && (
-            <h2 className="text-lg font-semibold text-foreground">
-              Gestão de Processos
-            </h2>
-          )}
+          <div className="flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-[#00ade8]" />
+            {sidebarOpen && (
+              <h2 className="text-lg font-semibold text-foreground">
+                Condomínio Villa Dei Fiori
+              </h2>
+            )}
+          </div>
           <Button
             variant="ghost"
             size="icon"
@@ -62,7 +66,7 @@ export default function DashboardLayout({
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
                   isActive
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-[#00ade8] text-white"
                     : "text-foreground hover:bg-accent hover:text-accent-foreground"
                 }`}
               >
