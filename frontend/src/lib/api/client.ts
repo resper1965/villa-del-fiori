@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? window.location.origin.replace(/^https?:\/\/([^.]+)\.vercel\.app/, 'https://api.$1.vercel.app') + '/api/v1' : "http://localhost:8000/api/v1")
 
 export const apiClient = axios.create({
   baseURL: API_URL,
