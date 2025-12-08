@@ -16,10 +16,5 @@ os.environ.setdefault("DEBUG", "False")
 from app.main import app
 from mangum import Mangum
 
-# Create ASGI adapter for Vercel
+# Create ASGI adapter for Vercel - this is the handler that Vercel will call
 handler = Mangum(app, lifespan="off")
-
-# Export handler for Vercel
-def handler_wrapper(event, context):
-    """Wrapper for Vercel serverless function"""
-    return handler(event, context)
