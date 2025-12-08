@@ -1,5 +1,5 @@
 """
-Vercel Serverless Function Handler for FastAPI
+Vercel Serverless Function Handler for FastAPI - Catch-all route
 """
 import sys
 import os
@@ -18,3 +18,4 @@ from mangum import Mangum
 
 # Create ASGI adapter for Vercel
 handler = Mangum(app, lifespan="off")
+

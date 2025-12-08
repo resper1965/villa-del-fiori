@@ -5,15 +5,14 @@
   "framework": "nextjs",
   "installCommand": "cd frontend && npm install",
   "functions": {
-    "api/index.py": {
-      "runtime": "python3.9",
-      "includeFiles": "backend/**"
+    "api/**/*.py": {
+      "runtime": "python3.9"
     }
   },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/index.py"
+      "dest": "/api/[...path].py"
     },
     {
       "src": "/(.*)",
