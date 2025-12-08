@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus, Search, X, Loader2 } from "lucide-react"
+import { Plus, Search, X, Loader2, FileText } from "lucide-react"
 import { useProcesses } from "@/lib/hooks/useProcesses"
 import { processesData } from "@/data/processes" // Fallback para dados mock
 
@@ -217,8 +217,6 @@ export default function ProcessesPage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categoryProcesses.map((process: any) => {
-                  // Usar ícone padrão se não houver
-                  const FileText = require("lucide-react").FileText
                   return (
                     <Card 
                       key={process.id} 
