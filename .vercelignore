@@ -4,3 +4,7 @@ node_modules
 *.log
 .env.local
 .env*.local
+backend/
+specs/
+docker-compose.yml
+
