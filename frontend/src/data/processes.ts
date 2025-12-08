@@ -11,6 +11,7 @@ export interface Process {
   entities: string[]
   variables: string[]
   documentType: string
+  mermaid_diagram?: string
 }
 
 export const processesData: Process[] = [
@@ -32,7 +33,16 @@ export const processesData: Process[] = [
     ],
     entities: ["Síndico", "Conselho Consultivo", "Administradora"],
     variables: ["ciclo_revisao", "responsavel_revisao"],
-    documentType: "Manual"
+    documentType: "Manual",
+    mermaid_diagram: `flowchart TD
+    A[Identificação da Necessidade] --> B[Elaboração do Rascunho]
+    B --> C[Revisão Interna]
+    C --> D[Apresentação ao Conselho]
+    D --> E{Aprovado?}
+    E -->|Sim| F[Publicação]
+    E -->|Não| G[Ajustes]
+    G --> C
+    F --> H[Revisão Periódica]`
   },
   {
     id: 2,
