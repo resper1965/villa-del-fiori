@@ -47,7 +47,7 @@ export default function DashboardPage() {
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Aprovados
               </CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CheckCircle className="h-4 w-4 text-green-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-foreground">0</div>
@@ -60,7 +60,7 @@ export default function DashboardPage() {
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Em Revisão
               </CardTitle>
-              <Clock className="h-4 w-4 text-yellow-500" />
+              <Clock className="h-4 w-4 text-yellow-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-foreground">0</div>
@@ -73,7 +73,7 @@ export default function DashboardPage() {
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Rejeitados
               </CardTitle>
-              <XCircle className="h-4 w-4 text-red-500" />
+              <XCircle className="h-4 w-4 text-red-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-foreground">0</div>
