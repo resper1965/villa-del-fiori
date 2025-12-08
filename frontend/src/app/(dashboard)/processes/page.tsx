@@ -95,7 +95,7 @@ export default function ProcessesPage() {
 
   // Agrupar por categoria
   const groupedProcesses = useMemo(() => {
-    const grouped: Record<string, typeof processesData> = {}
+    const grouped: Record<string, any[]> = {}
     filteredProcesses.forEach((process) => {
       if (!grouped[process.category]) {
         grouped[process.category] = []
