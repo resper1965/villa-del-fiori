@@ -4,32 +4,88 @@ import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle, XCircle, History, User } from "lucide-react"
-import { processesData } from "@/data/processes"
+import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle, XCircle, History, User, Loader2 } from "lucide-react"
+import { useProcess } from "@/lib/hooks/useProcesses"
+import { useApproveProcess, useRejectProcess } from "@/lib/hooks/useApprovals"
 import { ApprovalDialog } from "@/components/approvals/ApprovalDialog"
 import { RejectionDialog } from "@/components/approvals/RejectionDialog"
+import { processesData } from "@/data/processes" // Fallback
 
 export default function ProcessDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const processId = parseInt(params.id as string)
-  const process = processesData.find(p => p.id === processId)
+  const processId = params.id as string
+  
+  // Buscar processo da API
+  const { data: process, isLoading, error } = useProcess(processId)
+  const approveMutation = useApproveProcess()
+  const rejectMutation = useRejectProcess()
+  
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false)
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false)
 
+  // Fallback para dados mock se API não disponível
+  const mockProcess = processesData.find(p => p.id === parseInt(processId))
+  const displayProcess = process || (mockProcess ? {
+    id: mockProcess.id.toString(),
+    name: mockProcess.name,
+    category: mockProcess.category,
+    status: mockProcess.status,
+    document_type: mockProcess.documentType,
+    description: mockProcess.description,
+    workflow: mockProcess.workflow,
+    entities: mockProcess.entities,
+    variables: mockProcess.variables,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    current_version_number: 1,
+    creator_id: "1",
+  } : null)
+
   const handleApprove = async (comment?: string) => {
-    if (!process) return
-    console.log("Aprovando processo:", process.id, "Comentário:", comment)
-    alert(`Processo "${process.name}" aprovado com sucesso!`)
+    if (!displayProcess || !process?.current_version?.id) return
+    
+    try {
+      await approveMutation.mutateAsync({
+        processId: displayProcess.id,
+        versionId: process.current_version.id,
+        data: { comments: comment },
+      })
+      setApprovalDialogOpen(false)
+    } catch (error) {
+      console.error("Erro ao aprovar:", error)
+    }
   }
 
   const handleReject = async (reason: string) => {
-    if (!process) return
-    console.log("Rejeitando processo:", process.id, "Motivo:", reason)
-    alert(`Processo "${process.name}" rejeitado.\n\nMotivo: ${reason}`)
+    if (!displayProcess || !process?.current_version?.id) return
+    
+    try {
+      await rejectMutation.mutateAsync({
+        processId: displayProcess.id,
+        versionId: process.current_version.id,
+        data: { reason },
+      })
+      setRejectionDialogOpen(false)
+    } catch (error) {
+      console.error("Erro ao rejeitar:", error)
+    }
   }
 
-  if (!process) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="h-[73px] border-b border-border flex items-center px-6">
+          <h1 className="text-lg font-semibold text-foreground">Carregando...</h1>
+        </div>
+        <div className="p-6 flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    )
+  }
+
+  if (!displayProcess) {
     return (
       <div className="min-h-screen bg-background">
         <div className="h-[73px] border-b border-border flex items-center px-6">
@@ -45,14 +101,13 @@ export default function ProcessDetailPage() {
     )
   }
 
-  const Icon = process.icon
   const statusConfig = {
     aprovado: { icon: CheckCircle, color: "text-green-400", label: "Aprovado" },
     em_revisao: { icon: Clock, color: "text-yellow-400", label: "Em Revisão" },
     rascunho: { icon: FileText, color: "text-gray-400", label: "Rascunho" },
     rejeitado: { icon: AlertCircle, color: "text-red-400", label: "Rejeitado" },
   }
-  const statusInfo = statusConfig[process.status as keyof typeof statusConfig] || statusConfig.aprovado
+  const statusInfo = statusConfig[displayProcess.status as keyof typeof statusConfig] || statusConfig.aprovado
   const StatusIcon = statusInfo.icon
 
   return (
@@ -68,7 +123,7 @@ export default function ProcessDetailPage() {
           Voltar
         </Button>
         <h1 className="text-lg font-semibold text-foreground">
-          {process.name}
+          {displayProcess.name}
         </h1>
       </div>
       <div className="p-6">
@@ -82,11 +137,11 @@ export default function ProcessDetailPage() {
                     <Icon className="h-6 w-6 text-foreground" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl mb-2">{process.name}</CardTitle>
+                    <CardTitle className="text-xl mb-2">{displayProcess.name}</CardTitle>
                     <div className="flex items-center gap-3">
-                      <span className="text-sm text-muted-foreground">{process.category}</span>
+                      <span className="text-sm text-muted-foreground">{displayProcess.category}</span>
                       <span className="text-muted-foreground">•</span>
-                      <span className="text-sm text-muted-foreground">{process.documentType}</span>
+                      <span className="text-sm text-muted-foreground">{displayProcess.document_type}</span>
                     </div>
                   </div>
                 </div>
@@ -99,69 +154,75 @@ export default function ProcessDetailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-foreground leading-relaxed">{process.description}</p>
+              <p className="text-foreground leading-relaxed">{displayProcess.description || "Sem descrição"}</p>
             </CardContent>
           </Card>
 
           {/* Workflow Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Fluxo do Processo</CardTitle>
-              <CardDescription>Etapas sequenciais para execução deste processo</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ol className="space-y-3">
-                {process.workflow.map((step, index) => (
+          {displayProcess.workflow && displayProcess.workflow.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Fluxo do Processo</CardTitle>
+                <CardDescription>Etapas sequenciais para execução deste processo</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ol className="space-y-3">
+                  {displayProcess.workflow.map((step, index) => (
                   <li key={index} className="flex gap-3">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
                       {index + 1}
                     </span>
                     <span className="text-foreground pt-0.5">{step}</span>
                   </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Entities Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Entidades Envolvidas</CardTitle>
-              <CardDescription>Pessoas, sistemas ou infraestrutura que participam deste processo</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {process.entities.map((entity, index) => (
+          {displayProcess.entities && displayProcess.entities.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Entidades Envolvidas</CardTitle>
+                <CardDescription>Pessoas, sistemas ou infraestrutura que participam deste processo</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {displayProcess.entities.map((entity, index) => (
                   <span
                     key={index}
                     className="px-3 py-1.5 rounded-md bg-muted text-foreground text-sm border border-border"
                   >
                     {entity}
                   </span>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Variables Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Variáveis do Sistema</CardTitle>
-              <CardDescription>Parâmetros configuráveis aplicados neste processo</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {process.variables.map((variable, index) => (
+          {displayProcess.variables && displayProcess.variables.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Variáveis do Sistema</CardTitle>
+                <CardDescription>Parâmetros configuráveis aplicados neste processo</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {displayProcess.variables.map((variable, index) => (
                   <span
                     key={index}
                     className="px-3 py-1.5 rounded-md bg-accent text-accent-foreground text-sm border border-border"
                   >
                     {variable}
                   </span>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* History Card */}
           <Card>
@@ -239,7 +300,7 @@ export default function ProcessDetailPage() {
           </Card>
 
           {/* Actions Card - Mostrar apenas se processo está em revisão ou rascunho */}
-          {(process.status === "em_revisao" || process.status === "rascunho") && (
+          {(displayProcess.status === "em_revisao" || displayProcess.status === "rascunho") && (
             <Card>
               <CardHeader>
                 <CardTitle>Ações</CardTitle>
@@ -269,18 +330,18 @@ export default function ProcessDetailPage() {
         </div>
       </div>
 
-      {process && (
+      {displayProcess && (
         <>
           <ApprovalDialog
             open={approvalDialogOpen}
             onOpenChange={setApprovalDialogOpen}
-            processName={process.name}
+            processName={displayProcess.name}
             onApprove={handleApprove}
           />
           <RejectionDialog
             open={rejectionDialogOpen}
             onOpenChange={setRejectionDialogOpen}
-            processName={process.name}
+            processName={displayProcess.name}
             onReject={handleReject}
           />
         </>
