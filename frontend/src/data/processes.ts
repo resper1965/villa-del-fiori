@@ -294,8 +294,8 @@ export const processesData: Process[] = [
       "5. Comunicação ao síndico/administradora",
       "6. Acompanhamento de correções e melhorias"
     ],
-    entities: ["Faxineiro", "Síndico", "Administradora"],
-    variables: ["areas_comuns", "frequencia_limpeza"],
+    entities: ["Portaria Online", "Moradores", "Visitantes", "Entregadores"],
+    variables: ["portaria_online_contato", "portaria_funcionamento"],
     documentType: "POP",
     mermaid_diagram: `flowchart TD
     A[Atendimento via Sistema] --> B[Verificação de Autorização]
@@ -313,6 +313,36 @@ export const processesData: Process[] = [
   },
   {
     id: 11,
+    name: "Rotina de Limpeza (Faxineiro)",
+    category: "Operação",
+    icon: Wrench,
+    status: "em_revisao",
+    description: "Procedimento operacional padrão para rotina de limpeza das áreas comuns do condomínio, incluindo checklist semanal/mensal, reposição de materiais e reporte de problemas estruturais.",
+    workflow: [
+      "1. Execução da rotina diária de limpeza",
+      "2. Preenchimento de checklist semanal/mensal",
+      "3. Identificação de necessidade de reposição de materiais",
+      "4. Reporte de problemas estruturais identificados",
+      "5. Comunicação ao síndico/administradora",
+      "6. Acompanhamento de correções e melhorias"
+    ],
+    entities: ["Faxineiro", "Síndico", "Administradora"],
+    variables: ["areas_comuns", "frequencia_limpeza"],
+    documentType: "POP",
+    mermaid_diagram: `flowchart TD
+    A[Execução da Rotina Diária] --> B[Preenchimento de Checklist]
+    B --> C{Necessidade de Reposição?}
+    C -->|Sim| D[Identificação de Materiais]
+    C -->|Não| E{Problemas Estruturais?}
+    D --> F[Comunicação ao Síndico]
+    E -->|Sim| G[Reporte de Problemas]
+    E -->|Não| H[Concluído]
+    F --> I[Acompanhamento]
+    G --> F
+    I --> H`
+  },
+  {
+    id: 12,
     name: "Rotina de Limpeza (Faxineiro)",
     category: "Operação",
     icon: Wrench,
