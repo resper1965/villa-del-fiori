@@ -55,17 +55,12 @@ class ApprovalService:
 
         # TODO: Verificar se todos os stakeholders necessários aprovaram
         # Se sim, atualizar status do processo para "aprovado"
-        # Por enquanto, apenas marcar versão como aprovada se for a primeira aprovação
+        # Por enquanto, apenas marcar versão como aprovada após aprovação
         if version.status == ProcessStatus.EM_REVISAO:
-            # Verificar quantas aprovações existem para esta versão
-            approval_count = self.db.query(Approval).filter(
-                Approval.version_id == version_id
-            ).count()
             # Por enquanto, considerar aprovado com 1 aprovação (simplificado)
-            # TODO: Implementar lógica de workflow completo
-            if approval_count == 0:  # Esta será a primeira
-                version.status = ProcessStatus.APROVADO
-                process.status = ProcessStatus.APROVADO
+            # TODO: Implementar lógica de workflow completo com múltiplos aprovadores
+            version.status = ProcessStatus.APROVADO
+            process.status = ProcessStatus.APROVADO
 
         self.db.commit()
         self.db.refresh(approval)
