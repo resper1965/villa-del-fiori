@@ -7,13 +7,8 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    // Verificar se está autenticado
-    const token = localStorage.getItem("access_token")
-    if (token) {
-      router.push("/dashboard")
-    } else {
-      router.push("/login")
-    }
+    // Redirecionar diretamente para o dashboard
+    router.push("/dashboard")
   }, [router])
 
   return null

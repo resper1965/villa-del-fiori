@@ -1,20 +1,9 @@
 "use client"
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, CheckCircle, XCircle, Clock } from "lucide-react"
 
 export default function DashboardPage() {
-  const router = useRouter()
-
-  useEffect(() => {
-    // Verificar se está autenticado
-    const token = localStorage.getItem("access_token")
-    if (!token) {
-      router.push("/login")
-    }
-  }, [router])
 
   return (
     <div className="min-h-screen bg-background p-8">

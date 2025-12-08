@@ -8,8 +8,6 @@ import {
   LayoutDashboard,
   FileText,
   CheckCircle,
-  XCircle,
-  LogOut,
   Menu,
 } from "lucide-react"
 import { useState } from "react"
@@ -23,18 +21,6 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
-  useEffect(() => {
-    const token = localStorage.getItem("access_token")
-    if (!token) {
-      router.push("/login")
-    }
-  }, [router])
-
-  const handleLogout = () => {
-    localStorage.removeItem("access_token")
-    localStorage.removeItem("refresh_token")
-    router.push("/login")
-  }
 
   const menuItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -87,16 +73,6 @@ export default function DashboardLayout({
           })}
         </nav>
 
-        <div className="p-4 border-t border-border">
-          <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className="w-full justify-start text-foreground hover:bg-accent hover:text-accent-foreground"
-          >
-            <LogOut className="h-5 w-5 mr-3" />
-            {sidebarOpen && <span>Sair</span>}
-          </Button>
-        </div>
       </aside>
 
       {/* Main Content */}
