@@ -59,7 +59,7 @@ export default function ProcessesPage() {
     page_size: 100,
   })
 
-  // Usar dados da API ou fallback para mock (usar mock imediatamente se houver erro ou se não houver dados)
+  // Usar dados da API ou dados iniciais dos processos existentes (usar dados iniciais imediatamente se houver erro ou se não houver dados)
   const allProcesses = (apiData?.items && !isError) ? apiData.items : processesData.map((p) => ({
     id: p.id.toString(),
     name: p.name,

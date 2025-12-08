@@ -87,7 +87,7 @@ export default function ProcessDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="h-[73px] border-b border-border flex items-center px-6">
+        <div className="h-[73px] border-b border-border flex items-center px-4">
           <h1 className="text-lg font-semibold text-foreground">Carregando...</h1>
         </div>
         <div className="p-6 flex items-center justify-center min-h-[400px]">
@@ -100,7 +100,7 @@ export default function ProcessDetailPage() {
   if (!displayProcess) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="h-[73px] border-b border-border flex items-center px-6">
+        <div className="h-[73px] border-b border-border flex items-center px-4">
           <h1 className="text-lg font-light text-gray-200">Processo não encontrado</h1>
         </div>
         <div className="p-6">
@@ -124,7 +124,7 @@ export default function ProcessDetailPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="h-[73px] border-b border-border flex items-center px-6">
+      <div className="h-[73px] border-b border-border flex items-center px-4">
         <Button
           variant="ghost"
           size="sm"
