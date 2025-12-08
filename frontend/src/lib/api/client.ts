@@ -7,13 +7,15 @@ const getApiUrl = () => {
     return process.env.NEXT_PUBLIC_API_URL
   }
   
-  // Se estiver em produção (Vercel), tentar usar URL relativa ou configurar
+  // Se estiver em produção (Vercel), usar URL relativa
   if (typeof window !== "undefined") {
-    // Em produção, assumir que o backend está em outro domínio
-    // Por enquanto, usar localhost para desenvolvimento
-    return "http://localhost:8000/api/v1"
+    // Em produção na Vercel, usar URL relativa
+    if (window.location.hostname !== "localhost") {
+      return "/api/v1"
+    }
   }
   
+  // Desenvolvimento local
   return "http://localhost:8000/api/v1"
 }
 

@@ -1,12 +1,16 @@
+specs/
+docker-compose.yml
 node_modules
 .next
 .vercel
 *.log
 .env.local
 .env*.local
-backend/
-specs/
-docker-compose.yml
+backend/venv/
+backend/__pycache__/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
 .git
 .cursor
 .specify
@@ -14,6 +18,3 @@ docker-compose.yml
 frontend/node_modules
 frontend/.next
 frontend/.vercel
-frontend/.git
-
-
