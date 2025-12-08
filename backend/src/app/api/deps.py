@@ -19,3 +19,4 @@ async def get_current_active_user(
     # TODO: Implement proper user fetching from database
     return current_user
 
+

@@ -314,3 +314,4 @@ Usar Alembic para gerenciar migrations:
 4. **Paginação**: Sempre paginar listas grandes (LIMIT/OFFSET ou cursor-based)
 5. **Eager loading**: Usar joinedload/selectinload do SQLAlchemy para evitar N+1 queries
 
+

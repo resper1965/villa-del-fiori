@@ -70,3 +70,4 @@ export interface Rejection {
   additional_comments?: string
 }
 
+

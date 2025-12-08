@@ -369,3 +369,4 @@
 - Backend and frontend can be developed in parallel once API contracts are defined
 - Focus on MVP (US1-US4) first, then add P2 and P3 features
 
+

@@ -275,3 +275,4 @@ alembic history
 - Database Admin: Usar pgAdmin ou DBeaver
 - Logs: `docker-compose logs -f backend` ou `docker-compose logs -f frontend`
 
+
