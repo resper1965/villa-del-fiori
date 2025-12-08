@@ -1,6 +1,23 @@
 import axios from "axios"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+// Detectar URL da API automaticamente
+const getApiUrl = () => {
+  // Se estiver definida via variável de ambiente, usar
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL
+  }
+  
+  // Se estiver em produção (Vercel), tentar usar URL relativa ou configurar
+  if (typeof window !== "undefined") {
+    // Em produção, assumir que o backend está em outro domínio
+    // Por enquanto, usar localhost para desenvolvimento
+    return "http://localhost:8000/api/v1"
+  }
+  
+  return "http://localhost:8000/api/v1"
+}
+
+const API_URL = getApiUrl()
 
 export const apiClient = axios.create({
   baseURL: API_URL,

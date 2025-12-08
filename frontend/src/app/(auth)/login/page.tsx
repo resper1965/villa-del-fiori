@@ -32,7 +32,16 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       console.error("Login error:", err)
-      const errorMessage = err.response?.data?.detail || err.message || "Erro ao fazer login. Verifique a senha e se o backend está rodando."
+      let errorMessage = "Erro ao fazer login."
+      
+      if (err.code === "ERR_NETWORK" || err.message?.includes("Network Error")) {
+        errorMessage = "Não foi possível conectar ao servidor. Verifique se o backend está rodando em http://localhost:8000"
+      } else if (err.response?.data?.detail) {
+        errorMessage = err.response.data.detail
+      } else if (err.message) {
+        errorMessage = err.message
+      }
+      
       setError(errorMessage)
       setLoading(false)
     }
