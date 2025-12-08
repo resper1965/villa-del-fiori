@@ -263,6 +263,12 @@ export default function ProcessesPage() {
             </div>
           ))
         )}
+
+        <ProcessForm
+          open={formOpen}
+          onOpenChange={setFormOpen}
+          onSubmit={handleCreateProcess}
+        />
       </div>
     </div>
   )
