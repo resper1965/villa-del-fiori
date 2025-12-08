@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle, XCircle } from "lucide-react"
+import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle, XCircle, History, User } from "lucide-react"
 import { processesData } from "@/data/processes"
 import { ApprovalDialog } from "@/components/approvals/ApprovalDialog"
 import { RejectionDialog } from "@/components/approvals/RejectionDialog"
@@ -159,6 +159,81 @@ export default function ProcessDetailPage() {
                     {variable}
                   </span>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* History Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-5 w-5 text-muted-foreground" />
+                Histórico de Versões
+              </CardTitle>
+              <CardDescription>Versões anteriores e histórico de alterações</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Versão Atual */}
+                <div className="flex items-start gap-4 p-4 rounded-lg border border-[#00ade8]/30 bg-[#00ade8]/5">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00ade8] text-white flex items-center justify-center text-sm font-medium">
+                    {process.id}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-foreground">
+                        Versão Atual
+                      </span>
+                      <span className="text-xs px-2 py-1 rounded bg-[#00ade8]/20 text-[#00ade8] border border-[#00ade8]/30">
+                        Atual
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Criada em {new Date().toLocaleDateString("pt-BR")}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <User className="h-3 w-3" />
+                      <span>Síndico</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Versões Anteriores (Mock) */}
+                {[1, 2].map((version) => (
+                  <div key={version} className="flex items-start gap-4 p-4 rounded-lg border border-border bg-muted/30">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted text-foreground flex items-center justify-center text-sm font-medium">
+                      v{version}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-foreground">
+                          Versão {version}
+                        </span>
+                        <span className="text-xs px-2 py-1 rounded bg-green-500/10 text-green-400 border border-green-500/20">
+                          Aprovada
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        Criada em {new Date(Date.now() - version * 30 * 24 * 60 * 60 * 1000).toLocaleDateString("pt-BR")}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                        <User className="h-3 w-3" />
+                        <span>Síndico</span>
+                      </div>
+                      {version === 2 && (
+                        <p className="text-xs text-muted-foreground italic">
+                          Correções baseadas em feedback: ajustes na descrição do fluxo
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Mensagem se não houver histórico */}
+                <div className="text-center py-4 text-sm text-muted-foreground">
+                  <History className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>Esta é a primeira versão do processo</p>
+                </div>
               </div>
             </CardContent>
           </Card>
