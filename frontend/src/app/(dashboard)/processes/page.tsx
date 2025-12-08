@@ -13,8 +13,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus, Search, X, Loader2, FileText } from "lucide-react"
-import { useProcesses } from "@/lib/hooks/useProcesses"
+import { useProcesses, useCreateProcess } from "@/lib/hooks/useProcesses"
 import { processesData } from "@/data/processes" // Fallback para dados mock
+import { ProcessForm } from "@/components/processes/ProcessForm"
+import { useState } from "react"
 
 const categoryColors: Record<string, string> = {
   "Governança": "bg-blue-500/10 text-blue-400 border-blue-500/20",
@@ -46,6 +48,9 @@ export default function ProcessesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [selectedStatus, setSelectedStatus] = useState<string>("all")
+  const [formOpen, setFormOpen] = useState(false)
+  
+  const createMutation = useCreateProcess()
 
   // Tentar buscar da API, usar dados mock como fallback
   const { data: apiData, isLoading, error } = useProcesses({
@@ -109,13 +114,17 @@ export default function ProcessesPage() {
     setSelectedStatus("all")
   }
 
+  const handleCreateProcess = async (data: any) => {
+    await createMutation.mutateAsync(data)
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="h-[73px] border-b border-border flex items-center justify-between px-6">
         <h1 className="text-lg font-semibold text-foreground">
           Processos
         </h1>
-        <Button>
+        <Button onClick={() => setFormOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Novo Processo
         </Button>
