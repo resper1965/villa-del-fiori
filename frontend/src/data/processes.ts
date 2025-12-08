@@ -37,14 +37,65 @@ export const processesData: Process[] = [
     variables: ["ciclo_revisao", "responsavel_revisao"],
     documentType: "Manual",
     mermaid_diagram: `flowchart TD
-    A[Identificação da Necessidade] --> B[Elaboração do Rascunho]
-    B --> C[Revisão Interna]
-    C --> D[Apresentação ao Conselho]
+    A["Identificação da Necessidade<br/>(Síndico)"] --> B["Elaboração do Rascunho<br/>(Administradora)"]
+    B --> C["Revisão Interna<br/>(Síndico)"]
+    C --> D["Apresentação ao Conselho<br/>(Síndico)"]
     D --> E{Aprovado?}
-    E -->|Sim| F[Publicação]
-    E -->|Não| G[Ajustes]
+    E -->|Sim| F["Publicação<br/>(Administradora)"]
+    E -->|Não| G["Ajustes<br/>(Administradora)"]
     G --> C
-    F --> H[Revisão Periódica]`
+    F --> H["Revisão Periódica<br/>(Conselho Consultivo)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#166534,stroke:#22c55e,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Identificação da necessidade de novo processo ou revisão",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: ["Conselho Consultivo"],
+        informed: ["Administradora"],
+      },
+      {
+        step: "2. Estruturação do processo (categoria, subcategoria, entidades envolvidas)",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: ["Conselho Consultivo"],
+        informed: [],
+      },
+      {
+        step: "3. Definição de variáveis e parâmetros necessários",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: ["Conselho Consultivo"],
+        informed: [],
+      },
+      {
+        step: "4. Revisão pelo corpo consultivo (síndico + conselho)",
+        responsible: ["Conselho Consultivo"],
+        accountable: ["Conselho Consultivo"],
+        consulted: ["Síndico"],
+        informed: ["Administradora"],
+      },
+      {
+        step: "5. Aprovação e publicação do processo",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Conselho Consultivo"],
+      },
+      {
+        step: "6. Revisão periódica conforme ciclo definido",
+        responsible: ["Conselho Consultivo"],
+        accountable: ["Síndico"],
+        consulted: ["Administradora"],
+        informed: [],
+      },
+    ],
   },
   {
     id: 2,
@@ -65,17 +116,70 @@ export const processesData: Process[] = [
     variables: ["prazo_aprovacao", "quorum_minimo"],
     documentType: "Regulamento",
     mermaid_diagram: `flowchart TD
-    A[Submissão do Processo] --> B[Distribuição ao Conselho]
-    B --> C[Revisão Individual]
-    C --> D[Reunião de Deliberação]
+    A["Submissão do Processo<br/>(Síndico)"] --> B["Distribuição ao Conselho<br/>(Administradora)"]
+    B --> C["Revisão Individual<br/>(Conselho Consultivo)"]
+    C --> D["Reunião de Deliberação<br/>(Conselho Consultivo)"]
     D --> E{Votação}
-    E -->|Aprovado| F[Comunicação da Decisão]
-    E -->|Rejeitado| G[Ajustes Necessários]
-    E -->|Ajustes| H[Aplicação de Ajustes]
-    G --> I[Refazer Processo]
+    E -->|Aprovado| F["Comunicação da Decisão<br/>(Conselho Consultivo)"]
+    E -->|Rejeitado| G["Ajustes Necessários<br/>(Administradora)"]
+    E -->|Ajustes| H["Aplicação de Ajustes<br/>(Administradora)"]
+    G --> I["Refazer Processo<br/>(Síndico)"]
     H --> I
     I --> A
-    F --> J[Publicação]`
+    F --> J["Publicação<br/>(Administradora)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#166534,stroke:#22c55e,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff
+    style I fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Submissão do processo/documento para aprovação",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+      {
+        step: "2. Distribuição para membros do conselho consultivo",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Conselho Consultivo"],
+      },
+      {
+        step: "3. Revisão individual pelos membros",
+        responsible: ["Conselho Consultivo"],
+        accountable: ["Conselho Consultivo"],
+        consulted: ["Síndico"],
+        informed: [],
+      },
+      {
+        step: "4. Reunião de deliberação do conselho",
+        responsible: ["Conselho Consultivo"],
+        accountable: ["Conselho Consultivo"],
+        consulted: ["Síndico"],
+        informed: ["Administradora"],
+      },
+      {
+        step: "5. Votação e decisão (aprovado/rejeitado/ajustes necessários)",
+        responsible: ["Conselho Consultivo"],
+        accountable: ["Conselho Consultivo"],
+        consulted: [],
+        informed: ["Síndico", "Administradora"],
+      },
+      {
+        step: "6. Comunicação da decisão e aplicação de ajustes se necessário",
+        responsible: ["Administradora"],
+        accountable: ["Conselho Consultivo"],
+        consulted: [],
+        informed: ["Síndico"],
+      },
+    ],
   },
   {
     id: 3,
@@ -96,14 +200,65 @@ export const processesData: Process[] = [
     variables: ["nome_sindico", "contato_sindico", "administradora_nome"],
     documentType: "POP",
     mermaid_diagram: `flowchart TD
-    A[Seleção do Processo] --> B[Aplicação de Variáveis]
-    B --> C[Geração do Documento]
-    C --> D[Revisão do Documento]
+    A["Seleção do Processo<br/>(Síndico)"] --> B["Aplicação de Variáveis<br/>(Administradora)"]
+    B --> C["Geração do Documento<br/>(Administradora)"]
+    C --> D["Revisão do Documento<br/>(Síndico)"]
     D --> E{Aprovado?}
-    E -->|Sim| F[Publicação]
-    E -->|Não| G[Correções]
+    E -->|Sim| F["Publicação<br/>(Administradora)"]
+    E -->|Não| G["Correções<br/>(Administradora)"]
     G --> D
-    F --> H[Distribuição aos Moradores]`
+    F --> H["Distribuição aos Moradores<br/>(Administradora)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#166534,stroke:#22c55e,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Seleção do processo e tipo de documento a gerar",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: ["Conselho Consultivo"],
+        informed: ["Administradora"],
+      },
+      {
+        step: "2. Aplicação automática de variáveis configuradas",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Geração do documento em formato estruturado",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "4. Revisão do documento gerado",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: ["Conselho Consultivo"],
+        informed: [],
+      },
+      {
+        step: "5. Aprovação final pelo síndico",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Conselho Consultivo", "Administradora"],
+      },
+      {
+        step: "6. Publicação no website ou distribuição aos moradores",
+        responsible: ["Administradora"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Conselho Consultivo"],
+      },
+    ],
   },
   
   // Acesso e Segurança
@@ -126,14 +281,65 @@ export const processesData: Process[] = [
     variables: ["tipo_acesso_portas", "horario_funcionamento"],
     documentType: "POP",
     mermaid_diagram: `flowchart TD
-    A[Solicitação de Cadastro] --> B[Verificação de Identidade]
-    B --> C[Cadastro no Sistema]
-    C --> D[Teste de Funcionamento]
+    A["Solicitação de Cadastro<br/>(Moradores)"] --> B["Verificação de Identidade<br/>(Portaria Online)"]
+    B --> C["Cadastro no Sistema<br/>(Portaria Online)"]
+    C --> D["Teste de Funcionamento<br/>(Portaria Online)"]
     D --> E{Ativado?}
-    E -->|Sim| F[Orientação de Uso]
-    E -->|Não| G[Correção]
+    E -->|Sim| F["Orientação de Uso<br/>(Portaria Online)"]
+    E -->|Não| G["Correção<br/>(Portaria Online)"]
     G --> D
-    F --> H[Monitoramento]`
+    F --> H["Monitoramento<br/>(Síndico)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#166534,stroke:#22c55e,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Solicitação de cadastro biométrico pelo morador",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "2. Verificação de identidade e documentação",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Cadastro no sistema biométrico (facial e digital)",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Teste de funcionamento e ativação",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "5. Orientação sobre uso e regras de acesso",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "6. Monitoramento e manutenção do sistema",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+    ],
   },
   {
     id: 5,
@@ -154,14 +360,65 @@ export const processesData: Process[] = [
     variables: ["tipo_abertura_portao", "vagas_por_unidade"],
     documentType: "POP",
     mermaid_diagram: `flowchart TD
-    A[Solicitação de Controle] --> B[Verificação de Vaga]
-    B --> C[Cadastro no Sistema]
-    C --> D[Entrega e Orientação]
+    A["Solicitação de Controle<br/>(Moradores)"] --> B["Verificação de Vaga<br/>(Portaria Online)"]
+    B --> C["Cadastro no Sistema<br/>(Portaria Online)"]
+    C --> D["Entrega e Orientação<br/>(Portaria Online)"]
     D --> E{Uso Normal}
-    E -->|Perda| F[Bloqueio Imediato]
-    E -->|Substituição| G[Solicitação de Substituição]
+    E -->|Perda| F["Bloqueio Imediato<br/>(Portaria Online)"]
+    E -->|Substituição| G["Solicitação de Substituição<br/>(Moradores)"]
     F --> G
-    G --> H[Novo Cadastro]`
+    G --> H["Novo Cadastro<br/>(Portaria Online)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#dc2626,stroke:#ef4444,color:#fff
+    style G fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style H fill:#1e3a8a,stroke:#3b82f6,color:#fff`,
+    raci: [
+      {
+        step: "1. Solicitação de controle remoto pelo morador",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "2. Verificação de vaga e documentação",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Cadastro do controle no sistema",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Entrega e orientação sobre uso",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "5. Em caso de perda: bloqueio imediato do dispositivo",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "6. Substituição mediante solicitação e taxa se aplicável",
+        responsible: ["Moradores", "Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+    ],
   },
   {
     id: 6,
@@ -182,15 +439,66 @@ export const processesData: Process[] = [
     variables: ["politica_substituicao_controle_remoto"],
     documentType: "POP",
     mermaid_diagram: `flowchart TD
-    A[Solicitação] --> B{Tipo de Ação}
-    B -->|Cadastro| C[Verificação de Autorização]
-    B -->|Bloqueio| D[Verificação de Identidade]
-    B -->|Substituição| E[Verificação e Taxa]
-    C --> F[Execução]
+    A["Solicitação<br/>(Moradores)"] --> B{Tipo de Ação}
+    B -->|Cadastro| C["Verificação de Autorização<br/>(Portaria Online)"]
+    B -->|Bloqueio| D["Verificação de Identidade<br/>(Portaria Online)"]
+    B -->|Substituição| E["Verificação e Taxa<br/>(Portaria Online)"]
+    C --> F["Execução<br/>(Portaria Online)"]
     D --> F
     E --> F
-    F --> G[Registro no Sistema]
-    G --> H[Notificação]`
+    F --> G["Registro no Sistema<br/>(Portaria Online)"]
+    G --> H["Notificação<br/>(Portaria Online)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style E fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Solicitação de cadastro/bloqueio/substituição",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "2. Verificação de identidade e autorização",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: ["Administradora"],
+        informed: [],
+      },
+      {
+        step: "3. Execução da ação (cadastro/bloqueio/substituição)",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Registro no sistema de ocorrências",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+      {
+        step: "5. Notificação ao solicitante",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "6. Atualização de documentação e registros",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Administradora"],
+      },
+    ],
   },
   {
     id: 7,
@@ -211,16 +519,69 @@ export const processesData: Process[] = [
     variables: ["retencao_gravacoes", "areas_monitoradas"],
     documentType: "Regulamento",
     mermaid_diagram: `flowchart TD
-    A[Monitoramento Contínuo] --> B[Gravação]
-    B --> C[Armazenamento]
+    A["Monitoramento Contínuo<br/>(Empresa de Segurança)"] --> B["Gravação<br/>(Empresa de Segurança)"]
+    B --> C["Armazenamento<br/>(Empresa de Segurança)"]
     C --> D{Solicitação de Acesso}
-    D -->|Sim| E[Verificação de Autorização]
-    D -->|Não| F[Retenção Periódica]
+    D -->|Sim| E["Verificação de Autorização<br/>(Síndico)"]
+    D -->|Não| F["Retenção Periódica<br/>(Empresa de Segurança)"]
     E --> G{Autorizado?}
-    G -->|Sim| H[Fornecimento de Gravação]
-    G -->|Não| I[Negado]
-    H --> J[Registro de Acesso]
-    F --> K[Auditoria Periódica]`
+    G -->|Sim| H["Fornecimento de Gravação<br/>(Empresa de Segurança)"]
+    G -->|Não| I["Negado<br/>(Síndico)"]
+    H --> J["Registro de Acesso<br/>(Portaria Online)"]
+    F --> K["Auditoria Periódica<br/>(Síndico)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style E fill:#166534,stroke:#22c55e,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style H fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style I fill:#dc2626,stroke:#ef4444,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff
+    style K fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Monitoramento contínuo das áreas comuns",
+        responsible: ["Empresa de Segurança"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "2. Gravação e armazenamento conforme política de retenção",
+        responsible: ["Empresa de Segurança"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Solicitação de acesso às gravações (apenas autorizados)",
+        responsible: ["Síndico", "Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Empresa de Segurança"],
+      },
+      {
+        step: "4. Verificação de autorização e motivo da solicitação",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "5. Fornecimento de gravação com registro de acesso",
+        responsible: ["Empresa de Segurança"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "6. Auditoria periódica de acessos e uso do sistema",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: ["Empresa de Segurança"],
+        informed: ["Portaria Online"],
+      },
+    ],
   },
   {
     id: 8,
@@ -241,14 +602,67 @@ export const processesData: Process[] = [
     variables: ["portaria_funcionamento", "horario_visitas"],
     documentType: "POP",
     mermaid_diagram: `flowchart TD
-    A[Solicitação pelo Morador] --> B[Verificação de Identidade]
-    B --> C[Registro do Visitante]
-    C --> D[Autorização de Acesso]
-    D --> E[Orientação]
-    E --> F[Entrada]
-    F --> G[Acompanhamento]
-    G --> H[Saída]
-    H --> I[Atualização de Registros]`
+    A["Solicitação pelo Morador<br/>(Moradores)"] --> B["Verificação de Identidade<br/>(Portaria Online)"]
+    B --> C["Registro do Visitante<br/>(Portaria Online)"]
+    C --> D["Autorização de Acesso<br/>(Portaria Online)"]
+    D --> E["Orientação<br/>(Portaria Online)"]
+    E --> F["Entrada<br/>(Visitantes)"]
+    F --> G["Acompanhamento<br/>(Portaria Online)"]
+    G --> H["Saída<br/>(Visitantes)"]
+    H --> I["Atualização de Registros<br/>(Portaria Online)"]
+    style A fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style D fill:#166534,stroke:#22c55e,color:#fff
+    style E fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style G fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style H fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style I fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Solicitação de autorização pelo morador (presencial ou via app)",
+        responsible: ["Moradores"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "2. Verificação de identidade do morador solicitante",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: [],
+      },
+      {
+        step: "3. Registro do visitante no sistema",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "4. Autorização de acesso e orientação",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores", "Visitantes"],
+      },
+      {
+        step: "5. Acompanhamento e registro de entrada/saída",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+      {
+        step: "6. Encerramento da visita e atualização de registros",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Moradores"],
+      },
+    ],
   },
   {
     id: 9,
@@ -270,16 +684,78 @@ export const processesData: Process[] = [
     variables: ["telefone_policia", "telefone_bombeiros"],
     documentType: "Formulário",
     mermaid_diagram: `flowchart TD
-    A[Identificação do Incidente] --> B[Registro]
-    B --> C[Classificação]
-    C --> D[Notificação]
-    D --> E[Investigação]
-    E --> F[Coleta de Evidências]
-    F --> G[Análise]
-    G --> H[Ações Corretivas]
-    H --> I[Implementação]
-    I --> J[Acompanhamento]
-    J --> K[Registro no Histórico]`
+    A["Identificação do Incidente<br/>(Moradores/Portaria)"] --> B["Registro<br/>(Portaria Online)"]
+    B --> C["Classificação<br/>(Síndico)"]
+    C --> D["Notificação<br/>(Portaria Online)"]
+    D --> E["Investigaçã<br/>(Empresa de Segurança)"]
+    E --> F["Coleta de Evidências<br/>(Empresa de Segurança)"]
+    F --> G["Análise<br/>(Síndico)"]
+    G --> H["Ações Corretivas<br/>(Síndico)"]
+    H --> I["Implementação<br/>(Empresa de Segurança)"]
+    I --> J["Acompanhamento<br/>(Síndico)"]
+    J --> K["Registro no Histórico<br/>(Portaria Online)"]
+    style A fill:#dc2626,stroke:#ef4444,color:#fff
+    style B fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style C fill:#166534,stroke:#22c55e,color:#fff
+    style D fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style E fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style F fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style G fill:#166534,stroke:#22c55e,color:#fff
+    style H fill:#166534,stroke:#22c55e,color:#fff
+    style I fill:#1e3a8a,stroke:#3b82f6,color:#fff
+    style J fill:#166534,stroke:#22c55e,color:#fff
+    style K fill:#166534,stroke:#22c55e,color:#fff`,
+    raci: [
+      {
+        step: "1. Identificação e registro do incidente",
+        responsible: ["Moradores", "Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Empresa de Segurança"],
+      },
+      {
+        step: "2. Classificação do incidente (gravidade, tipo)",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: ["Empresa de Segurança"],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "3. Notificação aos responsáveis (síndico, segurança)",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Empresa de Segurança"],
+      },
+      {
+        step: "4. Investigação e coleta de evidências",
+        responsible: ["Empresa de Segurança"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "5. Análise e definição de ações corretivas",
+        responsible: ["Síndico"],
+        accountable: ["Síndico"],
+        consulted: ["Empresa de Segurança"],
+        informed: [],
+      },
+      {
+        step: "6. Implementação de medidas e acompanhamento",
+        responsible: ["Empresa de Segurança"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Portaria Online"],
+      },
+      {
+        step: "7. Registro no histórico e lições aprendidas",
+        responsible: ["Portaria Online"],
+        accountable: ["Síndico"],
+        consulted: [],
+        informed: ["Empresa de Segurança"],
+      },
+    ],
   },
   
   // Operação
