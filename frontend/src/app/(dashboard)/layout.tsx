@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button"
 import {
   LayoutDashboard,
   FileText,
-  CheckCircle,
   Menu,
   Building2,
+  LogOut,
 } from "lucide-react"
 import { useState } from "react"
+import { useAuth } from "@/hooks/useAuth"
+import Login from "@/components/auth/Login"
 
 export default function DashboardLayout({
   children,
@@ -21,6 +23,33 @@ export default function DashboardLayout({
   const router = useRouter()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const { isAuthenticated, isLoading, login, logout } = useAuth()
+
+  const handleLogin = (password: string) => {
+    const success = login(password)
+    if (success) {
+      // Login bem-sucedido, não precisa redirecionar pois já está no dashboard
+    }
+  }
+
+  const handleLogout = () => {
+    logout()
+    router.push("/")
+  }
+
+  // Mostrar loading enquanto verifica autenticação
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-gray-400 font-light">Carregando...</div>
+      </div>
+    )
+  }
+
+  // Se não autenticado, mostrar tela de login
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />
+  }
 
 
   const menuItems = [
@@ -75,6 +104,18 @@ export default function DashboardLayout({
             )
           })}
         </nav>
+
+        {/* Botão de Logout */}
+        <div className="p-4 border-t border-border">
+          <Button
+            variant="ghost"
+            onClick={handleLogout}
+            className="w-full justify-start text-gray-400 hover:text-white hover:bg-gray-800"
+          >
+            <LogOut className="h-5 w-5 flex-shrink-0 stroke-1" />
+            {sidebarOpen && <span className="text-sm font-light ml-3">Sair</span>}
+          </Button>
+        </div>
 
       </aside>
 
