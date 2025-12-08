@@ -159,6 +159,25 @@ export default function ProcessDetailPage() {
             </CardContent>
           </Card>
 
+          {/* Mermaid Diagram Card */}
+          {process?.current_version?.content?.mermaid_diagram && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <GitBranch className="h-5 w-5 text-muted-foreground" />
+                  Diagrama do Processo
+                </CardTitle>
+                <CardDescription>Visualização do fluxo do processo em diagrama</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <MermaidDiagram
+                  diagram={process.current_version.content.mermaid_diagram}
+                  id={`process-${displayProcess.id}-diagram`}
+                />
+              </CardContent>
+            </Card>
+          )}
+
           {/* Workflow Card */}
           {displayProcess.workflow && displayProcess.workflow.length > 0 && (
             <Card>
