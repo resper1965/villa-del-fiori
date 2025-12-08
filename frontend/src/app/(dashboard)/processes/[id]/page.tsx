@@ -38,6 +38,7 @@ export default function ProcessDetailPage() {
     workflow: initialProcess.workflow,
     entities: initialProcess.entities,
     variables: initialProcess.variables,
+    raci: initialProcess.raci, // Incluir matriz RACI
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     current_version_number: 1,
