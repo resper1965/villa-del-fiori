@@ -3,57 +3,83 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Clock, CheckCircle, XCircle, Eye } from "lucide-react"
+import { Clock, CheckCircle, XCircle, Eye, Loader2, FileText } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { processesData } from "@/data/processes"
+import { useProcesses } from "@/lib/hooks/useProcesses"
+import { useApproveProcess, useRejectProcess } from "@/lib/hooks/useApprovals"
 import { ApprovalDialog } from "@/components/approvals/ApprovalDialog"
 import { RejectionDialog } from "@/components/approvals/RejectionDialog"
-
-// Simulando processos pendentes de aprovação
-const pendingProcesses = processesData
-  .filter(p => p.status === "em_revisao" || p.status === "rascunho")
-  .slice(0, 5)
-  .map(p => ({
-    ...p,
-    submittedBy: "Síndico",
-    submittedAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
-    priority: Math.random() > 0.7 ? "alta" : "normal",
-  }))
+import { processesData } from "@/data/processes" // Fallback
 
 export default function ApprovalsPage() {
   const router = useRouter()
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false)
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false)
-  const [selectedProcess, setSelectedProcess] = useState<typeof pendingProcesses[0] | null>(null)
+  const [selectedProcess, setSelectedProcess] = useState<any | null>(null)
 
-  const handleApproveClick = (process: typeof pendingProcesses[0]) => {
+  // Buscar processos pendentes de aprovação
+  const { data: apiData, isLoading } = useProcesses({
+    status: "em_revisao",
+    page: 1,
+    page_size: 100,
+  })
+
+  const approveMutation = useApproveProcess()
+  const rejectMutation = useRejectProcess()
+
+  // Usar dados da API ou fallback para mock
+  const pendingProcesses = apiData?.items || processesData
+    .filter(p => p.status === "em_revisao" || p.status === "rascunho")
+    .slice(0, 5)
+    .map(p => ({
+      id: p.id.toString(),
+      name: p.name,
+      category: p.category,
+      status: p.status,
+      description: p.description,
+      current_version: { id: "1" }, // Mock version ID
+    }))
+
+  const handleApproveClick = (process: any) => {
     setSelectedProcess(process)
     setApprovalDialogOpen(true)
   }
 
-  const handleRejectClick = (process: typeof pendingProcesses[0]) => {
+  const handleRejectClick = (process: any) => {
     setSelectedProcess(process)
     setRejectionDialogOpen(true)
   }
 
   const handleApprove = async (comment?: string) => {
-    if (!selectedProcess) return
+    if (!selectedProcess || !selectedProcess.current_version?.id) return
     
-    // TODO: Integrar com API
-    console.log("Aprovando processo:", selectedProcess.id, "Comentário:", comment)
-    
-    // Simular atualização
-    alert(`Processo "${selectedProcess.name}" aprovado com sucesso!`)
+    try {
+      await approveMutation.mutateAsync({
+        processId: selectedProcess.id,
+        versionId: selectedProcess.current_version.id,
+        data: { comments: comment },
+      })
+      setApprovalDialogOpen(false)
+      setSelectedProcess(null)
+    } catch (error) {
+      console.error("Erro ao aprovar:", error)
+    }
   }
 
   const handleReject = async (reason: string) => {
-    if (!selectedProcess) return
+    if (!selectedProcess || !selectedProcess.current_version?.id) return
     
-    // TODO: Integrar com API
-    console.log("Rejeitando processo:", selectedProcess.id, "Motivo:", reason)
-    
-    // Simular atualização
-    alert(`Processo "${selectedProcess.name}" rejeitado.\n\nMotivo: ${reason}`)
+    try {
+      await rejectMutation.mutateAsync({
+        processId: selectedProcess.id,
+        versionId: selectedProcess.current_version.id,
+        data: { reason },
+      })
+      setRejectionDialogOpen(false)
+      setSelectedProcess(null)
+    } catch (error) {
+      console.error("Erro ao rejeitar:", error)
+    }
   }
 
   return (
@@ -64,7 +90,14 @@ export default function ApprovalsPage() {
         </h1>
       </div>
       <div className="p-6">
-        {pendingProcesses.length === 0 ? (
+        {isLoading ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">Carregando processos pendentes...</p>
+            </CardContent>
+          </Card>
+        ) : pendingProcesses.length === 0 ? (
           <Card>
             <CardHeader>
               <CardTitle>Aprovações Pendentes</CardTitle>
@@ -92,11 +125,12 @@ export default function ApprovalsPage() {
               </div>
             </div>
 
-            {pendingProcesses.map((process) => {
-              const Icon = process.icon
-              const daysAgo = Math.floor(
-                (Date.now() - process.submittedAt.getTime()) / (1000 * 60 * 60 * 24)
-              )
+            {pendingProcesses.map((process: any) => {
+              const daysAgo = process.created_at
+                ? Math.floor(
+                    (Date.now() - new Date(process.created_at).getTime()) / (1000 * 60 * 60 * 24)
+                  )
+                : 0
               
               return (
                 <Card key={process.id} className="hover:border-[#00ade8]/50 transition-colors">
@@ -104,23 +138,19 @@ export default function ApprovalsPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4 flex-1">
                         <div className="p-3 rounded-lg bg-muted">
-                          <Icon className="h-5 w-5 text-foreground" />
+                          <FileText className="h-5 w-5 text-foreground" />
                         </div>
                         <div className="flex-1">
                           <CardTitle className="text-base mb-2">{process.name}</CardTitle>
                           <CardDescription className="mb-3">
-                            {process.description.substring(0, 150)}...
+                            {process.description ? process.description.substring(0, 150) + "..." : "Sem descrição"}
                           </CardDescription>
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             <span>Categoria: {process.category}</span>
-                            <span>•</span>
-                            <span>Enviado por: {process.submittedBy}</span>
-                            <span>•</span>
-                            <span>{daysAgo === 0 ? "Hoje" : `${daysAgo} dia(s) atrás`}</span>
-                            {process.priority === "alta" && (
+                            {process.created_at && (
                               <>
                                 <span>•</span>
-                                <span className="text-red-400 font-medium">Prioridade Alta</span>
+                                <span>{daysAgo === 0 ? "Hoje" : `${daysAgo} dia(s) atrás`}</span>
                               </>
                             )}
                           </div>
@@ -143,18 +173,20 @@ export default function ApprovalsPage() {
                         size="sm"
                         className="bg-green-600 hover:bg-green-700 text-white"
                         onClick={() => handleApproveClick(process)}
+                        disabled={approveMutation.isPending}
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
-                        Aprovar
+                        {approveMutation.isPending ? "Aprovando..." : "Aprovar"}
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         className="border-red-500/50 text-red-400 hover:bg-red-500/10"
                         onClick={() => handleRejectClick(process)}
+                        disabled={rejectMutation.isPending}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
-                        Rejeitar
+                        {rejectMutation.isPending ? "Rejeitando..." : "Rejeitar"}
                       </Button>
                     </div>
                   </CardContent>
