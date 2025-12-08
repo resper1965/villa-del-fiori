@@ -29,7 +29,13 @@ class Settings(BaseSettings):
     
     @property
     def cors_origins_list(self) -> List[str]:
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+        origins = [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+        # Se estiver na Vercel, adicionar o domínio atual
+        import os
+        vercel_url = os.environ.get("VERCEL_URL")
+        if vercel_url:
+            origins.append(f"https://{vercel_url}")
+        return origins
     
     class Config:
         env_file = ".env"
