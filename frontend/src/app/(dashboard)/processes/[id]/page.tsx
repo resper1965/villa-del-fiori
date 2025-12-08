@@ -144,16 +144,16 @@ export default function ProcessDetailPage() {
           <Card>
             <CardHeader>
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-muted">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="p-2 rounded-lg bg-muted flex-shrink-0">
                     <FileText className="h-5 w-5 text-foreground stroke-1" />
                   </div>
-                  <div>
-                    <CardTitle className="text-lg mb-1">{displayProcess.name}</CardTitle>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">{displayProcess.category}</span>
-                      <span className="text-muted-foreground">•</span>
-                      <span className="text-sm text-muted-foreground">{displayProcess.document_type}</span>
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base sm:text-lg mb-1 break-words">{displayProcess.name}</CardTitle>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs sm:text-sm text-muted-foreground">{displayProcess.category}</span>
+                      <span className="text-muted-foreground hidden sm:inline">•</span>
+                      <span className="text-xs sm:text-sm text-muted-foreground">{displayProcess.document_type}</span>
                     </div>
                   </div>
                 </div>
