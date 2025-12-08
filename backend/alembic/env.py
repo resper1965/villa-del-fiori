@@ -12,7 +12,13 @@ from app.core.config import settings
 from app.core.database import Base
 
 # Import all models here so Alembic can detect them
-# from app.models import stakeholder, process, version, approval, rejection, etc.
+from app.models import (
+    Stakeholder,
+    Process,
+    ProcessVersion,
+    Approval,
+    Rejection,
+)
 
 # this is the Alembic Config object
 config = context.config
