@@ -65,12 +65,12 @@ export default function ProcessDetailPage() {
       if (isLoading) {
         return (
           <div className="min-h-screen">
-            <div className="h-[73px] border-b border-border/50 flex items-center px-4">
+            <div className="h-[73px] border-b border-border/50/50 flex items-center px-4">
           <div className="h-4 w-32 bg-muted animate-pulse rounded" />
         </div>
-        <div className="px-1 sm:px-2 md:px-3 py-2">
-          <div className="w-full space-y-2">
-            <Card>
+        <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+          <div className="w-full space-y-4">
+            <Card className="card-elevated">
               <CardHeader>
                 <div className="h-6 w-3/4 bg-muted animate-pulse rounded mb-2" />
                 <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
@@ -80,7 +80,7 @@ export default function ProcessDetailPage() {
                 <div className="h-4 w-5/6 bg-muted animate-pulse rounded" />
               </CardContent>
             </Card>
-            <Card>
+            <Card className="card-elevated">
               <CardHeader>
                 <div className="h-5 w-1/3 bg-muted animate-pulse rounded" />
               </CardHeader>
@@ -98,7 +98,7 @@ export default function ProcessDetailPage() {
   if (isError || error) {
         return (
           <div className="min-h-screen">
-            <div className="h-[73px] border-b border-border/50 flex items-center px-4">
+            <div className="h-[73px] border-b border-border/50/50 flex items-center px-4">
               <h1 className="text-lg font-light text-foreground">Erro ao carregar processo</h1>
         </div>
         <div className="p-2">
@@ -121,7 +121,7 @@ export default function ProcessDetailPage() {
   if (!displayProcess && !isLoading) {
         return (
           <div className="min-h-screen">
-            <div className="h-[73px] border-b border-border/50 flex items-center px-4">
+            <div className="h-[73px] border-b border-border/50/50 flex items-center px-4">
               <h1 className="text-lg font-light text-foreground">Processo não encontrado</h1>
         </div>
         <div className="p-2">
@@ -153,7 +153,7 @@ export default function ProcessDetailPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="h-[73px] border-b border-border flex items-center px-4">
+      <div className="h-[73px] border-b border-border/50 flex items-center px-4">
         <Button
           variant="ghost"
           size="sm"
@@ -172,10 +172,10 @@ export default function ProcessDetailPage() {
           </h1>
         </div>
       </div>
-      <div className="px-1 sm:px-2 md:px-3 py-2">
-        <div className="w-full space-y-2">
+      <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+        <div className="w-full space-y-4">
           {/* Header Card */}
-          <Card>
+          <Card className="card-elevated">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -208,7 +208,7 @@ export default function ProcessDetailPage() {
           {(() => {
             const diagram = process?.current_version?.content?.mermaid_diagram || "";
             return diagram ? (
-              <Card>
+              <Card className="card-elevated">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <GitBranch className="h-4 w-4 text-muted-foreground stroke-1" />
@@ -228,13 +228,13 @@ export default function ProcessDetailPage() {
 
           {/* Workflow Card */}
           {displayProcess.workflow && displayProcess.workflow.length > 0 && (
-            <Card className="bg-gray-800/50 border-gray-700/50">
+            <Card className="card-elevated">
               <CardHeader>
                 <CardTitle className="text-xl font-light text-gray-200">Fluxo do Processo</CardTitle>
                 <CardDescription className="text-gray-400 font-light">Etapas sequenciais para execução deste processo</CardDescription>
               </CardHeader>
               <CardContent>
-                <ol className="space-y-2">
+                <ol className="space-y-4">
                   {displayProcess.workflow.map((step, index) => (
                   <li key={index} className="flex gap-2">
                     <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
@@ -250,7 +250,7 @@ export default function ProcessDetailPage() {
 
           {/* Entities Card */}
           {displayProcess.entities && displayProcess.entities.length > 0 && (
-            <Card>
+            <Card className="card-elevated">
               <CardHeader>
                 <CardTitle>Entidades Envolvidas</CardTitle>
                 <CardDescription>Pessoas, sistemas ou infraestrutura que participam deste processo</CardDescription>
@@ -260,7 +260,7 @@ export default function ProcessDetailPage() {
                   {displayProcess.entities.map((entity, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 rounded-md bg-muted text-foreground text-xs border border-border"
+                    className="px-2 py-1 rounded-md bg-muted text-foreground text-xs border border-border/50"
                   >
                     {entity}
                   </span>
@@ -277,7 +277,7 @@ export default function ProcessDetailPage() {
 
           {/* Variables Card */}
           {displayProcess.variables && displayProcess.variables.length > 0 && (
-            <Card className="bg-gray-800/50 border-gray-700/50">
+            <Card className="card-elevated">
               <CardHeader>
                 <CardTitle className="text-xl font-light text-gray-200">Variáveis do Sistema</CardTitle>
                 <CardDescription className="text-gray-400 font-light">Parâmetros configuráveis aplicados neste processo</CardDescription>
@@ -287,7 +287,7 @@ export default function ProcessDetailPage() {
                   {displayProcess.variables.map((variable, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 rounded-md bg-accent text-accent-foreground text-xs border border-border"
+                    className="px-2 py-1 rounded-md bg-accent text-accent-foreground text-xs border border-border/50"
                   >
                     {variable}
                   </span>
@@ -298,7 +298,7 @@ export default function ProcessDetailPage() {
           )}
 
           {/* History Card */}
-          <Card>
+          <Card className="card-elevated">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <History className="h-5 w-5 text-muted-foreground stroke-1" />
@@ -307,7 +307,7 @@ export default function ProcessDetailPage() {
               <CardDescription>Versões anteriores e histórico de alterações</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {/* Versão Atual */}
                 <div className="flex items-start gap-2 p-2 rounded-lg border border-[#00ade8]/30 bg-[#00ade8]/5">
                   <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#00ade8] text-white flex items-center justify-center text-xs font-medium">
@@ -364,7 +364,7 @@ export default function ProcessDetailPage() {
 
           {/* Actions Card - Mostrar apenas se processo está em revisão ou rascunho */}
           {(displayProcess.status === "em_revisao" || displayProcess.status === "rascunho") && (
-            <Card>
+            <Card className="card-elevated">
               <CardHeader>
                 <CardTitle>Ações</CardTitle>
                 <CardDescription>Revisar e aprovar ou rejeitar este processo</CardDescription>
