@@ -115,51 +115,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Como Funciona o Sistema</CardTitle>
-            <CardDescription>
-              Sistema de Gestão de Processos Condominiais com Workflow de Aprovação
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="text-sm font-light text-gray-200 mb-2">1. Processos Organizados por Categoria</h3>
-              <p className="text-sm text-gray-400 font-light leading-relaxed">
-                Todos os processos do condomínio estão organizados em 7 categorias principais: Governança, Acesso e Segurança, Operação, Áreas Comuns, Convivência, Eventos e Emergências. Cada processo possui descrição detalhada, fluxo de execução, entidades envolvidas e variáveis configuráveis.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-sm font-light text-gray-200 mb-2">2. Workflow de Aprovação</h3>
-              <p className="text-sm text-gray-400 font-light leading-relaxed">
-                Stakeholders (síndico, conselho consultivo, administradora) podem revisar processos, aprovar ou rejeitar. Em caso de rejeição, devem fornecer motivos detalhados para que o processo possa ser refeito com base no feedback recebido.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-sm font-light text-gray-200 mb-2">3. Geração de Documentos Oficiais</h3>
-              <p className="text-sm text-gray-400 font-light leading-relaxed">
-                Processos aprovados podem gerar automaticamente documentos oficiais (POPs, manuais, regulamentos, avisos, comunicados) aplicando variáveis configuradas (horários, contatos, políticas) e em formato pronto para publicação no website do condomínio.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-sm font-light text-gray-200 mb-2">4. Histórico e Rastreabilidade</h3>
-              <p className="text-sm text-gray-400 font-light leading-relaxed">
-                O sistema mantém histórico completo de todas as ações (criação, edição, aprovação, rejeição) em cada processo, permitindo rastreabilidade completa e navegação entre versões anteriores.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-sm font-light text-gray-200 mb-2">5. Variáveis Configuráveis</h3>
-              <p className="text-sm text-gray-400 font-light leading-relaxed">
-                O sistema utiliza variáveis configuráveis (horários de áreas comuns, contatos, políticas) que são aplicadas automaticamente nos documentos gerados, permitindo personalização sem reescrever processos.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )
