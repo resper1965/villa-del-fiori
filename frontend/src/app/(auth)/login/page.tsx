@@ -47,7 +47,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-[#00ade8] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 px-4">
       <div className="w-full max-w-md space-y-8">
         {/* Logo e Título */}
         <div className="text-center space-y-2">
@@ -64,7 +64,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card de Login */}
-        <div className="w-full max-w-md bg-gray-800/50 border-gray-700/50 rounded-lg shadow-lg p-8 space-y-6">
+        <div className="w-full max-w-md bg-gray-800/90 backdrop-blur-md border border-gray-700/50 rounded-lg shadow-2xl p-8 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Campo Email */}
             <div className="space-y-2">

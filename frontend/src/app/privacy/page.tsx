@@ -3,9 +3,9 @@ import { Building2 } from "lucide-react"
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-[#00ade8] p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-gray-800/50 border border-gray-700/50 rounded-lg shadow-lg p-8 space-y-6">
+        <div className="bg-gray-800/90 backdrop-blur-md border border-gray-700/50 rounded-lg shadow-2xl p-8 space-y-6">
           {/* Header */}
           <div className="text-center space-y-2 mb-8">
             <div className="flex items-center justify-center mb-4">

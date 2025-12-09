@@ -145,8 +145,8 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-[#00ade8] flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-gray-800/90 backdrop-blur-md border-gray-700/50 shadow-2xl">
           <CardHeader className="space-y-1 text-center">
             <div className="flex items-center justify-center mb-4">
               <div className="p-3 rounded-full bg-green-500/10">
@@ -170,8 +170,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-[#00ade8] flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-gray-800/90 backdrop-blur-md border-gray-700/50 shadow-2xl">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <div className="p-3 rounded-full bg-[#00ade8]/10">
