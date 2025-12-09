@@ -14,6 +14,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
             retry: 1, // Tentar apenas 1 vez
             retryDelay: 1000, // 1 segundo
             refetchOnWindowFocus: false, // Não refazer fetch ao focar na janela
+            refetchOnMount: true, // Refazer fetch ao montar componente
+            refetchOnReconnect: true, // Refazer fetch ao reconectar
+            // Timeout para evitar loading infinito
+            gcTime: 10 * 60 * 1000, // 10 minutos (antes era cacheTime)
+            // Não usar suspense para evitar problemas
+            suspense: false,
+          },
+          mutations: {
+            retry: 1,
+            retryDelay: 1000,
           },
         },
       })
@@ -25,5 +35,3 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </QueryClientProvider>
   )
 }
-
-

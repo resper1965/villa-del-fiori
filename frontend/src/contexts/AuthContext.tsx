@@ -54,13 +54,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Buscar dados adicionais da tabela stakeholders (se existir)
       let stakeholder = null
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from("stakeholders")
           .select("id, name, type")
           .eq("auth_user_id", supabaseUser.id)
           .maybeSingle()
         
-        stakeholder = data
+        if (!error) {
+          stakeholder = data
+        }
       } catch (err) {
         // Se não encontrar na tabela, não é crítico - usamos dados do Auth
         console.warn("Stakeholder table not found or RLS blocking:", err)
@@ -91,29 +93,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Inicializar autenticação
   useEffect(() => {
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+
     const initAuth = async () => {
       try {
+        // Timeout de segurança (10 segundos)
+        timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.warn("Auth initialization timeout")
+            setIsLoading(false)
+          }
+        }, 10000)
+
         // Verificar sessão atual
         const {
           data: { session },
+          error: sessionError,
         } = await supabase.auth.getSession()
 
-        if (session?.user) {
-          const user = await loadUser(session.user)
-          if (user) {
+        if (sessionError) {
+          console.error("Error getting session:", sessionError)
+          if (mounted) {
+            setIsLoading(false)
+          }
+          return
+        }
+
+        if (session?.user && mounted) {
+          const loadedUser = await loadUser(session.user)
+          if (loadedUser && mounted) {
             // Verificar se está aprovado
-            if (!user.is_approved) {
+            if (!loadedUser.is_approved && !loadedUser.is_superadmin) {
               router.push("/auth/waiting-approval")
+              setIsLoading(false)
               return
             }
-            setUser(user)
+            setUser(loadedUser)
             setIsAuthenticated(true)
           }
         }
       } catch (error) {
         console.error("Error initializing auth:", error)
       } finally {
-        setIsLoading(false)
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+        }
+        if (mounted) {
+          setIsLoading(false)
+        }
       }
     }
 
@@ -123,15 +151,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return
+
       if (event === "SIGNED_IN" && session?.user) {
-        const user = await loadUser(session.user)
-        if (user) {
+        const loadedUser = await loadUser(session.user)
+        if (loadedUser) {
           // Superadmin sempre tem acesso, mesmo sem aprovação
-          if (!user.is_approved && !user.is_superadmin) {
+          if (!loadedUser.is_approved && !loadedUser.is_superadmin) {
             router.push("/auth/waiting-approval")
+            setIsLoading(false)
             return
           }
-          setUser(user)
+          setUser(loadedUser)
           setIsAuthenticated(true)
         }
       } else if (event === "SIGNED_OUT") {
@@ -142,6 +173,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     return () => {
+      mounted = false
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
       subscription.unsubscribe()
     }
   }, [loadUser, router])
@@ -159,14 +194,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.user) {
-        const user = await loadUser(data.user)
-        if (user) {
+        const loadedUser = await loadUser(data.user)
+        if (loadedUser) {
           // Superadmin sempre tem acesso, mesmo sem aprovação
-          if (!user.is_approved && !user.is_superadmin) {
+          if (!loadedUser.is_approved && !loadedUser.is_superadmin) {
             router.push("/auth/waiting-approval")
             return false
           }
-          setUser(user)
+          setUser(loadedUser)
           setIsAuthenticated(true)
           return true
         }
@@ -196,14 +231,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.user) {
-        const user = await loadUser(data.user)
-        if (user) {
+        const loadedUser = await loadUser(data.user)
+        if (loadedUser) {
           // Superadmin sempre tem acesso, mesmo sem aprovação
-          if (!user.is_approved && !user.is_superadmin) {
+          if (!loadedUser.is_approved && !loadedUser.is_superadmin) {
             router.push("/auth/waiting-approval")
             return false
           }
-          setUser(user)
+          setUser(loadedUser)
           setIsAuthenticated(true)
           return true
         }
@@ -217,26 +252,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [loadUser, router])
 
   const logout = useCallback(async () => {
-    await supabase.auth.signOut()
-    setUser(null)
-    setIsAuthenticated(false)
-    router.push("/login")
+    try {
+      await supabase.auth.signOut()
+      setUser(null)
+      setIsAuthenticated(false)
+      router.push("/login")
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error)
+      // Mesmo com erro, limpar estado local
+      setUser(null)
+      setIsAuthenticated(false)
+      router.push("/login")
+    }
   }, [router])
 
   const refreshToken = useCallback(async (): Promise<boolean> => {
     try {
       const {
         data: { session },
+        error,
       } = await supabase.auth.refreshSession()
 
+      if (error) {
+        console.error("Error refreshing session:", error)
+        return false
+      }
+
       if (session?.user) {
-        const user = await loadUser(session.user)
-        if (user) {
+        const loadedUser = await loadUser(session.user)
+        if (loadedUser) {
           // Superadmin sempre tem acesso, mesmo sem aprovação
-          if (!user.is_approved && !user.is_superadmin) {
+          if (!loadedUser.is_approved && !loadedUser.is_superadmin) {
             return false
           }
-          setUser(user)
+          setUser(loadedUser)
           setIsAuthenticated(true)
           return true
         }
@@ -273,4 +322,3 @@ export function useAuth() {
   }
   return context
 }
-

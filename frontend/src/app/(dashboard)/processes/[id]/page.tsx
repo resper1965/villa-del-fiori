@@ -27,11 +27,6 @@ export default function ProcessDetailPage() {
 
   const displayProcess = process
 
-  // Log para debug
-  if (error) {
-    console.error("Erro ao carregar processo:", error)
-  }
-
   const handleApprove = async (comment?: string) => {
     if (!displayProcess || !process?.current_version?.id) return
     
@@ -62,10 +57,10 @@ export default function ProcessDetailPage() {
     }
   }
 
-      if (isLoading) {
-        return (
-          <div className="min-h-screen">
-            <div className="h-[73px] border-b border-border/50/50 flex items-center px-4">
+  if (isLoading) {
+    return (
+      <div className="min-h-screen">
+        <div className="h-[73px] border-b border-border/50 flex items-center px-4 md:px-6">
           <div className="h-4 w-32 bg-muted animate-pulse rounded" />
         </div>
         <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
@@ -96,15 +91,15 @@ export default function ProcessDetailPage() {
 
   // Mostrar erro se houver
   if (isError || error) {
-        return (
-          <div className="min-h-screen">
-            <div className="h-[73px] border-b border-border/50/50 flex items-center px-4">
-              <h1 className="text-lg font-light text-foreground">Erro ao carregar processo</h1>
+    return (
+      <div className="min-h-screen">
+        <div className="h-[73px] border-b border-border/50 flex items-center px-4 md:px-6">
+          <h1 className="text-lg font-semibold text-foreground">Erro ao carregar processo</h1>
         </div>
-        <div className="p-2">
-          <Card className="mb-4">
+        <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+          <Card className="card-elevated mb-4">
             <CardContent className="pt-6">
-              <p className="text-red-400 mb-4">
+              <p className="text-destructive mb-4">
                 {error instanceof Error ? error.message : "Erro desconhecido ao carregar o processo"}
               </p>
               <Button onClick={() => router.push("/processes")} variant="outline">
@@ -119,16 +114,21 @@ export default function ProcessDetailPage() {
   }
 
   if (!displayProcess && !isLoading) {
-        return (
-          <div className="min-h-screen">
-            <div className="h-[73px] border-b border-border/50/50 flex items-center px-4">
-              <h1 className="text-lg font-light text-foreground">Processo não encontrado</h1>
+    return (
+      <div className="min-h-screen">
+        <div className="h-[73px] border-b border-border/50 flex items-center px-4 md:px-6">
+          <h1 className="text-lg font-semibold text-foreground">Processo não encontrado</h1>
         </div>
-        <div className="p-2">
-          <Button onClick={() => router.push("/processes")} variant="outline">
-            <ArrowLeft className="h-4 w-4 mr-2 stroke-1" />
-            Voltar para Processos
-          </Button>
+        <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+          <Card className="card-elevated">
+            <CardContent className="pt-6">
+              <p className="text-muted-foreground mb-4">O processo solicitado não foi encontrado.</p>
+              <Button onClick={() => router.push("/processes")} variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-2 stroke-1" />
+                Voltar para Processos
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )
@@ -142,7 +142,7 @@ export default function ProcessDetailPage() {
   const statusConfig = {
     aprovado: { icon: CheckCircle, color: "text-green-400", label: "Aprovado" },
     em_revisao: { icon: Clock, color: "text-yellow-400", label: "Em Revisão" },
-    rascunho: { icon: FileText, color: "text-gray-400", label: "Rascunho" },
+    rascunho: { icon: FileText, color: "text-muted-foreground", label: "Rascunho" },
     rejeitado: { icon: AlertCircle, color: "text-red-400", label: "Rejeitado" },
   }
   const statusInfo = statusConfig[displayProcess.status as keyof typeof statusConfig] || statusConfig.aprovado
@@ -153,7 +153,7 @@ export default function ProcessDetailPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="h-[73px] border-b border-border/50 flex items-center px-4">
+      <div className="h-[73px] border-b border-border/50 flex items-center px-4 md:px-6">
         <Button
           variant="ghost"
           size="sm"
@@ -164,10 +164,10 @@ export default function ProcessDetailPage() {
           Voltar
         </Button>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-[#00ade8] bg-[#00ade8]/10 px-2 py-1 rounded">
+          <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
             v{processVersion}
           </span>
-          <h1 className="text-lg font-light text-gray-200">
+          <h1 className="text-lg font-semibold text-foreground">
             {displayProcess.name}
           </h1>
         </div>
@@ -206,7 +206,7 @@ export default function ProcessDetailPage() {
 
           {/* Mermaid Diagram Card - Sempre mostrar se houver diagrama */}
           {(() => {
-            const diagram = process?.current_version?.content?.mermaid_diagram || "";
+            const diagram = process?.current_version?.content?.mermaid_diagram || ""
             return diagram ? (
               <Card className="card-elevated">
                 <CardHeader className="pb-2">
@@ -223,25 +223,25 @@ export default function ProcessDetailPage() {
                   />
                 </CardContent>
               </Card>
-            ) : null;
+            ) : null
           })()}
 
           {/* Workflow Card */}
           {displayProcess.workflow && displayProcess.workflow.length > 0 && (
             <Card className="card-elevated">
               <CardHeader>
-                <CardTitle className="text-xl font-light text-gray-200">Fluxo do Processo</CardTitle>
-                <CardDescription className="text-gray-400 font-light">Etapas sequenciais para execução deste processo</CardDescription>
+                <CardTitle className="text-base">Fluxo do Processo</CardTitle>
+                <CardDescription className="text-xs">Etapas sequenciais para execução deste processo</CardDescription>
               </CardHeader>
               <CardContent>
                 <ol className="space-y-4">
                   {displayProcess.workflow.map((step, index) => (
-                  <li key={index} className="flex gap-2">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
-                      {index + 1}
-                    </span>
-                    <span className="text-sm text-foreground pt-0.5">{step}</span>
-                  </li>
+                    <li key={index} className="flex gap-2">
+                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
+                        {index + 1}
+                      </span>
+                      <span className="text-sm text-foreground pt-0.5">{step}</span>
+                    </li>
                   ))}
                 </ol>
               </CardContent>
@@ -258,12 +258,12 @@ export default function ProcessDetailPage() {
               <CardContent>
                 <div className="flex flex-wrap gap-1.5">
                   {displayProcess.entities.map((entity, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 rounded-md bg-muted text-foreground text-xs border border-border/50"
-                  >
-                    {entity}
-                  </span>
+                    <span
+                      key={index}
+                      className="px-2 py-1 rounded-md bg-muted text-foreground text-xs border border-border/50"
+                    >
+                      {entity}
+                    </span>
                   ))}
                 </div>
               </CardContent>
@@ -279,18 +279,18 @@ export default function ProcessDetailPage() {
           {displayProcess.variables && displayProcess.variables.length > 0 && (
             <Card className="card-elevated">
               <CardHeader>
-                <CardTitle className="text-xl font-light text-gray-200">Variáveis do Sistema</CardTitle>
-                <CardDescription className="text-gray-400 font-light">Parâmetros configuráveis aplicados neste processo</CardDescription>
+                <CardTitle className="text-base">Variáveis do Sistema</CardTitle>
+                <CardDescription className="text-xs">Parâmetros configuráveis aplicados neste processo</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-1.5">
                   {displayProcess.variables.map((variable, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 rounded-md bg-accent text-accent-foreground text-xs border border-border/50"
-                  >
-                    {variable}
-                  </span>
+                    <span
+                      key={index}
+                      className="px-2 py-1 rounded-md bg-accent text-accent-foreground text-xs border border-border/50"
+                    >
+                      {variable}
+                    </span>
                   ))}
                 </div>
               </CardContent>
@@ -309,8 +309,8 @@ export default function ProcessDetailPage() {
             <CardContent>
               <div className="space-y-4">
                 {/* Versão Atual */}
-                <div className="flex items-start gap-2 p-2 rounded-lg border border-[#00ade8]/30 bg-[#00ade8]/5">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#00ade8] text-white flex items-center justify-center text-xs font-medium">
+                <div className="flex items-start gap-2 p-2 rounded-lg border border-primary/30 bg-primary/5">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
                     v{displayProcess.current_version_number || 1}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -325,7 +325,7 @@ export default function ProcessDetailPage() {
                           ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
                           : displayProcess.status === "rejeitado"
                           ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                          : "bg-[#00ade8]/20 text-[#00ade8] border border-[#00ade8]/30"
+                          : "bg-primary/20 text-primary border border-primary/30"
                       }`}>
                         {statusInfo.label}
                       </span>
@@ -374,17 +374,37 @@ export default function ProcessDetailPage() {
                   <Button
                     onClick={() => setApprovalDialogOpen(true)}
                     className="bg-green-600 hover:bg-green-700 text-white"
+                    disabled={approveMutation.isPending}
                   >
-                    <CheckCircle className="h-4 w-4 mr-2 stroke-1" />
-                    Aprovar Processo
+                    {approveMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin stroke-1" />
+                        Aprovando...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="h-4 w-4 mr-2 stroke-1" />
+                        Aprovar Processo
+                      </>
+                    )}
                   </Button>
                   <Button
                     onClick={() => setRejectionDialogOpen(true)}
                     variant="outline"
                     className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                    disabled={rejectMutation.isPending}
                   >
-                    <XCircle className="h-4 w-4 mr-2 stroke-1" />
-                    Rejeitar Processo
+                    {rejectMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin stroke-1" />
+                        Rejeitando...
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="h-4 w-4 mr-2 stroke-1" />
+                        Rejeitar Processo
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>
@@ -412,4 +432,3 @@ export default function ProcessDetailPage() {
     </div>
   )
 }
-

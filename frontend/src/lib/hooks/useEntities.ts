@@ -15,16 +15,31 @@ export const useEntities = (params?: {
     queryFn: () => entitiesApi.list(params),
     retry: 1,
     retryDelay: 1000,
+    staleTime: 5 * 60 * 1000, // Cache por 5 minutos
+    gcTime: 10 * 60 * 1000, // Manter em cache por 10 minutos
+    refetchOnWindowFocus: false,
+    meta: {
+      errorMessage: "Erro ao carregar entidades. Tente novamente.",
+    },
   })
 }
 
 export const useEntity = (id: string | null) => {
   return useQuery({
     queryKey: ["entity", id],
-    queryFn: () => entitiesApi.getById(id!),
-    enabled: !!id,
+    queryFn: async () => {
+      if (!id) throw new Error("ID da entidade é obrigatório")
+      return entitiesApi.getById(id)
+    },
+    enabled: !!id, // Só executa se tiver ID
     retry: 1,
     retryDelay: 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    meta: {
+      errorMessage: "Erro ao carregar entidade. Tente novamente.",
+    },
   })
 }
 
@@ -35,6 +50,9 @@ export const useCreateEntity = () => {
     mutationFn: entitiesApi.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["entities"] })
+    },
+    onError: (error) => {
+      console.error("Erro ao criar entidade:", error)
     },
   })
 }
@@ -49,6 +67,9 @@ export const useUpdateEntity = () => {
       queryClient.invalidateQueries({ queryKey: ["entities"] })
       queryClient.invalidateQueries({ queryKey: ["entity", variables.id] })
     },
+    onError: (error) => {
+      console.error("Erro ao atualizar entidade:", error)
+    },
   })
 }
 
@@ -60,6 +81,8 @@ export const useDeleteEntity = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["entities"] })
     },
+    onError: (error) => {
+      console.error("Erro ao deletar entidade:", error)
+    },
   })
 }
-
