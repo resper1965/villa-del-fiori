@@ -4,6 +4,9 @@ from typing import List
 
 class Settings(BaseSettings):
     # Database
+    # Suporta: Neon, Vercel Postgres, Supabase, ou qualquer PostgreSQL
+    # Neon: postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/dbname
+    # Vercel Postgres: use POSTGRES_URL_NON_POOLING (criado automaticamente)
     DATABASE_URL: str = "postgresql://user:pass@localhost/db"
     
     # Security
@@ -23,6 +26,10 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     API_V1_PREFIX: str = "/api/v1"
+    
+    # AI Configuration
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-4o"  # ou "gpt-4o-mini" para custo menor
     
     # CORS
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001,https://*.vercel.app"

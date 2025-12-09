@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 
 from app.core.database import get_db
+from app.core.security import get_current_council_or_syndic
+from app.models.stakeholder import Stakeholder
 from app.schemas.approval import ApprovalCreate, ApprovalResponse, RejectionCreate, RejectionResponse
 from app.services.approval_service import ApprovalService
 
@@ -15,13 +17,10 @@ async def approve_process(
     version_id: UUID,
     approval_data: ApprovalCreate,
     db: Session = Depends(get_db),
-    # TODO: Adicionar get_current_user quando autenticação estiver completa
-    # current_user: dict = Depends(get_current_user),
+    current_user: Stakeholder = Depends(get_current_council_or_syndic),
 ):
-    """Aprovar processo/versão"""
-    # Por enquanto, usar um stakeholder_id fixo
-    # TODO: Usar current_user["id"] quando autenticação estiver completa
-    stakeholder_id = UUID("00000000-0000-0000-0000-000000000001")  # Admin default
+    """Aprovar processo/versão - Apenas Conselho, Síndico ou Admin"""
+    stakeholder_id = current_user.id
 
     service = ApprovalService(db)
     try:
@@ -45,13 +44,10 @@ async def reject_process(
     version_id: UUID,
     rejection_data: RejectionCreate,
     db: Session = Depends(get_db),
-    # TODO: Adicionar get_current_user quando autenticação estiver completa
-    # current_user: dict = Depends(get_current_user),
+    current_user: Stakeholder = Depends(get_current_council_or_syndic),
 ):
-    """Rejeitar processo/versão"""
-    # Por enquanto, usar um stakeholder_id fixo
-    # TODO: Usar current_user["id"] quando autenticação estiver completa
-    stakeholder_id = UUID("00000000-0000-0000-0000-000000000001")  # Admin default
+    """Rejeitar processo/versão - Apenas Conselho, Síndico ou Admin"""
+    stakeholder_id = current_user.id
 
     service = ApprovalService(db)
     try:

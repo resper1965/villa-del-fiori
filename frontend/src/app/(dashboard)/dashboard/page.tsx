@@ -11,6 +11,12 @@ export default function DashboardPage() {
   const router = useRouter()
   const { canAccessDashboard } = useRBAC()
 
+  // Buscar todos os processos do Supabase (hooks devem ser chamados antes de qualquer return)
+  const { data: allProcessesData, isLoading: isLoadingAll } = useProcesses({
+    page: 1,
+    page_size: 1000, // Buscar todos
+  })
+
   // Redirecionar moradores para o chat
   useEffect(() => {
     if (!canAccessDashboard()) {
@@ -23,21 +29,11 @@ export default function DashboardPage() {
     return null
   }
 
-  // Buscar todos os processos do Supabase
-  const { data: allProcessesData, isLoading: isLoadingAll } = useProcesses({
-    page: 1,
-    page_size: 1000, // Buscar todos
-  })
-
   const processes = allProcessesData?.items || []
   const totalProcesses = processes.length
   const approvedProcesses = processes.filter(p => p.status === "aprovado").length
   const pendingProcesses = processes.filter(p => p.status === "em_revisao" || p.status === "rascunho").length
   const rejectedProcesses = processes.filter(p => p.status === "rejeitado").length
-
-  if (!canAccessDashboard()) {
-    return null
-  }
 
   if (isLoadingAll) {
     return (

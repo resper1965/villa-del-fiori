@@ -1,0 +1,881 @@
+openapi: 3.0.3
+info:
+  title: Ingestão de Contratos de Fornecedores API
+  description: API para ingestão de contratos, análise por IA e geração automática de processos
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development server
+  - url: https://api.condominio.com/api/v1
+    description: Production server
+
+tags:
+  - name: contracts
+    description: Gestão de contratos de fornecedores
+  - name: analysis
+    description: Análise de contratos por IA
+  - name: suggestions
+    description: Processos sugeridos pela IA
+  - name: dashboard
+    description: Dashboard e métricas
+
+paths:
+  /contracts/upload:
+    post:
+      tags: [contracts]
+      summary: Upload de contrato de fornecedor
+      description: Faz upload de um contrato (PDF, DOC, DOCX) e inicia extração de texto
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Arquivo do contrato (PDF, DOC, DOCX)
+                contract_number:
+                  type: string
+                  description: Número do contrato (opcional)
+                contract_type:
+                  $ref: '#/components/schemas/ContractType'
+                supplier_name:
+                  type: string
+                  description: Nome do fornecedor (opcional, será inferido)
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+      responses:
+        '201':
+          description: Contrato enviado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractUploadResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '413':
+          description: Arquivo muito grande (limite 50MB)
+
+  /contracts:
+    get:
+      tags: [contracts]
+      summary: Listar contratos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ContractStatus'
+        - name: contract_type
+          in: query
+          schema:
+            $ref: '#/components/schemas/ContractType'
+        - name: supplier_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Busca por nome do arquivo ou fornecedor
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Lista de contratos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractListResponse'
+
+  /contracts/{contract_id}:
+    get:
+      tags: [contracts]
+      summary: Obter detalhes do contrato
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contract_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Detalhes do contrato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [contracts]
+      summary: Atualizar metadados do contrato
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contract_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractUpdate'
+      responses:
+        '200':
+          description: Contrato atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contract'
+
+  /contracts/{contract_id}/analyze:
+    post:
+      tags: [analysis]
+      summary: Iniciar análise do contrato por IA
+      description: Inicia análise assíncrona do contrato. Retorna imediatamente e o status pode ser consultado via GET /contracts/{id}/analysis
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contract_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '202':
+          description: Análise iniciada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisStartResponse'
+        '400':
+          description: Contrato não está pronto para análise (texto não extraído)
+        '409':
+          description: Análise já em andamento
+
+  /contracts/{contract_id}/analysis:
+    get:
+      tags: [analysis]
+      summary: Obter resultado da análise
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contract_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Resultado da análise
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractAnalysis'
+        '404':
+          description: Análise não encontrada
+
+  /contracts/{contract_id}/suggested-processes:
+    get:
+      tags: [suggestions]
+      summary: Listar processos sugeridos para o contrato
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contract_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: min_confidence
+          in: query
+          schema:
+            type: number
+            minimum: 0
+            maximum: 1
+          description: Filtrar por score mínimo de confiança
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, accepted, rejected]
+      responses:
+        '200':
+          description: Lista de processos sugeridos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SuggestedProcess'
+
+  /contracts/{contract_id}/suggested-processes/{suggestion_id}/accept:
+    post:
+      tags: [suggestions]
+      summary: Aceitar sugestão de processo
+      description: Aceita a sugestão e prepara para geração do processo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contract_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: suggestion_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuggestionAcceptRequest'
+      responses:
+        '200':
+          description: Sugestão aceita
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuggestedProcess'
+
+  /contracts/{contract_id}/suggested-processes/{suggestion_id}/reject:
+    post:
+      tags: [suggestions]
+      summary: Rejeitar sugestão de processo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contract_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: suggestion_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuggestionRejectRequest'
+      responses:
+        '200':
+          description: Sugestão rejeitada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuggestedProcess'
+
+  /contracts/{contract_id}/generate:
+    post:
+      tags: [suggestions]
+      summary: Gerar processos das sugestões aceitas
+      description: Gera processos no sistema para todas as sugestões aceitas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contract_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Processos gerados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateProcessesResponse'
+        '400':
+          description: Nenhuma sugestão aceita para gerar
+
+  /contracts/{contract_id}/processes:
+    get:
+      tags: [contracts]
+      summary: Listar processos gerados a partir do contrato
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contract_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de processos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessSummary'
+
+  /contracts/{contract_id}/history:
+    get:
+      tags: [contracts]
+      summary: Histórico de eventos do contrato
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contract_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Timeline de eventos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContractHistoryEvent'
+
+  /contracts/dashboard:
+    get:
+      tags: [dashboard]
+      summary: Dashboard de contratos e métricas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [7d, 30d, 90d, 1y, all]
+            default: 30d
+      responses:
+        '200':
+          description: Dados do dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractDashboard'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ContractStatus:
+      type: string
+      enum:
+        - uploaded
+        - extracting
+        - extracted
+        - analyzing
+        - analyzed
+        - generating
+        - completed
+        - error
+
+    ContractType:
+      type: string
+      enum:
+        - servico
+        - manutencao
+        - fornecimento
+        - terceirizacao
+        - outro
+
+    Contract:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        file_name:
+          type: string
+        file_size:
+          type: integer
+          description: Tamanho em bytes
+        file_type:
+          type: string
+          enum: [pdf, doc, docx]
+        contract_number:
+          type: string
+          nullable: true
+        contract_type:
+          $ref: '#/components/schemas/ContractType'
+        supplier_name:
+          type: string
+          nullable: true
+        supplier_id:
+          type: string
+          format: uuid
+          nullable: true
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
+        status:
+          $ref: '#/components/schemas/ContractStatus'
+        created_by:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ContractDetail:
+      allOf:
+        - $ref: '#/components/schemas/Contract'
+        - type: object
+          properties:
+            extracted_text:
+              type: string
+              nullable: true
+            extraction_metadata:
+              type: object
+              nullable: true
+            error_message:
+              type: string
+              nullable: true
+            latest_analysis:
+              $ref: '#/components/schemas/ContractAnalysis'
+            suggested_processes:
+              type: array
+              items:
+                $ref: '#/components/schemas/SuggestedProcess'
+            generated_processes:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProcessSummary'
+
+    ContractUploadResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        file_name:
+          type: string
+        status:
+          $ref: '#/components/schemas/ContractStatus'
+        message:
+          type: string
+
+    ContractListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contract'
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+
+    ContractUpdate:
+      type: object
+      properties:
+        contract_number:
+          type: string
+        contract_type:
+          $ref: '#/components/schemas/ContractType'
+        supplier_name:
+          type: string
+        supplier_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+
+    ContractAnalysis:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        contract_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        identified_supplier:
+          type: object
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+            confidence:
+              type: number
+            extracted_info:
+              type: object
+        identified_services:
+          type: array
+          items:
+            type: object
+            properties:
+              service:
+                type: string
+              frequency:
+                type: string
+                nullable: true
+              confidence:
+                type: number
+        suggested_categories:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              confidence:
+                type: number
+              justification:
+                type: string
+        tokens_used:
+          type: integer
+          nullable: true
+        processing_time_ms:
+          type: integer
+          nullable: true
+        model_used:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+
+    AnalysisStartResponse:
+      type: object
+      properties:
+        analysis_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, processing]
+        message:
+          type: string
+
+    SuggestedProcess:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        analysis_id:
+          type: string
+          format: uuid
+        process_name:
+          type: string
+        process_category:
+          type: string
+          enum: [governanca, acesso_seguranca, operacao, areas_comuns, convivencia, eventos, emergencias]
+        document_type:
+          type: string
+          enum: [pop, manual, regulamento, fluxograma, aviso, comunicado, checklist, formulario, politica]
+        description:
+          type: string
+        workflow_steps:
+          type: array
+          items:
+            type: string
+        mermaid_diagram:
+          type: string
+          nullable: true
+        raci_matrix:
+          type: array
+          items:
+            type: object
+            properties:
+              step:
+                type: string
+              responsible:
+                type: array
+                items:
+                  type: string
+              accountable:
+                type: array
+                items:
+                  type: string
+              consulted:
+                type: array
+                items:
+                  type: string
+              informed:
+                type: array
+                items:
+                  type: string
+        entities_involved:
+          type: array
+          items:
+            type: string
+        variables:
+          type: array
+          items:
+            type: string
+        confidence_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        justification:
+          type: string
+        missing_entities:
+          type: array
+          items:
+            type: string
+          nullable: true
+        is_accepted:
+          type: boolean
+        is_rejected:
+          type: boolean
+        rejection_reason:
+          type: string
+          nullable: true
+        generated_process_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    SuggestionAcceptRequest:
+      type: object
+      properties:
+        modifications:
+          type: object
+          description: Modificações opcionais antes de aceitar
+          properties:
+            process_name:
+              type: string
+            description:
+              type: string
+            workflow_steps:
+              type: array
+              items:
+                type: string
+            raci_matrix:
+              type: array
+              items:
+                type: object
+
+    SuggestionRejectRequest:
+      type: object
+      required:
+        - reason
+      properties:
+        reason:
+          type: string
+          minLength: 10
+
+    GenerateProcessesResponse:
+      type: object
+      properties:
+        generated_count:
+          type: integer
+        processes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProcessSummary'
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              suggestion_id:
+                type: string
+                format: uuid
+              error:
+                type: string
+
+    ProcessSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+        is_ai_generated:
+          type: boolean
+        source_contract_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    ContractHistoryEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum:
+            - uploaded
+            - extraction_started
+            - extraction_completed
+            - extraction_failed
+            - analysis_started
+            - analysis_completed
+            - analysis_failed
+            - process_suggested
+            - process_accepted
+            - process_rejected
+            - process_generated
+            - supplier_linked
+            - metadata_updated
+        description:
+          type: string
+        event_data:
+          type: object
+          nullable: true
+        user_name:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    ContractDashboard:
+      type: object
+      properties:
+        summary:
+          type: object
+          properties:
+            total_contracts:
+              type: integer
+            contracts_by_status:
+              type: object
+              additionalProperties:
+                type: integer
+            total_processes_generated:
+              type: integer
+            avg_processing_time_ms:
+              type: number
+        ai_metrics:
+          type: object
+          properties:
+            total_suggestions:
+              type: integer
+            accepted_suggestions:
+              type: integer
+            rejected_suggestions:
+              type: integer
+            acceptance_rate:
+              type: number
+            avg_confidence_score:
+              type: number
+        contracts_by_period:
+          type: array
+          items:
+            type: object
+            properties:
+              period:
+                type: string
+              count:
+                type: integer
+        processes_by_category:
+          type: object
+          additionalProperties:
+            type: integer
+        recent_contracts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contract'
+
+  responses:
+    BadRequest:
+      description: Requisição inválida
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string

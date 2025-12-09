@@ -4,7 +4,9 @@ from typing import Optional
 from uuid import UUID
 
 from app.core.database import get_db
+from app.core.security import get_current_active_user, get_current_active_syndic
 from app.models.process import ProcessCategory, ProcessStatus
+from app.models.stakeholder import Stakeholder
 from app.schemas.process import (
     ProcessCreate,
     ProcessUpdate,
@@ -79,13 +81,10 @@ async def get_process(
 async def create_process(
     process_data: ProcessCreate,
     db: Session = Depends(get_db),
-    # TODO: Adicionar get_current_user quando autenticação estiver completa
-    # current_user: dict = Depends(get_current_user),
+    current_user: Stakeholder = Depends(get_current_active_user),
 ):
-    """Criar novo processo"""
-    # Por enquanto, usar um creator_id fixo
-    # TODO: Usar current_user["id"] quando autenticação estiver completa
-    creator_id = UUID("00000000-0000-0000-0000-000000000001")  # Admin default
+    """Criar novo processo - Requer autenticação"""
+    creator_id = current_user.id
 
     service = ProcessService(db)
     process = service.create_process(process_data, creator_id)
@@ -98,8 +97,9 @@ async def update_process(
     process_id: UUID,
     process_data: ProcessUpdate,
     db: Session = Depends(get_db),
+    current_user: Stakeholder = Depends(get_current_active_user),
 ):
-    """Atualizar processo"""
+    """Atualizar processo - Requer autenticação"""
     service = ProcessService(db)
     process = service.update_process(process_id, process_data)
 
@@ -116,8 +116,9 @@ async def update_process(
 async def delete_process(
     process_id: UUID,
     db: Session = Depends(get_db),
+    current_user: Stakeholder = Depends(get_current_active_syndic),
 ):
-    """Deletar processo"""
+    """Deletar processo - Apenas Síndico ou Admin"""
     service = ProcessService(db)
     success = service.delete_process(process_id)
 

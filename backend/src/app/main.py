@@ -43,6 +43,10 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
+@app.get("/v1/health")
+async def health_v1():
+    return {"status": "healthy", "version": "1.0.0"}
+
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):

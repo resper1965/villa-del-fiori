@@ -26,11 +26,11 @@ export default function DashboardLayout({
   const router = useRouter()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const { isAuthenticated, isLoading, login, logout } = useAuth()
+  const { isAuthenticated, isLoading, loginSimple, logout } = useAuth()
   const { canAccessDashboard, canAccessChat, canApproveUsers } = useRBAC()
 
-  const handleLogin = (password: string) => {
-    const success = login(password)
+  const handleLogin = async (password: string) => {
+    const success = await loginSimple(password)
     if (success) {
       // Login bem-sucedido, não precisa redirecionar pois já está no dashboard
     }

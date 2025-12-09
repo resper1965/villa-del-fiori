@@ -14,11 +14,21 @@ os.environ.setdefault("ENVIRONMENT", "production")
 os.environ.setdefault("DEBUG", "False")
 os.environ["VERCEL"] = "1"  # Mark that we're running on Vercel
 
-from app.main import app
-from mangum import Mangum
-
-# Create ASGI adapter for Vercel
-# Vercel passes the path after /api/ as the path parameter
-# So /api/v1/auth/login becomes "v1/auth/login" in the handler
-# We need to ensure the path is correctly processed
-handler = Mangum(app, lifespan="off", api_gateway_base_path="/api")
+try:
+    from app.main import app
+    from mangum import Mangum
+    
+    # Create ASGI adapter for Vercel
+    # Vercel rewrites /v1/* to /api/v1/*, then passes to this handler
+    # The handler receives the full path including /v1
+    # Mangum will handle the routing correctly
+    handler = Mangum(app, lifespan="off")
+except Exception as e:
+    # Fallback for debugging
+    import traceback
+    def handler(event, context):
+        return {
+            "statusCode": 500,
+            "headers": {"Content-Type": "application/json"},
+            "body": f'{{"error": "Error loading app: {str(e)}", "traceback": "{traceback.format_exc()}"}}'
+        }

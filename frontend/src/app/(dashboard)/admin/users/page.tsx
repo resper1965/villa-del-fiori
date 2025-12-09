@@ -16,13 +16,7 @@ export default function AdminUsersPage() {
   const { canApproveUsers } = useRBAC()
   const queryClient = useQueryClient()
 
-  // Verificar permissão
-  if (!canApproveUsers()) {
-    router.push("/dashboard")
-    return null
-  }
-
-  // Buscar todos os usuários
+  // Buscar todos os usuários (hooks devem ser chamados antes de qualquer return)
   const { data: allUsers, isLoading } = useQuery({
     queryKey: ["all-users"],
     queryFn: async () => {
@@ -35,6 +29,7 @@ export default function AdminUsersPage() {
       if (error) throw error
       return data || []
     },
+    enabled: canApproveUsers(), // Só busca se tiver permissão
   })
 
   // Mutation para aprovar usuário
@@ -72,6 +67,12 @@ export default function AdminUsersPage() {
       queryClient.invalidateQueries({ queryKey: ["all-users"] })
     },
   })
+
+  // Verificar permissão após hooks
+  if (!canApproveUsers()) {
+    router.push("/dashboard")
+    return null
+  }
 
   const handleApprove = async (userId: string) => {
     if (confirm("Deseja aprovar este usuário?")) {

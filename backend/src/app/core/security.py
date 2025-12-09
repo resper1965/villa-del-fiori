@@ -59,8 +59,11 @@ def decode_token(token: str) -> dict:
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-) -> dict:
-    """Get current user from JWT token"""
+    db: Session = Depends(get_db),
+) -> "Stakeholder":
+    """Get current user from JWT token and database"""
+    from app.models.stakeholder import Stakeholder
+    
     payload = decode_token(token)
     user_id: str = payload.get("sub")
     if user_id is None:
@@ -68,6 +71,69 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
         )
-    # TODO: Fetch user from database using user_id
-    return {"id": user_id, "email": payload.get("email")}
+    
+    # Fetch user from database
+    user = db.query(Stakeholder).filter(Stakeholder.id == user_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
+    
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is inactive",
+        )
+    
+    return user
+
+
+async def get_current_active_user(
+    current_user: "Stakeholder" = Depends(get_current_user),
+) -> "Stakeholder":
+    """Get current active user (alias for get_current_user)"""
+    return current_user
+
+
+async def get_current_active_syndic(
+    current_user: "Stakeholder" = Depends(get_current_user),
+) -> "Stakeholder":
+    """Get current user only if they are a syndic or admin"""
+    from app.models.stakeholder import UserRole
+    
+    if current_user.user_role not in [UserRole.SYNDIC, UserRole.ADMIN]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions. Syndic or Admin role required.",
+        )
+    return current_user
+
+
+async def get_current_admin(
+    current_user: "Stakeholder" = Depends(get_current_user),
+) -> "Stakeholder":
+    """Get current user only if they are an admin"""
+    from app.models.stakeholder import UserRole
+    
+    if current_user.user_role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions. Admin role required.",
+        )
+    return current_user
+
+
+async def get_current_council_or_syndic(
+    current_user: "Stakeholder" = Depends(get_current_user),
+) -> "Stakeholder":
+    """Get current user only if they are council, syndic or admin"""
+    from app.models.stakeholder import UserRole
+    
+    if current_user.user_role not in [UserRole.COUNCIL, UserRole.SYNDIC, UserRole.ADMIN]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions. Council, Syndic or Admin role required.",
+        )
+    return current_user
 
