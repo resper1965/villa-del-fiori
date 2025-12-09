@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus, Search, X, Loader2, FileText, Upload } from "lucide-react"
+import { Plus, Search, X, Loader2, FileText } from "lucide-react"
 import { useProcesses, useCreateProcess } from "@/lib/hooks/useProcesses"
 import { ProcessForm } from "@/components/processes/ProcessForm"
 
