@@ -3,10 +3,11 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, Mail, Lock, Building2 } from "lucide-react"
+import { Loader2, Mail, Lock } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 
 export default function LoginPage() {
@@ -49,15 +50,18 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 px-4">
       <div className="w-full max-w-md space-y-8">
-        {/* Logo e Título */}
+        {/* Logo */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center mb-4">
-            <div className="rounded-full bg-[#00ade8] p-3">
-              <Building2 className="h-6 w-6 text-white stroke-1" />
-            </div>
+            <Image
+              src="/logo.svg"
+              alt="Gabi - Síndica Virtual"
+              width={200}
+              height={80}
+              className="h-auto w-auto max-w-[200px]"
+              priority
+            />
           </div>
-          <h1 className="text-2xl font-light text-gray-200">Gabi</h1>
-          <p className="text-gray-400 font-light">Síndica Virtual</p>
           <p className="text-sm text-gray-400 mt-2">
             Entre com seu email para acessar sua conta
           </p>
