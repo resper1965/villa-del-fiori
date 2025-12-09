@@ -30,10 +30,10 @@ export default function ChatPage() {
   // Redirecionar se não pode acessar chat
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || !canAccessChat())) {
-      if (canAccessDashboard()) {
-        router.push("/dashboard")
-      } else {
+      if (!isAuthenticated) {
         router.push("/login")
+      } else if (!canAccessChat()) {
+        router.push("/auth/unauthorized")
       }
     }
   }, [authLoading, isAuthenticated, canAccessChat, canAccessDashboard, router])

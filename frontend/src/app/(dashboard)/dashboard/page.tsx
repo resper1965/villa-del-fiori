@@ -17,10 +17,10 @@ export default function DashboardPage() {
     page_size: 1000, // Buscar todos
   })
 
-  // Redirecionar moradores para o chat
+  // Redirecionar se não tiver permissão
   useEffect(() => {
     if (!canAccessDashboard()) {
-      router.push("/chat")
+      router.push("/auth/unauthorized")
     }
   }, [canAccessDashboard, router])
   

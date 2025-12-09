@@ -12,7 +12,11 @@ interface User {
   user_role: "admin" | "syndic" | "subsindico" | "council" | "resident" | "staff"
   type: string
   is_approved: boolean
+  is_superadmin?: boolean
 }
+
+// UID do superadministrador (definido em variável de ambiente)
+const SUPERADMIN_UID = process.env.NEXT_PUBLIC_SUPERADMIN_UID || "23d80a86-4099-46c4-8102-43002206c46f"
 
 // Tipos para app_metadata do Supabase Auth
 interface AppMetadata {
@@ -62,9 +66,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.warn("Stakeholder table not found or RLS blocking:", err)
       }
 
+      // Verificar se é superadministrador
+      const isSuperadmin = supabaseUser.id === SUPERADMIN_UID
+
       // Usar app_metadata para roles e aprovação (gerenciado pelo Supabase Auth)
-      const userRole = appMetadata.user_role || "resident"
-      const isApproved = appMetadata.is_approved || false
+      // Superadmin sempre tem role admin e está aprovado
+      const userRole = isSuperadmin ? "admin" : (appMetadata.user_role || "resident")
+      const isApproved = isSuperadmin ? true : (appMetadata.is_approved || false)
 
       return {
         id: supabaseUser.id,
@@ -73,6 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user_role: userRole,
         type: userMetadata.type || stakeholder?.type || "morador",
         is_approved: isApproved,
+        is_superadmin: isSuperadmin,
       }
     } catch (error) {
       console.error("Error loading user:", error)
@@ -117,8 +126,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event === "SIGNED_IN" && session?.user) {
         const user = await loadUser(session.user)
         if (user) {
-          // Verificar se está aprovado
-          if (!user.is_approved) {
+          // Superadmin sempre tem acesso, mesmo sem aprovação
+          if (!user.is_approved && !user.is_superadmin) {
             router.push("/auth/waiting-approval")
             return
           }
@@ -152,8 +161,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.user) {
         const user = await loadUser(data.user)
         if (user) {
-          // Verificar se está aprovado
-          if (!user.is_approved) {
+          // Superadmin sempre tem acesso, mesmo sem aprovação
+          if (!user.is_approved && !user.is_superadmin) {
             router.push("/auth/waiting-approval")
             return false
           }
@@ -189,8 +198,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.user) {
         const user = await loadUser(data.user)
         if (user) {
-          // Verificar se está aprovado
-          if (!user.is_approved) {
+          // Superadmin sempre tem acesso, mesmo sem aprovação
+          if (!user.is_approved && !user.is_superadmin) {
             router.push("/auth/waiting-approval")
             return false
           }
@@ -223,8 +232,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         const user = await loadUser(session.user)
         if (user) {
-          // Verificar se está aprovado
-          if (!user.is_approved) {
+          // Superadmin sempre tem acesso, mesmo sem aprovação
+          if (!user.is_approved && !user.is_superadmin) {
             return false
           }
           setUser(user)

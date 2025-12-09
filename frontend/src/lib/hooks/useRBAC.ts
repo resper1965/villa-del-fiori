@@ -8,8 +8,15 @@ export type UserRole = "admin" | "syndic" | "subsindico" | "council" | "resident
 export function useRBAC() {
   const { user } = useAuth()
 
+  // Superadmin tem todas as permissões
+  const isSuperadmin = (): boolean => {
+    return user?.is_superadmin === true
+  }
+
   const hasRole = (role: UserRole | UserRole[]): boolean => {
     if (!user) return false
+    // Superadmin tem todas as roles
+    if (isSuperadmin()) return true
     const roles = Array.isArray(role) ? role : [role]
     return roles.includes(user.user_role)
   }
@@ -40,6 +47,8 @@ export function useRBAC() {
 
   const canAccessDashboard = (): boolean => {
     if (!user) return false
+    // Superadmin sempre tem acesso
+    if (isSuperadmin()) return true
     // Moradores só podem acessar o chat
     if (user.user_role === "resident") return false
     return true
@@ -50,15 +59,21 @@ export function useRBAC() {
   }
 
   const canAccessChat = (): boolean => {
+    // Superadmin sempre tem acesso
+    if (isSuperadmin()) return true
     // Todos os usuários aprovados podem acessar o chat
     return !!user && user.is_approved
   }
 
   const canApproveUsers = (): boolean => {
+    // Superadmin sempre pode aprovar usuários
+    if (isSuperadmin()) return true
     return hasRole(["admin", "syndic", "subsindico"])
   }
 
   const canManageProcesses = (): boolean => {
+    // Superadmin sempre pode gerenciar processos
+    if (isSuperadmin()) return true
     return hasRole(["admin", "syndic", "subsindico", "council", "staff"])
   }
 
@@ -70,6 +85,7 @@ export function useRBAC() {
     isCouncil,
     isStaff,
     isResident,
+    isSuperadmin,
     canAccessDashboard,
     canAccessProcesses,
     canAccessChat,

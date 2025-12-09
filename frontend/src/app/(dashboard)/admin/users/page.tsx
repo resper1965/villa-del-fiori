@@ -118,7 +118,7 @@ export default function AdminUsersPage() {
 
   // Verificar permissão após hooks
   if (!canApproveUsers()) {
-    router.push("/dashboard")
+    router.push("/auth/unauthorized")
     return null
   }
 
