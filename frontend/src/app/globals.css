@@ -55,11 +55,12 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Background unificado com gradiente sutil */
-    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(0 0% 11%) 50%, hsl(var(--background)) 100%);
+    /* Background igual ao login: gradiente de gray-950 via gray-900 para gray-800 */
+    background: linear-gradient(to bottom right, hsl(0 0% 3.9%) 0%, hsl(0 0% 9%) 50%, hsl(0 0% 14.9%) 100%);
     background-attachment: fixed;
+    min-height: 100vh;
   }
 }
 
