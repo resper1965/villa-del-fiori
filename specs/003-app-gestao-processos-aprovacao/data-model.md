@@ -32,7 +32,7 @@ CREATE TABLE stakeholders (
     type stakeholdertype,  -- Enum: sindico, conselheiro, administradora, morador, staff, outro
     role stakeholderrole DEFAULT 'visualizador',  -- Enum: aprovador, visualizador, editor
     user_role userrole DEFAULT 'resident',  -- Enum: admin, syndic, subsindico, council, resident, staff
-    is_approved BOOLEAN DEFAULT false,  -- Sistema de aprovação
+    is_approved BOOLEAN DEFAULT false,  -- Sistema de aprovação (legado, usar app_metadata)
     approved_at TIMESTAMPTZ,
     approved_by UUID REFERENCES stakeholders(id),
     approval_notes TEXT,
@@ -42,11 +42,13 @@ CREATE TABLE stakeholders (
 );
 ```
 
-**Campos de Aprovação**:
+**Nota**: Roles e aprovação são gerenciados via `app_metadata` no Supabase Auth. A tabela `stakeholders` é mantida para sincronização e dados adicionais.
+
+**Campos de Aprovação** (em `app_metadata` do Supabase Auth):
+- `user_role`: Role do usuário (admin, syndic, subsindico, council, resident, staff)
 - `is_approved`: Se o usuário foi aprovado para acessar o sistema
 - `approved_at`: Data/hora da aprovação
 - `approved_by`: ID do stakeholder que aprovou
-- `approval_notes`: Notas sobre a aprovação
 
 **Roles (user_role)**:
 - `admin`: Administrador da aplicação
@@ -183,7 +185,7 @@ CREATE TABLE rejections (
 
 ### 6. Entity
 
-Representa entidades envolvidas nos processos (pessoas, empresas, serviços).
+Representa entidades envolvidas nos processos (pessoas, empresas, serviços, infraestrutura).
 
 **Tabela**: `entities`
 
@@ -200,13 +202,71 @@ CREATE TABLE entities (
     address TEXT,
     emergency_phone VARCHAR(255),
     meeting_point VARCHAR(255),
+    cnpj VARCHAR(18),  -- CNPJ da entidade (formato: XX.XXX.XXX/XXXX-XX)
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 ```
 
-### 7. ValidationResult
+**Nota**: Inclui entidade do condomínio com informações completas (CNPJ, endereço, descrição).
+
+### 7. Chat Conversations
+
+Representa conversas do chat com Gabi (Síndica Virtual).
+
+**Tabela**: `chat_conversations`
+
+```sql
+CREATE TABLE chat_conversations (
+    id TEXT PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id),
+    title TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 8. Chat Messages
+
+Representa mensagens do chat.
+
+**Tabela**: `chat_messages`
+
+```sql
+CREATE TABLE chat_messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    conversation_id TEXT REFERENCES chat_conversations(id),
+    user_id UUID REFERENCES auth.users(id),
+    role TEXT CHECK (role IN ('user', 'assistant')),
+    content TEXT NOT NULL,
+    sources JSONB DEFAULT '[]',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 9. Documents (Base de Conhecimento)
+
+Representa documentos para base de conhecimento (usado pelo chat).
+
+**Tabela**: `documents`
+
+```sql
+CREATE TABLE documents (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    category TEXT,
+    file_path TEXT,
+    file_size INTEGER,
+    mime_type TEXT DEFAULT 'text/markdown',
+    embedding vector(1536),  -- Para busca semântica
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 10. Validation Results
 
 Resultados de validação de processos.
 
@@ -226,173 +286,45 @@ CREATE TABLE validation_results (
 );
 ```
 
-### 8. ChatConversation
+## Views e Funções
 
-Conversas do chat com Gabi (Síndica Virtual).
+### auth_users_with_metadata
 
-**Tabela**: `chat_conversations`
-
-```sql
-CREATE TABLE chat_conversations (
-    id TEXT PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id),
-    title TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-### 9. ChatMessage
-
-Mensagens do chat.
-
-**Tabela**: `chat_messages`
+View que combina dados de `auth.users` e `public.stakeholders` para facilitar consultas.
 
 ```sql
-CREATE TABLE chat_messages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    conversation_id TEXT REFERENCES chat_conversations(id),
-    user_id UUID REFERENCES auth.users(id),
-    role TEXT CHECK (role IN ('user', 'assistant')),
-    content TEXT NOT NULL,
-    sources JSONB DEFAULT '[]',
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+CREATE VIEW auth_users_with_metadata AS
+SELECT 
+    u.id,
+    u.email,
+    u.created_at,
+    u.raw_user_meta_data->>'name' as name,
+    u.raw_user_meta_data->>'type' as type,
+    u.raw_app_meta_data->>'user_role' as user_role,
+    (u.raw_app_meta_data->>'is_approved')::boolean as is_approved,
+    (u.raw_app_meta_data->>'approved_at')::timestamptz as approved_at,
+    u.raw_app_meta_data->>'approved_by' as approved_by
+FROM auth.users u;
 ```
-
-### 10. Document
-
-Documentos para base de conhecimento (futuro).
-
-**Tabela**: `documents`
-
-```sql
-CREATE TABLE documents (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    title TEXT,
-    content TEXT,
-    category TEXT,
-    file_path TEXT,
-    file_size INTEGER,
-    mime_type TEXT DEFAULT 'text/markdown',
-    embedding vector,  -- Para busca semântica
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-## Relacionamentos Principais
-
-```
-auth.users (1) ──< (1) stakeholders (auth_user_id)
-stakeholders (1) ──< (N) processes (creator_id)
-stakeholders (1) ──< (N) approvals
-stakeholders (1) ──< (N) rejections
-stakeholders (1) ──< (N) stakeholders (approved_by)
-
-processes (1) ──< (N) process_versions
-processes (1) ──< (N) approvals
-processes (1) ──< (N) rejections
-processes (1) ──< (N) validation_results
-
-process_versions (1) ──< (N) approvals
-process_versions (1) ──< (N) rejections
-process_versions (1) ── (1) process_versions (previous_version_id)
-
-auth.users (1) ──< (N) chat_conversations
-chat_conversations (1) ──< (N) chat_messages
-```
-
-## Constraints e Validações
-
-1. **ProcessVersion**: `version_number` deve ser sequencial e único por processo
-2. **Approval**: Um stakeholder só pode aprovar uma vez por versão (UNIQUE constraint)
-3. **Rejection**: Motivo (`reason`) é obrigatório (NOT NULL)
-4. **Process**: Status deve seguir fluxo válido (rascunho → em_revisao → aprovado/rejeitado)
-5. **Stakeholder**: `auth_user_id` é único (um usuário Auth = um stakeholder)
-6. **ProcessVersion**: Versões são imutáveis após criação (apenas leitura)
 
 ## Row Level Security (RLS)
 
-Todas as tabelas têm RLS habilitado. Políticas básicas:
+Todas as tabelas têm RLS habilitado. Policies garantem que:
 
-- **Leitura pública**: Processos podem ser visualizados por todos autenticados
-- **Escrita**: Requer autenticação e permissões adequadas
-- **Aprovação de usuários**: Apenas admin, syndic, subsindico
-- **Chat**: Apenas usuários autenticados e aprovados
-
-## Queries Otimizadas
-
-### Busca de Processos Pendentes de Aprovação
-
-```sql
-SELECT p.* 
-FROM processes p
-JOIN process_versions pv ON p.id = pv.process_id AND pv.version_number = p.current_version_number
-WHERE p.status = 'em_revisao'
-  AND pv.status = 'em_revisao'
-  AND NOT EXISTS (
-    SELECT 1 FROM approvals a
-    WHERE a.version_id = pv.id
-      AND a.stakeholder_id = :stakeholder_id
-  )
-ORDER BY p.created_at DESC;
-```
-
-### Processos por Categoria
-
-```sql
-SELECT category, COUNT(*) as total, 
-       COUNT(*) FILTER (WHERE status = 'aprovado') as aprovados,
-       COUNT(*) FILTER (WHERE status = 'em_revisao') as em_revisao
-FROM processes
-GROUP BY category
-ORDER BY category;
-```
-
-### Histórico Completo de Processo
-
-```sql
-SELECT 
-  pv.version_number,
-  pv.created_at,
-  s.name as created_by_name,
-  pv.status,
-  COUNT(DISTINCT a.id) as total_approvals,
-  COUNT(DISTINCT r.id) as total_rejections
-FROM process_versions pv
-JOIN processes p ON pv.process_id = p.id
-JOIN stakeholders s ON pv.created_by = s.id
-LEFT JOIN approvals a ON a.version_id = pv.id
-LEFT JOIN rejections r ON r.version_id = pv.id
-WHERE p.id = :process_id
-GROUP BY pv.id, pv.version_number, pv.created_at, s.name, pv.status
-ORDER BY pv.version_number DESC;
-```
+- Usuários só veem seus próprios dados quando apropriado
+- Aprovações/rejeições só podem ser feitas por stakeholders autorizados
+- Processos podem ser visualizados por usuários aprovados
+- Entidades podem ser gerenciadas por administradores
 
 ## Migrations
 
-Migrations SQL aplicadas via Supabase:
+Migrations SQL estão em `supabase/migrations/` e são aplicadas via Supabase Dashboard ou MCP tools.
 
-1. `001_initial_migration.sql` - Tabelas principais
-2. `002_add_entities_table.sql` - Tabela de entidades
-3. `003_add_validation_results_table.sql` - Validações
-4. `004_add_auth_to_stakeholders.sql` - Integração Auth e aprovação
-5. `005_seed_processes.sql` - Função de seed
-6. `006_fix_seed_function.sql` - Correção da função
-7. `009_seed_batch_*.sql` - Seed dos 35 processos
-
-## Considerações de Performance
-
-1. **Índices**: Todos os FKs e campos frequentemente consultados indexados
-2. **JSONB**: Usar JSONB para campos flexíveis (content, variables_applied, entities_involved)
-3. **Paginação**: Sempre paginar listas grandes (LIMIT/OFFSET ou cursor-based)
-4. **RLS**: Políticas otimizadas para evitar scans completos
-5. **Full-text search**: GIN index em content_text para busca (futuro)
-
-## Integração com Supabase Auth
-
-- `auth.users`: Usuários autenticados via Supabase Auth
-- `stakeholders.auth_user_id`: Vincula stakeholder ao usuário Auth
-- RLS policies verificam autenticação via `auth.uid()`
-- Sistema de aprovação customizado via campo `is_approved`
+Principais migrations:
+- `001_create_schema_completo.sql`: Schema inicial
+- `002_rls_policies.sql`: Policies de segurança
+- `003_sync_auth_users.sql`: Sincronização com Auth
+- `005_seed_processes.sql`: Seed de processos
+- `009_seed_entities.sql`: Seed de entidades
+- `010_add_condominio_entity.sql`: Entidade do condomínio
+- `011_add_cnpj_to_entities.sql`: Campo CNPJ
