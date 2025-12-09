@@ -52,7 +52,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="text-center space-y-2">
-          <div className="flex items-center justify-center mb-4">
+          <div className="flex items-center justify-center mb-2">
             <Image
               src="/logo.png"
               alt="Gabi - Síndica Virtual"
@@ -62,6 +62,7 @@ export default function LoginPage() {
               priority
             />
           </div>
+          <p className="text-gray-400 font-light text-sm">Síndica Virtual</p>
           <p className="text-sm text-gray-400 mt-2">
             Entre com seu email para acessar sua conta
           </p>
