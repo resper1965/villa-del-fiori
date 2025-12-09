@@ -54,6 +54,59 @@ const mapProcessFromDB = (dbProcess: any): Process => {
   }
 }
 
+// Função auxiliar para fallback (fora do objeto para evitar referência circular)
+async function getByIdFallback(id: string | number): Promise<ProcessDetailResponse> {
+  // Buscar processo
+  const { data: processData, error: processError } = await supabase
+    .from("processes")
+    .select("*")
+    .eq("id", id)
+    .single()
+
+  if (processError) {
+    console.error("Error fetching process:", processError)
+    throw processError
+  }
+
+  // Buscar versões do processo
+  const { data: versions, error: versionsError } = await supabase
+    .from("process_versions")
+    .select("*")
+    .eq("process_id", id)
+    .order("version_number", { ascending: false })
+
+  if (versionsError) {
+    console.error("Error fetching versions:", versionsError)
+    throw versionsError
+  }
+
+  // Encontrar versão atual
+  const currentVersion = versions?.find(
+    (v) => v.version_number === processData.current_version_number
+  ) || versions?.[0] || null
+
+  const process = mapProcessFromDB({ ...processData, current_version: currentVersion })
+
+  return {
+    ...process,
+    current_version: currentVersion
+      ? {
+          id: currentVersion.id,
+          process_id: currentVersion.process_id,
+          version_number: currentVersion.version_number,
+          content: currentVersion.content || {},
+          content_text: currentVersion.content_text,
+          variables_applied: currentVersion.variables_applied || {},
+          entities_involved: currentVersion.entities_involved || [],
+          status: currentVersion.status || processData.status,
+          created_by: currentVersion.created_by || processData.creator_id,
+          created_at: currentVersion.created_at,
+          change_summary: currentVersion.change_summary,
+        }
+      : undefined,
+  }
+}
+
 export const processesApiSupabase = {
   // Listar processos
   list: async (params?: {
@@ -119,54 +172,62 @@ export const processesApiSupabase = {
     }
   },
 
-  // Buscar processo por ID (otimizado com join)
+  // Buscar processo por ID (otimizado com join, com fallback)
   getById: async (id: string | number): Promise<ProcessDetailResponse> => {
-    // Buscar processo e versões em uma única query
-    const { data: processData, error: processError } = await supabase
-      .from("processes")
-      .select(`
-        *,
-        versions:process_versions(
-          *
-        )
-      `)
-      .eq("id", id)
-      .single()
+    try {
+      // Tentar buscar processo e versões em uma única query
+      const { data: processData, error: processError } = await supabase
+        .from("processes")
+        .select(`
+          *,
+          versions:process_versions(
+            *
+          )
+        `)
+        .eq("id", id)
+        .single()
 
-    if (processError) {
-      console.error("Error fetching process:", processError)
-      throw processError
-    }
+      if (processError) {
+        console.error("Error fetching process with join:", processError)
+        // Fallback: buscar separadamente se o join falhar
+        // Usar função local para evitar referência circular
+        return await getByIdFallback(id)
+      }
 
-    // Ordenar versões por número (mais recente primeiro)
-    const versions = (processData.versions || []).sort(
-      (a: any, b: any) => b.version_number - a.version_number
-    )
+      // Ordenar versões por número (mais recente primeiro)
+      const versions = (processData.versions || []).sort(
+        (a: any, b: any) => b.version_number - a.version_number
+      )
 
-    // Encontrar versão atual
-    const currentVersion = versions.find(
-      (v: any) => v.version_number === processData.current_version_number
-    ) || versions[0] || null
+      // Encontrar versão atual
+      const currentVersion = versions.find(
+        (v: any) => v.version_number === processData.current_version_number
+      ) || versions[0] || null
 
-    const process = mapProcessFromDB({ ...processData, current_version: currentVersion })
+      const process = mapProcessFromDB({ ...processData, current_version: currentVersion })
 
-    return {
-      ...process,
-      current_version: currentVersion
-        ? {
-            id: currentVersion.id,
-            process_id: currentVersion.process_id,
-            version_number: currentVersion.version_number,
-            content: currentVersion.content || {},
-            content_text: currentVersion.content_text,
-            variables_applied: currentVersion.variables_applied || {},
-            entities_involved: currentVersion.entities_involved || [],
-            status: currentVersion.status || processData.status,
-            created_by: currentVersion.created_by || processData.creator_id,
-            created_at: currentVersion.created_at,
-            change_summary: currentVersion.change_summary,
-          }
-        : undefined,
+      return {
+        ...process,
+        current_version: currentVersion
+          ? {
+              id: currentVersion.id,
+              process_id: currentVersion.process_id,
+              version_number: currentVersion.version_number,
+              content: currentVersion.content || {},
+              content_text: currentVersion.content_text,
+              variables_applied: currentVersion.variables_applied || {},
+              entities_involved: currentVersion.entities_involved || [],
+              status: currentVersion.status || processData.status,
+              created_by: currentVersion.created_by || processData.creator_id,
+              created_at: currentVersion.created_at,
+              change_summary: currentVersion.change_summary,
+            }
+          : undefined,
+      }
+    } catch (error) {
+      console.error("Error in getById:", error)
+      // Fallback: buscar separadamente
+      return await getByIdFallback(id)
     }
   },
 

@@ -18,7 +18,7 @@ export default function ProcessDetailPage() {
   const processId = params.id as string
   
   // Buscar processo da API (sem fallback mock)
-  const { data: process, isLoading, error } = useProcess(processId)
+  const { data: process, isLoading, error, isError } = useProcess(processId)
   const approveMutation = useApproveProcess()
   const rejectMutation = useRejectProcess()
   
@@ -26,6 +26,11 @@ export default function ProcessDetailPage() {
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false)
 
   const displayProcess = process
+
+  // Log para debug
+  if (error) {
+    console.error("Erro ao carregar processo:", error)
+  }
 
   const handleApprove = async (comment?: string) => {
     if (!displayProcess || !process?.current_version?.id) return
@@ -89,7 +94,31 @@ export default function ProcessDetailPage() {
     )
   }
 
-  if (!displayProcess) {
+  // Mostrar erro se houver
+  if (isError || error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="h-[73px] border-b border-border flex items-center px-4">
+          <h1 className="text-lg font-light text-gray-200">Erro ao carregar processo</h1>
+        </div>
+        <div className="p-2">
+          <Card className="mb-4">
+            <CardContent className="pt-6">
+              <p className="text-red-400 mb-4">
+                {error instanceof Error ? error.message : "Erro desconhecido ao carregar o processo"}
+              </p>
+              <Button onClick={() => router.push("/processes")} variant="outline">
+                <ArrowLeft className="h-4 w-4 mr-2 stroke-1" />
+                Voltar para Processos
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
+  if (!displayProcess && !isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <div className="h-[73px] border-b border-border flex items-center px-4">
@@ -103,6 +132,11 @@ export default function ProcessDetailPage() {
         </div>
       </div>
     )
+  }
+
+  // Se ainda está carregando ou não há processo, não renderizar
+  if (!displayProcess) {
+    return null
   }
 
   const statusConfig = {

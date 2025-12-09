@@ -23,8 +23,9 @@ export const useProcess = (id: string | number) => {
     queryFn: () => processesApi.getById(id),
     enabled: !!id,
     staleTime: 5 * 60 * 1000, // Cache por 5 minutos
-    retry: 1, // Tentar apenas 1 vez
+    retry: 2, // Tentar 2 vezes
     retryDelay: 1000, // Esperar 1 segundo antes de tentar novamente
+    refetchOnWindowFocus: false, // Não refazer fetch ao focar na janela
   })
 }
 
