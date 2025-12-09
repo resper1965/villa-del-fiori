@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   title: "Gabi - Síndica Virtual",
   description: "Sistema de gestão de processos condominiais com workflow de aprovação",
   icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
 }
 

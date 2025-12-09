@@ -8,12 +8,12 @@ import {
   LayoutDashboard,
   FileText,
   Menu,
-  Building2,
   LogOut,
   Users,
   MessageSquare,
 } from "lucide-react"
 import { useState } from "react"
+import Image from "next/image"
 import { useAuth } from "@/contexts/AuthContext"
 import { useRBAC } from "@/lib/hooks/useRBAC"
 
@@ -87,19 +87,25 @@ export default function DashboardLayout({
         } bg-card/50 backdrop-blur-sm border-r border-border/50 transition-all duration-300 flex flex-col`}
       >
         <div className="h-[73px] p-4 border-b border-border/50 flex items-center justify-between">
-          <div className="flex flex-col gap-0.5">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-primary stroke-1" />
-              {sidebarOpen && (
-                <h2 className="text-sm font-semibold text-foreground tracking-wide">
-                  Gabi
-                </h2>
-              )}
-            </div>
-            {sidebarOpen && (
-              <p className="text-xs text-muted-foreground ml-7">
-                Síndica Virtual
-              </p>
+          <div className="flex items-center gap-2">
+            {sidebarOpen ? (
+              <Image
+                src="/logo.png"
+                alt="Gabi - Síndica Virtual"
+                width={120}
+                height={40}
+                className="h-auto w-auto max-w-[120px]"
+                priority
+              />
+            ) : (
+              <Image
+                src="/logo.png"
+                alt="Gabi"
+                width={40}
+                height={40}
+                className="h-auto w-auto"
+                priority
+              />
             )}
           </div>
           <Button
