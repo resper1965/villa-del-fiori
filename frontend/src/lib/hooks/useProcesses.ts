@@ -22,6 +22,9 @@ export const useProcess = (id: string | number) => {
     queryKey: ["process", id],
     queryFn: () => processesApi.getById(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000, // Cache por 5 minutos
+    retry: 1, // Tentar apenas 1 vez
+    retryDelay: 1000, // Esperar 1 segundo antes de tentar novamente
   })
 }
 

@@ -119,12 +119,17 @@ export const processesApiSupabase = {
     }
   },
 
-  // Buscar processo por ID
+  // Buscar processo por ID (otimizado com join)
   getById: async (id: string | number): Promise<ProcessDetailResponse> => {
-    // Buscar processo
+    // Buscar processo e versões em uma única query
     const { data: processData, error: processError } = await supabase
       .from("processes")
-      .select("*")
+      .select(`
+        *,
+        versions:process_versions(
+          *
+        )
+      `)
       .eq("id", id)
       .single()
 
@@ -133,22 +138,15 @@ export const processesApiSupabase = {
       throw processError
     }
 
-    // Buscar versões do processo
-    const { data: versions, error: versionsError } = await supabase
-      .from("process_versions")
-      .select("*")
-      .eq("process_id", id)
-      .order("version_number", { ascending: false })
-
-    if (versionsError) {
-      console.error("Error fetching versions:", versionsError)
-      throw versionsError
-    }
+    // Ordenar versões por número (mais recente primeiro)
+    const versions = (processData.versions || []).sort(
+      (a: any, b: any) => b.version_number - a.version_number
+    )
 
     // Encontrar versão atual
-    const currentVersion = versions?.find(
-      (v) => v.version_number === processData.current_version_number
-    ) || versions?.[0] || null
+    const currentVersion = versions.find(
+      (v: any) => v.version_number === processData.current_version_number
+    ) || versions[0] || null
 
     const process = mapProcessFromDB({ ...processData, current_version: currentVersion })
 

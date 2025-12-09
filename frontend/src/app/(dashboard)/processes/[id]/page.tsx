@@ -61,10 +61,29 @@ export default function ProcessDetailPage() {
     return (
       <div className="min-h-screen bg-background">
         <div className="h-[73px] border-b border-border flex items-center px-4">
-          <h1 className="text-lg font-semibold text-foreground">Carregando...</h1>
+          <div className="h-4 w-32 bg-muted animate-pulse rounded" />
         </div>
-        <div className="p-2 flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground stroke-1" />
+        <div className="px-1 sm:px-2 md:px-3 py-2">
+          <div className="w-full space-y-2">
+            <Card>
+              <CardHeader>
+                <div className="h-6 w-3/4 bg-muted animate-pulse rounded mb-2" />
+                <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-4 w-full bg-muted animate-pulse rounded mb-2" />
+                <div className="h-4 w-5/6 bg-muted animate-pulse rounded" />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <div className="h-5 w-1/3 bg-muted animate-pulse rounded" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 w-full bg-muted animate-pulse rounded" />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     )
