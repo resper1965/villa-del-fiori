@@ -8,6 +8,11 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Gabi - Síndica Virtual",
   description: "Sistema de gestão de processos condominiais com workflow de aprovação",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 }
 
 export default function RootLayout({
