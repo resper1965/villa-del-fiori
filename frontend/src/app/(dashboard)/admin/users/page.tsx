@@ -207,7 +207,7 @@ export default function AdminUsersPage() {
   const approvedCount = allUsers?.filter((u) => u.is_approved && u.is_active).length || 0
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <div className="h-[73px] border-b border-border flex items-center justify-between px-4">
         <div>
           <h1 className="text-lg font-semibold text-foreground">Gerenciar Usuários</h1>

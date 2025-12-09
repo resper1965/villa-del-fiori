@@ -72,7 +72,7 @@ export default function ApprovalsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <div className="h-[73px] border-b border-border flex items-center px-6">
         <h1 className="text-lg font-semibold text-foreground">
           Aprovações

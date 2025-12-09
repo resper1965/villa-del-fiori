@@ -48,48 +48,45 @@ export default function ProcessesPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>("all")
   const [formOpen, setFormOpen] = useState(false)
   
-  const createMutation = useCreateProcess()
-
-  // Buscar processos do Supabase
-  const { data: apiData, isLoading, error, isError } = useProcesses({
+  const { data, isLoading } = useProcesses({
     category: selectedCategory !== "all" ? reverseCategoryMap[selectedCategory] || selectedCategory : undefined,
     status: selectedStatus !== "all" ? selectedStatus : undefined,
     page: 1,
-    page_size: 100,
+    page_size: 1000,
   })
+  
+  const createMutation = useCreateProcess()
 
-  // Usar dados da API (sem fallback para mock)
-  const allProcesses = apiData?.items || []
+  const processes = data?.items || []
+  const categories = Object.values(categoryMap)
+  const statuses = ["rascunho", "em_revisao", "aprovado", "rejeitado"]
 
-  const categories = Array.from(new Set(allProcesses.map((p: any) => p.category)))
-  const statuses = Array.from(new Set(allProcesses.map((p: any) => p.status)))
-
-  // Filtrar processos (busca local se usando API)
+  // Filtrar processos localmente
   const filteredProcesses = useMemo(() => {
-    return allProcesses.filter((process: any) => {
-      // Filtro de busca (nome)
-      const matchesSearch =
-        searchQuery === "" ||
-        process.name.toLowerCase().includes(searchQuery.toLowerCase())
-
-      // Filtro de categoria
-      const matchesCategory = selectedCategory === "all" || process.category === selectedCategory
-
-      // Filtro de status
-      const matchesStatus = selectedStatus === "all" || process.status === selectedStatus
-
+    return processes.filter((process: any) => {
+      const matchesSearch = !searchQuery || 
+        process.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        process.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      
+      const matchesCategory = selectedCategory === "all" || 
+        categoryMap[process.category] === selectedCategory
+      
+      const matchesStatus = selectedStatus === "all" || 
+        process.status === selectedStatus
+      
       return matchesSearch && matchesCategory && matchesStatus
     })
-  }, [allProcesses, searchQuery, selectedCategory, selectedStatus])
+  }, [processes, searchQuery, selectedCategory, selectedStatus])
 
   // Agrupar por categoria
   const groupedProcesses = useMemo(() => {
     const grouped: Record<string, any[]> = {}
-    filteredProcesses.forEach((process) => {
-      if (!grouped[process.category]) {
-        grouped[process.category] = []
+    filteredProcesses.forEach((process: any) => {
+      const category = categoryMap[process.category] || process.category
+      if (!grouped[category]) {
+        grouped[category] = []
       }
-      grouped[process.category].push(process)
+      grouped[category].push(process)
     })
     return grouped
   }, [filteredProcesses])
@@ -103,25 +100,28 @@ export default function ProcessesPage() {
   }
 
   const handleCreateProcess = async (data: any) => {
-    await createMutation.mutateAsync(data)
+    try {
+      await createMutation.mutateAsync(data)
+      setFormOpen(false)
+    } catch (error) {
+      console.error("Erro ao criar processo:", error)
+    }
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="h-[73px] border-b border-border flex items-center justify-between px-4">
+    <div className="min-h-screen">
+      <div className="h-[73px] border-b border-border/50 flex items-center justify-between px-4 md:px-6">
         <h1 className="text-lg font-semibold text-foreground">
           Processos
         </h1>
-        <div className="flex gap-2">
-          <Button onClick={() => setFormOpen(true)}>
-            <Plus className="h-4 w-4 mr-2 stroke-1" />
-            Novo Processo
-          </Button>
-        </div>
+        <Button onClick={() => setFormOpen(true)}>
+          <Plus className="h-4 w-4 mr-2 stroke-1" />
+          Novo Processo
+        </Button>
       </div>
-      <div className="px-1 sm:px-2 md:px-3 py-2">
+      <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
         {/* Filtros */}
-        <div className="mb-2 space-y-2">
+        <div className="mb-4 space-y-2">
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Busca */}
             <div className="flex-1 relative">
@@ -184,16 +184,16 @@ export default function ProcessesPage() {
           )}
         </div>
 
-        {/* Lista de processos */}
+        {/* Lista de processos - Bento Grid */}
         {isLoading ? (
-          <Card>
+          <Card className="card-elevated">
             <CardContent className="py-12 text-center">
               <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
               <p className="text-muted-foreground">Carregando processos...</p>
             </CardContent>
           </Card>
         ) : Object.keys(groupedProcesses).length === 0 ? (
-          <Card>
+          <Card className="card-elevated">
             <CardContent className="py-12 text-center">
               <p className="text-muted-foreground">
                 Nenhum processo encontrado com os filtros aplicados.
@@ -202,32 +202,32 @@ export default function ProcessesPage() {
           </Card>
         ) : (
           Object.entries(groupedProcesses).map(([category, categoryProcesses]) => (
-            <div key={category} className="mb-2">
-              <h2 className="text-xs font-light text-gray-400 mb-1.5 uppercase tracking-wide">
+            <div key={category} className="mb-6">
+              <h2 className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">
                 {category}
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-                {categoryProcesses.map((process: any, index: number) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {categoryProcesses.map((process: any) => (
                   <Card 
                     key={process.id} 
-                    className="bg-gray-800/50 border-gray-700/50 hover:bg-gray-800/70 hover:border-primary/50 transition-all cursor-pointer"
+                    className="card-elevated cursor-pointer group"
                     onClick={() => router.push(`/processes/${process.id}`)}
                   >
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="flex flex-col items-center gap-1">
-                            <div className="p-2 rounded-md bg-muted">
-                              <FileText className="h-4 w-4 text-foreground stroke-1" />
-                            </div>
-                            <span className="text-[10px] font-medium text-[#00ade8] bg-[#00ade8]/10 px-1.5 py-0.5 rounded">
-                              v{process.current_version_number || 1}
-                            </span>
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-primary/10 transition-colors">
+                            <FileText className="h-4 w-4 text-foreground group-hover:text-primary transition-colors stroke-1" />
                           </div>
-                          <div className="flex-1">
-                            <CardTitle className="text-sm font-light text-gray-200 line-clamp-2">
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                               {process.name}
                             </CardTitle>
+                            <div className="mt-1">
+                              <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                                v{process.current_version_number || 1}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -237,7 +237,7 @@ export default function ProcessesPage() {
                         <span className={`text-xs px-2 py-1 rounded border ${categoryColors[category]}`}>
                           {category}
                         </span>
-                        <span className="text-xs text-gray-400 font-light capitalize">
+                        <span className="text-xs text-muted-foreground font-light capitalize">
                           {process.status?.replace("_", " ") || "rascunho"}
                         </span>
                       </div>
@@ -258,5 +258,3 @@ export default function ProcessesPage() {
     </div>
   )
 }
-
-

@@ -110,14 +110,14 @@ export default function ChatPage() {
 
   if (authLoading || !isAuthenticated || !canAccessChat()) {
     return (
-      <div className="h-[calc(100vh-73px)] flex items-center justify-center bg-background">
+      <div className="h-[calc(100vh-73px)] flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground stroke-1" />
       </div>
     )
   }
 
   return (
-    <div className="h-[calc(100vh-73px)] flex flex-col bg-background">
+    <div className="h-[calc(100vh-73px)] flex flex-col">
       {/* Header */}
       <div className="flex-shrink-0 border-b border-border bg-card px-4 py-3">
         <div className="flex items-center gap-2">

@@ -62,10 +62,10 @@ export default function ProcessDetailPage() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="h-[73px] border-b border-border flex items-center px-4">
+      if (isLoading) {
+        return (
+          <div className="min-h-screen">
+            <div className="h-[73px] border-b border-border/50 flex items-center px-4">
           <div className="h-4 w-32 bg-muted animate-pulse rounded" />
         </div>
         <div className="px-1 sm:px-2 md:px-3 py-2">
@@ -96,10 +96,10 @@ export default function ProcessDetailPage() {
 
   // Mostrar erro se houver
   if (isError || error) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="h-[73px] border-b border-border flex items-center px-4">
-          <h1 className="text-lg font-light text-gray-200">Erro ao carregar processo</h1>
+        return (
+          <div className="min-h-screen">
+            <div className="h-[73px] border-b border-border/50 flex items-center px-4">
+              <h1 className="text-lg font-light text-foreground">Erro ao carregar processo</h1>
         </div>
         <div className="p-2">
           <Card className="mb-4">
@@ -119,10 +119,10 @@ export default function ProcessDetailPage() {
   }
 
   if (!displayProcess && !isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="h-[73px] border-b border-border flex items-center px-4">
-          <h1 className="text-lg font-light text-gray-200">Processo não encontrado</h1>
+        return (
+          <div className="min-h-screen">
+            <div className="h-[73px] border-b border-border/50 flex items-center px-4">
+              <h1 className="text-lg font-light text-foreground">Processo não encontrado</h1>
         </div>
         <div className="p-2">
           <Button onClick={() => router.push("/processes")} variant="outline">
@@ -152,7 +152,7 @@ export default function ProcessDetailPage() {
   const processVersion = displayProcess?.current_version_number || 1
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <div className="h-[73px] border-b border-border flex items-center px-4">
         <Button
           variant="ghost"

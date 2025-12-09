@@ -43,8 +43,8 @@ export default function DashboardLayout({
   // Mostrar loading enquanto verifica autenticação
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-gray-400 font-light">Carregando...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-muted-foreground font-light">Carregando...</div>
       </div>
     )
   }
@@ -52,8 +52,8 @@ export default function DashboardLayout({
   // Se não autenticado, mostrar mensagem de redirecionamento
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-gray-400 font-light">Redirecionando para login...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-muted-foreground font-light">Redirecionando para login...</div>
       </div>
     )
   }
@@ -79,17 +79,17 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen flex">
       {/* Sidebar */}
       <aside
         className={`${
           sidebarOpen ? "w-64" : "w-20"
-        } bg-card border-r border-border transition-all duration-300 flex flex-col`}
+        } bg-card/50 backdrop-blur-sm border-r border-border/50 transition-all duration-300 flex flex-col`}
       >
-        <div className="h-[73px] p-4 border-b border-border flex items-center justify-between">
+        <div className="h-[73px] p-4 border-b border-border/50 flex items-center justify-between">
           <div className="flex flex-col gap-0.5">
             <div className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-[#00ade8] stroke-1" />
+              <Building2 className="h-5 w-5 text-primary stroke-1" />
               {sidebarOpen && (
                 <h2 className="text-sm font-semibold text-foreground tracking-wide">
                   Gabi
@@ -120,10 +120,10 @@ export default function DashboardLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200 ${
                   isActive
-                    ? "bg-[#00ade8] text-white"
-                    : "text-foreground hover:bg-accent hover:text-accent-foreground"
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                    : "text-foreground hover:bg-accent/50 hover:text-accent-foreground"
                 }`}
               >
                 <Icon className="h-5 w-5 flex-shrink-0 stroke-1" />
@@ -134,11 +134,11 @@ export default function DashboardLayout({
         </nav>
 
         {/* Botão de Logout */}
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-border/50">
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="w-full justify-start text-gray-400 hover:text-white hover:bg-gray-800"
+            className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/50"
           >
             <LogOut className="h-5 w-5 flex-shrink-0 stroke-1" />
             {sidebarOpen && <span className="text-sm font-light ml-3">Sair</span>}
@@ -152,5 +152,3 @@ export default function DashboardLayout({
     </div>
   )
 }
-
-

@@ -72,8 +72,8 @@ export default function EntitiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="h-[73px] border-b border-border flex items-center justify-between px-4">
+    <div className="min-h-screen">
+      <div className="h-[73px] border-b border-border/50 flex items-center justify-between px-4 md:px-6">
         <h1 className="text-lg font-semibold text-foreground">
           Entidades
         </h1>
@@ -82,9 +82,9 @@ export default function EntitiesPage() {
           Nova Entidade
         </Button>
       </div>
-      <div className="px-1 sm:px-2 md:px-3 py-2">
+      <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
         {/* Filtros */}
-        <div className="mb-3 space-y-2">
+        <div className="mb-4 space-y-2">
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Busca */}
             <div className="flex-1 relative">
@@ -152,16 +152,16 @@ export default function EntitiesPage() {
           )}
         </div>
 
-        {/* Lista de entidades */}
+        {/* Lista de entidades - Bento Grid */}
         {isLoading ? (
-          <Card>
+          <Card className="card-elevated">
             <CardContent className="py-12 text-center">
               <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground stroke-1" />
               <p className="text-muted-foreground">Carregando entidades...</p>
             </CardContent>
           </Card>
         ) : entities.length === 0 ? (
-          <Card>
+          <Card className="card-elevated">
             <CardContent className="py-12 text-center">
               <p className="text-muted-foreground">
                 Nenhuma entidade encontrada com os filtros aplicados.
@@ -169,22 +169,22 @@ export default function EntitiesPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {entities.map((entity) => {
               const TypeIcon = getTypeIcon(entity.type)
               return (
                 <Card
                   key={entity.id}
-                  className={`${!entity.is_active ? "opacity-50" : ""}`}
+                  className={`card-elevated ${!entity.is_active ? "opacity-50" : ""}`}
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 flex-1">
-                        <div className="p-2 rounded-md bg-muted">
+                        <div className="p-2 rounded-lg bg-muted/50">
                           <TypeIcon className="h-4 w-4 text-foreground stroke-1" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-sm font-light text-gray-200 line-clamp-2">
+                          <CardTitle className="text-sm font-medium text-foreground line-clamp-2">
                             {entity.name}
                           </CardTitle>
                           <CardDescription className="text-xs mt-1">
@@ -262,4 +262,3 @@ export default function EntitiesPage() {
     </div>
   )
 }
-
