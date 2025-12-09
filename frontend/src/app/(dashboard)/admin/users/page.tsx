@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { useRouter } from "next/navigation"
 import UsersDataTable from "./data-table"
 import { Loader2 } from "lucide-react"
+import { updateUserAppMetadata } from "@/lib/api/user-metadata"
 
 export default function AdminUsersPage() {
   const router = useRouter()
@@ -16,55 +17,102 @@ export default function AdminUsersPage() {
   const { canApproveUsers } = useRBAC()
   const queryClient = useQueryClient()
 
-  // Buscar todos os usuários (hooks devem ser chamados antes de qualquer return)
+  // Buscar todos os usuários do Supabase Auth (via view ou função)
   const { data: allUsers, isLoading } = useQuery({
     queryKey: ["all-users"],
     queryFn: async () => {
+      // Buscar usuários do Supabase Auth via view
       const { data, error } = await supabase
-        .from("stakeholders")
+        .from("auth_users_with_metadata")
         .select("*")
-        .eq("is_active", true)
         .order("created_at", { ascending: false })
 
-      if (error) throw error
-      return data || []
+      if (error) {
+        // Fallback: buscar da tabela stakeholders se a view não existir
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from("stakeholders")
+          .select("*")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+        
+        if (fallbackError) throw fallbackError
+        return fallbackData || []
+      }
+      
+      // Mapear dados da view para o formato esperado
+      return (data || []).map((user: any) => ({
+        id: user.id,
+        auth_user_id: user.id,
+        name: user.name || user.email?.split("@")[0] || "Usuário",
+        email: user.email,
+        type: user.type || "morador",
+        user_role: user.user_role || "resident",
+        is_approved: user.is_approved || false,
+        approved_at: user.approved_at,
+        approved_by: user.approved_by,
+        is_active: true,
+        created_at: user.created_at,
+      }))
     },
     enabled: canApproveUsers(), // Só busca se tiver permissão
   })
 
-  // Mutation para aprovar usuário
+  // Mutation para aprovar usuário (atualiza app_metadata no Supabase Auth)
   const approveMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      const { error } = await supabase
-        .from("stakeholders")
-        .update({
-          is_approved: true,
-          approved_at: new Date().toISOString(),
-          approved_by: currentUser?.id || null,
-        })
-        .eq("id", userId)
+    mutationFn: async (authUserId: string) => {
+      // Atualizar app_metadata via Edge Function
+      await updateUserAppMetadata(authUserId, {
+        is_approved: true,
+        approved_at: new Date().toISOString(),
+        approved_by: currentUser?.id || undefined,
+      })
 
-      if (error) throw error
+      // Também atualizar na tabela stakeholders se existir (para sincronização)
+      try {
+        await supabase
+          .from("stakeholders")
+          .update({
+            is_approved: true,
+            approved_at: new Date().toISOString(),
+            approved_by: currentUser?.id || null,
+          })
+          .eq("auth_user_id", authUserId)
+      } catch (err) {
+        // Não crítico se falhar - app_metadata é a fonte da verdade
+        console.warn("Erro ao atualizar stakeholders:", err)
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all-users"] })
+      // Forçar refresh da sessão para atualizar app_metadata
+      supabase.auth.refreshSession()
     },
   })
 
   // Mutation para rejeitar usuário
   const rejectMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      const { error } = await supabase
-        .from("stakeholders")
-        .update({
-          is_active: false,
-        })
-        .eq("id", userId)
+    mutationFn: async (authUserId: string) => {
+      // Atualizar app_metadata para não aprovado
+      await updateUserAppMetadata(authUserId, {
+        is_approved: false,
+      })
 
-      if (error) throw error
+      // Também atualizar na tabela stakeholders se existir
+      try {
+        await supabase
+          .from("stakeholders")
+          .update({
+            is_active: false,
+            is_approved: false,
+          })
+          .eq("auth_user_id", authUserId)
+      } catch (err) {
+        console.warn("Erro ao atualizar stakeholders:", err)
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all-users"] })
+      supabase.auth.refreshSession()
     },
   })
 

@@ -39,6 +39,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 
 export type Stakeholder = {
   id: string
+  auth_user_id?: string // ID do usuário no Supabase Auth
   name: string
   email: string
   type: string
@@ -243,7 +244,7 @@ export function createColumns(
             <DropdownMenuContent align="end">
               {canApprove && onApprove && (
                 <DropdownMenuItem
-                  onClick={() => onApprove(stakeholder.id)}
+                  onClick={() => onApprove(stakeholder.auth_user_id || stakeholder.id)}
                   className="text-green-400"
                 >
                   <UserCheck className="mr-2 h-4 w-4" />
@@ -252,7 +253,7 @@ export function createColumns(
               )}
               {canReject && onReject && (
                 <DropdownMenuItem
-                  onClick={() => onReject(stakeholder.id)}
+                  onClick={() => onReject(stakeholder.auth_user_id || stakeholder.id)}
                   className="text-red-400"
                 >
                   <UserX className="mr-2 h-4 w-4" />

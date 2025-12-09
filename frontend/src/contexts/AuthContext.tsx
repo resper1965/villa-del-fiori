@@ -14,6 +14,14 @@ interface User {
   is_approved: boolean
 }
 
+// Tipos para app_metadata do Supabase Auth
+interface AppMetadata {
+  user_role?: "admin" | "syndic" | "subsindico" | "council" | "resident" | "staff"
+  is_approved?: boolean
+  approved_at?: string
+  approved_by?: string
+}
+
 interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
@@ -32,31 +40,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
-  // Carregar stakeholder do banco baseado no usuário autenticado
-  const loadStakeholder = useCallback(async (supabaseUser: SupabaseUser): Promise<User | null> => {
+  // Carregar usuário do Supabase Auth (roles gerenciados via app_metadata)
+  const loadUser = useCallback(async (supabaseUser: SupabaseUser): Promise<User | null> => {
     try {
-      // Buscar stakeholder pelo email ou auth_user_id
-      const { data: stakeholder, error } = await supabase
-        .from("stakeholders")
-        .select("*")
-        .or(`email.eq.${supabaseUser.email},auth_user_id.eq.${supabaseUser.id}`)
-        .single()
+      // Roles e aprovação vêm do app_metadata do Supabase Auth
+      const appMetadata = (supabaseUser.app_metadata || {}) as AppMetadata
+      const userMetadata = supabaseUser.user_metadata || {}
 
-      if (error || !stakeholder) {
-        console.error("Stakeholder not found:", error)
-        return null
+      // Buscar dados adicionais da tabela stakeholders (se existir)
+      let stakeholder = null
+      try {
+        const { data } = await supabase
+          .from("stakeholders")
+          .select("id, name, type")
+          .eq("auth_user_id", supabaseUser.id)
+          .maybeSingle()
+        
+        stakeholder = data
+      } catch (err) {
+        // Se não encontrar na tabela, não é crítico - usamos dados do Auth
+        console.warn("Stakeholder table not found or RLS blocking:", err)
       }
+
+      // Usar app_metadata para roles e aprovação (gerenciado pelo Supabase Auth)
+      const userRole = appMetadata.user_role || "resident"
+      const isApproved = appMetadata.is_approved || false
 
       return {
-        id: stakeholder.id,
-        name: stakeholder.name,
-        email: stakeholder.email,
-        user_role: stakeholder.user_role || "resident",
-        type: stakeholder.type || "morador",
-        is_approved: stakeholder.is_approved || false,
+        id: supabaseUser.id,
+        name: userMetadata.name || stakeholder?.name || supabaseUser.email?.split("@")[0] || "Usuário",
+        email: supabaseUser.email || "",
+        user_role: userRole,
+        type: userMetadata.type || stakeholder?.type || "morador",
+        is_approved: isApproved,
       }
     } catch (error) {
-      console.error("Error loading stakeholder:", error)
+      console.error("Error loading user:", error)
       return null
     }
   }, [])
@@ -71,14 +90,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } = await supabase.auth.getSession()
 
         if (session?.user) {
-          const stakeholder = await loadStakeholder(session.user)
-          if (stakeholder) {
+          const user = await loadUser(session.user)
+          if (user) {
             // Verificar se está aprovado
-            if (!stakeholder.is_approved) {
+            if (!user.is_approved) {
               router.push("/auth/waiting-approval")
               return
             }
-            setUser(stakeholder)
+            setUser(user)
             setIsAuthenticated(true)
           }
         }
@@ -96,14 +115,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session?.user) {
-        const stakeholder = await loadStakeholder(session.user)
-        if (stakeholder) {
+        const user = await loadUser(session.user)
+        if (user) {
           // Verificar se está aprovado
-          if (!stakeholder.is_approved) {
+          if (!user.is_approved) {
             router.push("/auth/waiting-approval")
             return
           }
-          setUser(stakeholder)
+          setUser(user)
           setIsAuthenticated(true)
         }
       } else if (event === "SIGNED_OUT") {
@@ -116,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [loadStakeholder])
+  }, [loadUser, router])
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     try {
@@ -131,14 +150,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.user) {
-        const stakeholder = await loadStakeholder(data.user)
-        if (stakeholder) {
+        const user = await loadUser(data.user)
+        if (user) {
           // Verificar se está aprovado
-          if (!stakeholder.is_approved) {
+          if (!user.is_approved) {
             router.push("/auth/waiting-approval")
             return false
           }
-          setUser(stakeholder)
+          setUser(user)
           setIsAuthenticated(true)
           return true
         }
@@ -149,7 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("Erro ao fazer login:", error)
       return false
     }
-  }, [loadStakeholder, router])
+  }, [loadUser, router])
 
   const loginSimple = useCallback(async (password: string): Promise<boolean> => {
     // Para login simples, tentar com um email padrão ou criar usuário temporário
@@ -168,14 +187,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.user) {
-        const stakeholder = await loadStakeholder(data.user)
-        if (stakeholder) {
+        const user = await loadUser(data.user)
+        if (user) {
           // Verificar se está aprovado
-          if (!stakeholder.is_approved) {
+          if (!user.is_approved) {
             router.push("/auth/waiting-approval")
             return false
           }
-          setUser(stakeholder)
+          setUser(user)
           setIsAuthenticated(true)
           return true
         }
@@ -186,7 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("Erro ao fazer login simples:", error)
       return false
     }
-  }, [loadStakeholder, router])
+  }, [loadUser, router])
 
   const logout = useCallback(async () => {
     await supabase.auth.signOut()
@@ -202,13 +221,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } = await supabase.auth.refreshSession()
 
       if (session?.user) {
-        const stakeholder = await loadStakeholder(session.user)
-        if (stakeholder) {
+        const user = await loadUser(session.user)
+        if (user) {
           // Verificar se está aprovado
-          if (!stakeholder.is_approved) {
+          if (!user.is_approved) {
             return false
           }
-          setUser(stakeholder)
+          setUser(user)
           setIsAuthenticated(true)
           return true
         }
@@ -219,7 +238,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("Erro ao renovar token:", error)
       return false
     }
-  }, [loadStakeholder])
+  }, [loadUser])
 
   return (
     <AuthContext.Provider

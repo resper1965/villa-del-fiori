@@ -47,30 +47,30 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-[#00ade8] px-4">
       <div className="w-full max-w-md space-y-8">
         {/* Logo e Título */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center mb-4">
-            <div className="p-3 rounded-full bg-[#00ade8]/10">
-              <Building2 className="h-8 w-8 text-[#00ade8] stroke-1" />
+            <div className="rounded-full bg-[#00ade8] p-3">
+              <Building2 className="h-6 w-6 text-white stroke-1" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Gabi</h1>
-          <p className="text-muted-foreground font-medium">Síndica Virtual</p>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h1 className="text-2xl font-light text-gray-200">Gabi</h1>
+          <p className="text-gray-400 font-light">Síndica Virtual</p>
+          <p className="text-sm text-gray-400 mt-2">
             Entre com seu email para acessar sua conta
           </p>
         </div>
 
         {/* Card de Login */}
-        <div className="bg-card border rounded-lg shadow-lg p-8 space-y-6">
+        <div className="w-full max-w-md bg-gray-800/50 border-gray-700/50 rounded-lg shadow-lg p-8 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Campo Email */}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-300 font-light">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 stroke-1" />
                 <Input
                   id="email"
                   type="email"
@@ -80,7 +80,7 @@ export default function LoginPage() {
                   disabled={loading}
                   required
                   autoFocus
-                  className="pl-10"
+                  className="pl-10 bg-gray-900/50 border-gray-700 text-gray-200 placeholder:text-gray-500"
                 />
               </div>
             </div>
@@ -88,7 +88,7 @@ export default function LoginPage() {
             {/* Campo Senha */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Senha</Label>
+                <Label htmlFor="password" className="text-gray-300 font-light">Senha</Label>
                 <Link
                   href="/auth/forgot-password"
                   className="text-sm text-[#00ade8] hover:underline"
@@ -97,7 +97,7 @@ export default function LoginPage() {
                 </Link>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 stroke-1" />
                 <Input
                   id="password"
                   type="password"
@@ -106,22 +106,22 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
                   required
-                  className="pl-10"
+                  className="pl-10 bg-gray-900/50 border-gray-700 text-gray-200 placeholder:text-gray-500"
                 />
               </div>
             </div>
 
             {/* Mensagem de Erro */}
             {error && (
-              <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
-                <p className="text-sm text-destructive">{error}</p>
+              <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20">
+                <p className="text-sm text-red-400 font-light">{error}</p>
               </div>
             )}
 
             {/* Botão de Login */}
             <Button
               type="submit"
-              className="w-full bg-[#00ade8] hover:bg-[#00ade8]/90 text-white"
+              className="w-full bg-[#00ade8] hover:bg-[#0099cc] text-white font-light"
               disabled={loading || !email || !password}
             >
               {loading ? (
@@ -141,12 +141,12 @@ export default function LoginPage() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">ou</span>
+              <span className="bg-gray-800/50 px-2 text-gray-400">ou</span>
             </div>
           </div>
 
           {/* Link para Registro */}
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-center text-sm text-gray-400">
             <p>
               Não tem uma conta?{" "}
               <Link href="/register" className="text-[#00ade8] font-medium hover:underline">
@@ -157,7 +157,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="text-center text-xs text-gray-400">
           Ao continuar, você concorda com nossos{" "}
           <Link href="/terms" className="underline hover:text-foreground">
             Termos de Serviço

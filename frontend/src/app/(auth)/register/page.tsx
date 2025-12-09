@@ -49,7 +49,17 @@ export default function RegisterPage() {
     }
 
     try {
-      // 1. Criar usuário no Supabase Auth
+      // Mapear tipo para user_role
+      const userRoleMap: Record<string, string> = {
+        morador: "resident",
+        sindico: "syndic",
+        conselheiro: "council",
+        administradora: "staff",
+        staff: "staff",
+        outro: "resident",
+      }
+
+      // 1. Criar usuário no Supabase Auth com roles em app_metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -58,6 +68,8 @@ export default function RegisterPage() {
             name: formData.name,
             type: formData.type,
           },
+          // app_metadata é gerenciado apenas pelo admin (seguro para roles)
+          // Por enquanto, definimos via admin após criação
         },
       })
 
@@ -69,31 +81,42 @@ export default function RegisterPage() {
         throw new Error("Erro ao criar usuário")
       }
 
-      // 2. Criar stakeholder no banco (não aprovado ainda)
-      // Mapear tipo para user_role
-      const userRoleMap: Record<string, string> = {
-        morador: "resident",
-        sindico: "syndic",
-        conselheiro: "council",
-        administradora: "staff",
-        staff: "staff",
-        outro: "resident",
+      // 2. Definir app_metadata inicial via Edge Function
+      const userRole = userRoleMap[formData.type] || "resident"
+      
+      // Atualizar app_metadata com role e aprovação inicial
+      try {
+        const { error: metadataError } = await supabase.functions.invoke("update-user-metadata", {
+          body: {
+            userId: authData.user.id,
+            appMetadata: {
+              user_role: userRole as any,
+              is_approved: false, // Não aprovado por padrão
+            },
+          },
+        })
+
+        if (metadataError) {
+          console.warn("Erro ao definir app_metadata (não crítico):", metadataError)
+        }
+      } catch (err) {
+        console.warn("Erro ao chamar Edge Function:", err)
       }
       
-      const { error: stakeholderError } = await supabase.from("stakeholders").insert({
-        name: formData.name,
-        email: formData.email,
-        type: formData.type,
-        user_role: userRoleMap[formData.type] || "resident",
-        auth_user_id: authData.user.id,
-        is_approved: false, // Não aprovado por padrão
-        is_active: true,
-      })
-
-      if (stakeholderError) {
-        // Se falhar ao criar stakeholder, tentar deletar o usuário auth
-        await supabase.auth.admin.deleteUser(authData.user.id).catch(() => {})
-        throw stakeholderError
+      // 3. Criar stakeholder no banco (para dados adicionais, opcional)
+      try {
+        await supabase.from("stakeholders").insert({
+          name: formData.name,
+          email: formData.email,
+          type: formData.type,
+          user_role: userRole,
+          auth_user_id: authData.user.id,
+          is_approved: false,
+          is_active: true,
+        })
+      } catch (err) {
+        // Não crítico - app_metadata é a fonte da verdade
+        console.warn("Erro ao criar stakeholder (não crítico):", err)
       }
 
       setSuccess(true)
@@ -122,7 +145,7 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-[#00ade8] flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
             <div className="flex items-center justify-center mb-4">
@@ -147,7 +170,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-[#00ade8] flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
