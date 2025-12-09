@@ -113,7 +113,8 @@ export default function ProcessesPage() {
           Processos
         </h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => router.push("/processes/import")}>
+          {/* Botão de importação desabilitado temporariamente */}
+          {/* <Button variant="outline" onClick={() => router.push("/processes/import")}> */}
             <Upload className="h-4 w-4 mr-2 stroke-1" />
             Importar Contrato
           </Button>

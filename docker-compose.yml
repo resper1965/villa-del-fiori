@@ -1,3 +1,7 @@
+# Docker Compose para desenvolvimento local (opcional)
+# Nota: A aplicação usa Supabase como backend, então este docker-compose
+# é apenas para desenvolvimento local se necessário
+
 version: '3.8'
 
 services:
@@ -18,25 +22,6 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:
-    build: ./backend
-    container_name: condominio_backend
-    command: uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload
-    volumes:
-      - ./backend:/app
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://condominio_user:condominio_pass@postgres:5432/condominio_db
-      - SECRET_KEY=dev-secret-key-change-in-production
-      - ENVIRONMENT=development
-      - DEBUG=True
-    depends_on:
-      postgres:
-        condition: service_healthy
-    env_file:
-      - ./backend/.env
-
   frontend:
     build: ./frontend
     container_name: condominio_frontend
@@ -47,11 +32,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
-    depends_on:
-      - backend
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+    # Não depende mais do backend FastAPI
 
 volumes:
   postgres_data:
-
-

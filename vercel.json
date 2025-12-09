@@ -3,21 +3,5 @@
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/.next",
   "framework": "nextjs",
-  "installCommand": "cd frontend && npm install",
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "python3.9",
-      "maxDuration": 60
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/v1/:path*",
-      "destination": "/api/[...path]"
-    },
-    {
-      "source": "/api/v1/:path*",
-      "destination": "/api/[...path]"
-    }
-  ]
+  "installCommand": "cd frontend && npm install"
 }
