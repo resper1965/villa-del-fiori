@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 import { useRBAC } from "@/lib/hooks/useRBAC"
-import { apiClient } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Send, Loader2, Bot, User } from "lucide-react"
@@ -15,11 +14,6 @@ interface Message {
   role: "user" | "bot"
   content: string
   timestamp: Date
-}
-
-interface ChatResponse {
-  response: string
-  suggestions: string[]
 }
 
 export default function ChatPage() {
@@ -81,19 +75,19 @@ export default function ChatPage() {
     setSuggestions([])
 
     try {
-      const response = await apiClient.post<ChatResponse>("/chat/message", {
-        message: text,
-      })
+      // Por enquanto, resposta simples do chat
+      // TODO: Integrar com Supabase Edge Function ou API de chat quando disponível
+      await new Promise((resolve) => setTimeout(resolve, 500)) // Simular delay
 
-      // Adicionar resposta do bot
+      // Resposta simples do bot
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "bot",
-        content: response.data.response,
+        content: "Olá! Sou a Gabi, Síndica Virtual. Como posso ajudá-lo hoje? Por favor, descreva sua dúvida ou solicitação.",
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, botMessage])
-      setSuggestions(response.data.suggestions || [])
+      setSuggestions([])
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error)
       const errorMessage: Message = {

@@ -1,4 +1,4 @@
-import { apiClient } from "./client"
+import { supabase } from "@/lib/supabase/client"
 import { Entity, EntityCreate, EntityUpdate, EntityListResponse, EntityType, EntityCategory } from "@/types/entity"
 
 export const entitiesApi = {
@@ -10,27 +10,100 @@ export const entitiesApi = {
     page?: number
     page_size?: number
   }): Promise<EntityListResponse> => {
-    const response = await apiClient.get<EntityListResponse>("/entities", { params })
-    return response.data
+    let query = supabase.from("entities").select("*", { count: "exact" })
+
+    // Aplicar filtros
+    if (params?.type) {
+      query = query.eq("type", params.type)
+    }
+    if (params?.category) {
+      query = query.eq("category", params.category)
+    }
+    if (params?.is_active !== undefined) {
+      query = query.eq("is_active", params.is_active)
+    }
+    if (params?.search) {
+      query = query.ilike("name", `%${params.search}%`)
+    }
+
+    // Paginação
+    const page = params?.page || 1
+    const pageSize = params?.page_size || 100
+    const from = (page - 1) * pageSize
+    const to = from + pageSize - 1
+
+    query = query.range(from, to).order("name", { ascending: true })
+
+    const { data, error, count } = await query
+
+    if (error) {
+      throw error
+    }
+
+    const totalPages = count ? Math.ceil(count / pageSize) : 0
+
+    return {
+      items: data || [],
+      total: count || 0,
+      page: page,
+      page_size: pageSize,
+      total_pages: totalPages,
+    }
   },
 
   getById: async (id: string): Promise<Entity> => {
-    const response = await apiClient.get<Entity>(`/entities/${id}`)
-    return response.data
+    const { data, error } = await supabase
+      .from("entities")
+      .select("*")
+      .eq("id", id)
+      .single()
+
+    if (error) {
+      throw error
+    }
+
+    return data
   },
 
   create: async (data: EntityCreate): Promise<Entity> => {
-    const response = await apiClient.post<Entity>("/entities", data)
-    return response.data
+    const { data: created, error } = await supabase
+      .from("entities")
+      .insert(data)
+      .select()
+      .single()
+
+    if (error) {
+      throw error
+    }
+
+    return created
   },
 
   update: async (id: string, data: EntityUpdate): Promise<Entity> => {
-    const response = await apiClient.put<Entity>(`/entities/${id}`, data)
-    return response.data
+    const { data: updated, error } = await supabase
+      .from("entities")
+      .update(data)
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) {
+      throw error
+    }
+
+    return updated
   },
 
   delete: async (id: string): Promise<void> => {
-    await apiClient.delete(`/entities/${id}`)
+    // Soft delete - marcar como inativo
+    const { error } = await supabase
+      .from("entities")
+      .update({ is_active: false })
+      .eq("id", id)
+
+    if (error) {
+      throw error
+    }
   },
 }
 
