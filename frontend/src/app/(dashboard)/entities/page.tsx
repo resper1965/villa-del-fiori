@@ -231,6 +231,11 @@ export default function EntitiesPage() {
                         Contato: {entity.contact_person}
                       </div>
                     )}
+                    {entity.cnpj && (
+                      <div className="text-xs text-muted-foreground">
+                        CNPJ: {entity.cnpj}
+                      </div>
+                    )}
                     {entity.emergency_phone && (
                       <div className="text-xs text-red-400">
                         Emergência: {entity.emergency_phone}

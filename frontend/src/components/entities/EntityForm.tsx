@@ -37,6 +37,7 @@ const entitySchema = z.object({
   address: z.string().optional(),
   emergency_phone: z.string().optional(),
   meeting_point: z.string().optional(),
+  cnpj: z.string().optional(),
   is_active: z.boolean().default(true),
 })
 
@@ -83,6 +84,7 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
         address: entity.address || "",
         emergency_phone: entity.emergency_phone || "",
         meeting_point: entity.meeting_point || "",
+        cnpj: entity.cnpj || "",
         is_active: entity.is_active,
       })
     } else if (!entityId && open) {
@@ -97,6 +99,7 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
         address: "",
         emergency_phone: "",
         meeting_point: "",
+        cnpj: "",
         is_active: true,
       })
     }
@@ -113,6 +116,7 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
         address: data.address || undefined,
         emergency_phone: data.emergency_phone || undefined,
         meeting_point: data.meeting_point || undefined,
+        cnpj: data.cnpj || undefined,
         category: data.category || undefined,
       }
 
@@ -258,6 +262,19 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
                 id="meeting_point"
                 {...register("meeting_point")}
                 placeholder="Local de encontro em emergências"
+              />
+            </div>
+          )}
+
+          {/* CNPJ (para empresas) */}
+          {selectedType === EntityType.EMPRESA && (
+            <div className="space-y-2">
+              <Label htmlFor="cnpj">CNPJ</Label>
+              <Input
+                id="cnpj"
+                {...register("cnpj")}
+                placeholder="00.000.000/0000-00"
+                maxLength={18}
               />
             </div>
           )}

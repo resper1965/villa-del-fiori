@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
 import { useRBAC } from "@/lib/hooks/useRBAC"
 import { supabase } from "@/lib/supabase/client"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -10,12 +12,16 @@ import { useRouter } from "next/navigation"
 import UsersDataTable from "./data-table"
 import { Loader2 } from "lucide-react"
 import { updateUserAppMetadata } from "@/lib/api/user-metadata"
+import { UserForm } from "@/components/users/UserForm"
 
 export default function AdminUsersPage() {
   const router = useRouter()
   const { user: currentUser } = useAuth()
   const { canApproveUsers } = useRBAC()
   const queryClient = useQueryClient()
+  const [formOpen, setFormOpen] = useState(false)
+  const [editingUserId, setEditingUserId] = useState<string | null>(null)
+  const [editingUserEmail, setEditingUserEmail] = useState<string>("")
 
   // Buscar todos os usuários do Supabase Auth (via view ou função)
   const { data: allUsers, isLoading } = useQuery({
@@ -116,6 +122,31 @@ export default function AdminUsersPage() {
     },
   })
 
+  // Mutation para deletar usuário
+  const deleteMutation = useMutation({
+    mutationFn: async (authUserId: string) => {
+      // Desativar usuário (soft delete)
+      await updateUserAppMetadata(authUserId, {
+        is_approved: false,
+      })
+
+      // Desativar na tabela stakeholders
+      await supabase
+        .from("stakeholders")
+        .update({
+          is_active: false,
+          is_approved: false,
+        })
+        .eq("auth_user_id", authUserId)
+
+      // Nota: Deletar completamente do Supabase Auth requer Admin API
+      // Por enquanto, apenas desativamos
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-users"] })
+    },
+  })
+
   // Verificar permissão após hooks
   if (!canApproveUsers()) {
     router.push("/auth/unauthorized")
@@ -144,6 +175,34 @@ export default function AdminUsersPage() {
     }
   }
 
+  const handleEdit = (userId: string, userEmail: string) => {
+    setEditingUserId(userId)
+    setEditingUserEmail(userEmail)
+    setFormOpen(true)
+  }
+
+  const handleDelete = async (userId: string) => {
+    if (confirm("Deseja deletar este usuário? Esta ação desativará o usuário permanentemente.")) {
+      try {
+        await deleteMutation.mutateAsync(userId)
+      } catch (error) {
+        console.error("Erro ao deletar usuário:", error)
+        alert("Erro ao deletar usuário. Tente novamente.")
+      }
+    }
+  }
+
+  const handleFormClose = () => {
+    setFormOpen(false)
+    setEditingUserId(null)
+    setEditingUserEmail("")
+  }
+
+  const handleFormSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["all-users"] })
+    handleFormClose()
+  }
+
   const pendingCount = allUsers?.filter((u) => !u.is_approved && u.is_active).length || 0
   const approvedCount = allUsers?.filter((u) => u.is_approved && u.is_active).length || 0
 
@@ -156,6 +215,10 @@ export default function AdminUsersPage() {
             Gerencie usuários do sistema e suas aprovações
           </p>
         </div>
+        <Button onClick={() => setFormOpen(true)}>
+          <Plus className="h-4 w-4 mr-2 stroke-1" />
+          Novo Usuário
+        </Button>
       </div>
       <div className="p-4 sm:p-6">
         {/* Estatísticas */}
@@ -202,12 +265,22 @@ export default function AdminUsersPage() {
                 data={allUsers || []}
                 onApprove={handleApprove}
                 onReject={handleReject}
-                isLoading={approveMutation.isPending || rejectMutation.isPending}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                isLoading={approveMutation.isPending || rejectMutation.isPending || deleteMutation.isPending}
               />
             </CardContent>
           </Card>
         )}
       </div>
+
+      <UserForm
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        userId={editingUserId}
+        userEmail={editingUserEmail}
+        onSuccess={handleFormSuccess}
+      />
     </div>
   )
 }

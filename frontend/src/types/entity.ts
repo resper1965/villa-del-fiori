@@ -48,6 +48,7 @@ export interface Entity {
   address?: string
   emergency_phone?: string
   meeting_point?: string
+  cnpj?: string
   is_active: boolean
   created_at: string
   updated_at: string
@@ -64,6 +65,7 @@ export interface EntityCreate {
   address?: string
   emergency_phone?: string
   meeting_point?: string
+  cnpj?: string
   is_active?: boolean
 }
 
@@ -78,6 +80,7 @@ export interface EntityUpdate {
   address?: string
   emergency_phone?: string
   meeting_point?: string
+  cnpj?: string
   is_active?: boolean
 }
 

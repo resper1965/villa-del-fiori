@@ -1,6 +1,20 @@
 -- Migration: Seed de Entidades Comuns de Condomínio
 -- Descrição: Insere entidades padrão que são comuns em qualquer condomínio
 
+-- CONDOMÍNIO (Entidade Principal)
+INSERT INTO entities (name, type, category, description, address, phone, email, is_active) VALUES
+  (
+    'Condomínio Villa Dei Fiori',
+    'empresa',
+    'administradora',
+    'Condomínio Residencial Villa Dei Fiori - Administração e Gestão Condominial',
+    'Endereço do Condomínio - A definir',
+    NULL,
+    'contato@villadelfiori.com.br',
+    true
+  )
+ON CONFLICT DO NOTHING;
+
 -- PESSOAS
 INSERT INTO entities (name, type, category, description, is_active) VALUES
   ('Síndico', 'pessoa', 'sindico', 'Responsável pela administração do condomínio', true),

@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, Columns, MoreHorizontal, UserCheck, UserX } from "lucide-react"
+import { ArrowUpDown, Columns, MoreHorizontal, UserCheck, UserX, Edit, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -55,6 +55,8 @@ interface UsersDataTableProps {
   data: Stakeholder[]
   onApprove?: (userId: string) => void
   onReject?: (userId: string) => void
+  onEdit?: (userId: string, userEmail: string) => void
+  onDelete?: (userId: string) => void
   isLoading?: boolean
 }
 
@@ -69,7 +71,9 @@ const roleLabels: Record<string, string> = {
 
 export function createColumns(
   onApprove?: (userId: string) => void,
-  onReject?: (userId: string) => void
+  onReject?: (userId: string) => void,
+  onEdit?: (userId: string, userEmail: string) => void,
+  onDelete?: (userId: string) => void
 ): ColumnDef<Stakeholder>[] {
   return [
     {
@@ -242,6 +246,14 @@ export function createColumns(
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {onEdit && (
+                <DropdownMenuItem
+                  onClick={() => onEdit(stakeholder.auth_user_id || stakeholder.id, stakeholder.email)}
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Editar
+                </DropdownMenuItem>
+              )}
               {canApprove && onApprove && (
                 <DropdownMenuItem
                   onClick={() => onApprove(stakeholder.auth_user_id || stakeholder.id)}
@@ -260,6 +272,15 @@ export function createColumns(
                   Rejeitar
                 </DropdownMenuItem>
               )}
+              {onDelete && (
+                <DropdownMenuItem
+                  onClick={() => onDelete(stakeholder.auth_user_id || stakeholder.id)}
+                  className="text-red-400"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Deletar
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -272,6 +293,8 @@ export default function UsersDataTable({
   data,
   onApprove,
   onReject,
+  onEdit,
+  onDelete,
   isLoading = false,
 }: UsersDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -280,8 +303,8 @@ export default function UsersDataTable({
   const [rowSelection, setRowSelection] = React.useState({})
 
   const columns = React.useMemo(
-    () => createColumns(onApprove, onReject),
-    [onApprove, onReject]
+    () => createColumns(onApprove, onReject, onEdit, onDelete),
+    [onApprove, onReject, onEdit, onDelete]
   )
 
   const table = useReactTable({
