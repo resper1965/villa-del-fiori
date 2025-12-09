@@ -24,13 +24,9 @@
 │  └── Versionamento de processos (modelo existe)                                     │
 │                                                                                      │
 │  ❌ NÃO IMPLEMENTADO (Apenas Especificado)                                           │
-│  ├── Base de Conhecimento (RAG)                                                     │
-│  ├── Chatbot Inteligente                                                            │
-│  ├── Ingestão de Contratos                                                          │
-│  ├── Sistema Financeiro                                                             │
-│  ├── Portaria Online                                                                │
-│  ├── Controle de Acesso (Biometria)                                                 │
-│  └── Áreas Comuns / Reservas                                                        │
+│  ├── Base de Conhecimento (RAG) - Spec 005                                          │
+│  ├── Chatbot Inteligente - Spec 006                                                 │
+│  └── Ingestão de Contratos - Spec 007                                               │
 │                                                                                      │
 └─────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -169,7 +165,6 @@ Cada processo inclui:
 
 | Spec | Descrição | % Implementado |
 |------|-----------|----------------|
-| 001 | Gestão Condominial | 5% (apenas estrutura de processos) |
 | 002 | Sistema de Processos | 60% (falta geração de documentos para website) |
 | 003 | Workflow de Aprovação | 70% (funciona, falta múltiplos aprovadores) |
 | 004 | Validação de Entidades | 80% (funciona, falta UI completa) |
@@ -177,7 +172,7 @@ Cada processo inclui:
 | 006 | Chatbot Inteligente | 0% |
 | 007 | Ingestão de Contratos | 0% |
 
-### 3.2 Funcionalidades Críticas Faltantes
+### 3.2 Funcionalidades Faltantes
 
 ```
 ❌ NÃO IMPLEMENTADO
@@ -185,22 +180,11 @@ Cada processo inclui:
 ├── Sistema de notificações
 ├── Histórico de versões (visualização)
 ├── Geração de documentos para publicação
-├── Base de conhecimento (RAG)
-├── Chatbot com IA
-├── Ingestão de contratos
-├── Dashboard de métricas operacionais
-└── Integração com sistemas externos
+├── Base de conhecimento (RAG) - Spec 005
+├── Chatbot com IA - Spec 006
+├── Ingestão de contratos - Spec 007
+└── Dashboard de métricas operacionais
 ```
-
-### 3.3 Módulos Operacionais (Spec 001) - Nenhum Implementado
-
-- ❌ Financeiro (orçamento, boletos, inadimplência)
-- ❌ Acesso e Segurança (biometria, câmeras)
-- ❌ Portaria Online (visitantes, entregas)
-- ❌ Manutenção (preventiva, corretiva)
-- ❌ Áreas Comuns (reservas)
-- ❌ Eventos (assembleias)
-- ❌ Emergências (procedimentos ativos)
 
 ---
 
@@ -272,10 +256,6 @@ workspace/
 5. **Base de Conhecimento (Spec 005)** - Indexar processos aprovados
 6. **Chatbot (Spec 006)** - Assistente para moradores
 7. **Ingestão de Contratos (Spec 007)** - Geração automática de processos
-
-### 5.3 Prioridade Baixa (Módulos Operacionais)
-
-8. **Gestão Condominial (Spec 001)** - Financeiro, Reservas, etc.
 
 ---
 
