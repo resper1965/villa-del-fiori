@@ -16,7 +16,6 @@ import {
 import { useState } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useRBAC } from "@/lib/hooks/useRBAC"
-import Login from "@/components/auth/Login"
 
 export default function DashboardLayout({
   children,
@@ -26,20 +25,20 @@ export default function DashboardLayout({
   const router = useRouter()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const { isAuthenticated, isLoading, loginSimple, logout } = useAuth()
+  const { isAuthenticated, isLoading, logout } = useAuth()
   const { canAccessDashboard, canAccessChat, canApproveUsers } = useRBAC()
-
-  const handleLogin = async (password: string) => {
-    const success = await loginSimple(password)
-    if (success) {
-      // Login bem-sucedido, não precisa redirecionar pois já está no dashboard
-    }
-  }
 
   const handleLogout = () => {
     logout()
-    router.push("/")
+    router.push("/login")
   }
+
+  // Se não autenticado, redirecionar para página de login (hooks devem vir antes de returns)
+  useEffect(() => {
+    if (!isAuthenticated && !isLoading) {
+      router.push("/login")
+    }
+  }, [isAuthenticated, isLoading, router])
 
   // Mostrar loading enquanto verifica autenticação
   if (isLoading) {
@@ -50,9 +49,13 @@ export default function DashboardLayout({
     )
   }
 
-  // Se não autenticado, mostrar tela de login
+  // Se não autenticado, mostrar mensagem de redirecionamento
   if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-gray-400 font-light">Redirecionando para login...</div>
+      </div>
+    )
   }
 
   // Não redirecionar moradores aqui - deixar cada página lidar com suas próprias permissões
