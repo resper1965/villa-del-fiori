@@ -54,7 +54,7 @@ export default function LoginPage() {
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center mb-4">
             <Image
-              src="/logo.svg"
+              src="/logo.png"
               alt="Gabi - Síndica Virtual"
               width={200}
               height={80}
