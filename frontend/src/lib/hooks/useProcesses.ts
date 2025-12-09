@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { processesApi } from "@/lib/api/processes"
+import { processesApiSupabase as processesApi } from "@/lib/api/processes-supabase"
 import { Process, ProcessDetailResponse } from "@/types"
 
 export const useProcesses = (params?: {

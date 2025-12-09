@@ -1,15 +1,16 @@
-# Quickstart: Aplicação de Gestão de Processos Condominiais
+# Quickstart: Gabi - Síndica Virtual
 
 **Feature**: `003-app-gestao-processos-aprovacao`  
-**Date**: 2024-12-08
+**Date**: 2024-12-08  
+**Updated**: 2025-01-09  
+**Application Name**: Gabi - Síndica Virtual
 
 ## Pré-requisitos
 
-- Python 3.11+
 - Node.js 20+
-- PostgreSQL 15+
-- Docker e Docker Compose (opcional, mas recomendado)
+- Conta no Supabase (gratuita)
 - Git
+- Python 3.11+ (apenas para scripts de seed)
 
 ## Setup Rápido
 
@@ -20,41 +21,44 @@ git clone <repository-url>
 cd villadelfiori
 ```
 
-### 2. Backend Setup
+### 2. Configurar Supabase
+
+1. Crie uma conta em [supabase.com](https://supabase.com)
+2. Crie um novo projeto
+3. Anote as credenciais:
+   - Project URL
+   - Anon Key (publishable)
+   - Service Role Key (para migrations)
+
+### 3. Aplicar Migrations no Supabase
 
 ```bash
-cd backend
-
-# Criar ambiente virtual
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# ou
-venv\Scripts\activate  # Windows
-
-# Instalar dependências
-pip install -r requirements.txt
-
-# Configurar variáveis de ambiente
-cp .env.example .env
-# Editar .env com suas configurações:
-# - DATABASE_URL
-# - SECRET_KEY
-# - SMTP settings
-
-# Executar migrations
-alembic upgrade head
-
-# Seed dados iniciais (processos pré-cadastrados)
-python -m app.services.seed_service
-
-# Iniciar servidor de desenvolvimento
-uvicorn app.main:app --reload --port 8000
+# Via Supabase Dashboard SQL Editor ou MCP tools
+# Aplicar migrations em ordem:
+# - 001_initial_migration.sql
+# - 002_add_entities_table.sql
+# - 003_add_validation_results_table.sql
+# - 004_add_auth_to_stakeholders.sql
+# - 005_seed_processes.sql
+# - ... (outras migrations)
 ```
 
-Backend estará disponível em: http://localhost:8000  
-API Docs: http://localhost:8000/docs
+### 4. Seed de Processos (Opcional)
 
-### 3. Frontend Setup
+```bash
+# Instalar dependências Python
+pip install supabase
+
+# Configurar variáveis de ambiente
+export SUPABASE_URL="https://seu-projeto.supabase.co"
+export SUPABASE_SERVICE_KEY="sua-service-key"
+
+# Executar seed
+cd scripts
+python seed_processes_to_supabase.py
+```
+
+### 5. Frontend Setup
 
 ```bash
 cd frontend
@@ -65,7 +69,8 @@ npm install
 # Configurar variáveis de ambiente
 cp .env.example .env.local
 # Editar .env.local:
-# - NEXT_PUBLIC_API_URL=http://localhost:8000
+# - NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
+# - NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-anon-key
 
 # Iniciar servidor de desenvolvimento
 npm run dev
@@ -73,62 +78,66 @@ npm run dev
 
 Frontend estará disponível em: http://localhost:3000
 
-### 4. Setup com Docker (Recomendado)
-
-```bash
-# Na raiz do projeto
-docker-compose up -d
-
-# Executar migrations
-docker-compose exec backend alembic upgrade head
-
-# Seed dados iniciais
-docker-compose exec backend python -m app.services.seed_service
-```
-
 ## Primeiro Acesso
 
-### 1. Criar Usuário Administrador
+### 1. Cadastrar Primeiro Usuário Administrador
 
-```bash
-# Via CLI do backend
-python -m app.cli create_admin --email admin@condominio.com --name "Administrador"
+1. Acesse http://localhost:3000/register
+2. Preencha o formulário:
+   - Nome: "Administrador"
+   - Email: seu@email.com
+   - Senha: (escolha uma senha segura)
+   - Tipo: Selecione "Administrador da Aplicação"
+3. Clique em "Criar Conta"
+4. Você será redirecionado para `/auth/waiting-approval`
+
+### 2. Aprovar Primeiro Usuário (via Supabase)
+
+Como não há administrador ainda, você precisa aprovar manualmente:
+
+```sql
+-- Via Supabase SQL Editor
+UPDATE stakeholders 
+SET is_approved = true, 
+    approved_at = NOW(),
+    user_role = 'admin'
+WHERE email = 'seu@email.com';
 ```
 
-### 2. Login
+### 3. Login
 
 1. Acesse http://localhost:3000/login
-2. Use as credenciais do administrador criado
+2. Use o email e senha cadastrados
 3. Você será redirecionado para o dashboard
 
-### 3. Configurar Stakeholders
+### 4. Gerenciar Usuários
 
-1. Acesse "Stakeholders" no menu
-2. Crie stakeholders (síndico, conselheiros, administradora)
-3. Atribua permissões (Aprovador, Visualizador, Editor)
+1. Acesse "Usuários" no menu (apenas admin/síndico/subsíndico)
+2. Veja lista de usuários pendentes de aprovação
+3. Aprove ou rejeite usuários conforme necessário
 
-### 4. Explorar Processos Pré-cadastrados
+### 5. Explorar Processos Pré-cadastrados
 
 1. Acesse "Processos" no menu
-2. Explore processos organizados por categoria
+2. Explore os 35 processos pré-cadastrados organizados por categoria
 3. Visualize detalhes de um processo
 4. Teste workflow de aprovação
 
+### 6. Usar o Chat (Gabi - Síndica Virtual)
+
+1. Acesse "Chat" no menu
+2. Converse com a Gabi, Síndica Virtual
+3. Faça perguntas sobre processos e procedimentos
+
 ## Estrutura de Desenvolvimento
 
-### Backend
+### Backend (Supabase)
 
-```
-backend/
-├── src/app/
-│   ├── api/v1/endpoints/    # Endpoints da API
-│   ├── core/                # Config, security, database
-│   ├── models/              # SQLAlchemy models
-│   ├── schemas/             # Pydantic schemas
-│   └── services/            # Lógica de negócio
-├── alembic/                 # Migrations
-└── tests/                   # Testes
-```
+- **Database**: PostgreSQL via Supabase
+- **Auth**: Supabase Auth com sistema de aprovação customizado
+- **Storage**: Supabase Storage (se necessário)
+- **Edge Functions**: Deno functions para lógica serverless
+- **Migrations**: SQL migrations aplicadas via Supabase Dashboard ou MCP
 
 ### Frontend
 
@@ -142,23 +151,15 @@ frontend/
 
 ## Comandos Úteis
 
-### Backend
+### Supabase
 
 ```bash
-# Rodar testes
-pytest
+# Aplicar migration via MCP (se configurado)
+# Ou via Supabase Dashboard SQL Editor
 
-# Criar nova migration
-alembic revision --autogenerate -m "description"
-
-# Aplicar migrations
-alembic upgrade head
-
-# Reverter última migration
-alembic downgrade -1
-
-# Seed dados
-python -m app.services.seed_service
+# Seed processos
+cd scripts
+python seed_processes_to_supabase.py
 ```
 
 ### Frontend
@@ -203,76 +204,47 @@ npm run type-check
 
 ### 3. Testar Workflow Completo
 
-```bash
-# 1. Criar processo via API
-curl -X POST http://localhost:8000/api/v1/processes \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Teste Processo",
-    "category": "governanca",
-    "document_type": "pop"
-  }'
-
-# 2. Enviar para aprovação
-curl -X POST http://localhost:8000/api/v1/processes/{id}/submit \
-  -H "Authorization: Bearer <token>"
-
-# 3. Aprovar como stakeholder
-curl -X POST http://localhost:8000/api/v1/processes/{id}/approve \
-  -H "Authorization: Bearer <stakeholder_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"comments": "Aprovado"}'
-```
+1. **Criar Processo**: Acesse "Processos" → "Novo Processo"
+2. **Preencher Dados**: Nome, categoria, tipo de documento, conteúdo
+3. **Salvar**: Processo fica em status "Rascunho"
+4. **Enviar para Aprovação**: Clique em "Enviar para Aprovação"
+5. **Aprovar/Rejeitar**: Stakeholders podem aprovar ou rejeitar via interface
+6. **Refazer (se rejeitado)**: Criador pode refazer baseado nos motivos
 
 ## Troubleshooting
 
-### Erro de Conexão com Banco
+### Erro de Conexão com Supabase
 
-```bash
-# Verificar se PostgreSQL está rodando
-docker-compose ps
+1. Verificar `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` no `.env.local`
+2. Verificar se o projeto Supabase está ativo
+3. Verificar RLS policies no Supabase Dashboard
 
-# Ver logs
-docker-compose logs postgres
+### Erro de Autenticação
 
-# Recriar banco
-docker-compose down -v
-docker-compose up -d
-alembic upgrade head
-```
+1. Verificar se usuário está aprovado (`is_approved = true`)
+2. Verificar se `auth_user_id` está vinculado corretamente
+3. Verificar logs do Supabase Auth
 
-### Erro de Migrations
+### Erro de Permissões (RLS)
 
-```bash
-# Verificar status
-alembic current
-
-# Ver histórico
-alembic history
-
-# Resolver conflitos manualmente se necessário
-```
-
-### Frontend não conecta ao Backend
-
-1. Verificar `NEXT_PUBLIC_API_URL` no `.env.local`
-2. Verificar se backend está rodando na porta 8000
-3. Verificar CORS no backend
+1. Verificar Row Level Security policies no Supabase
+2. Verificar se usuário tem role correto
+3. Verificar se `is_approved = true` no stakeholder
 
 ## Próximos Passos
 
-1. Explorar processos pré-cadastrados
+1. Explorar os 35 processos pré-cadastrados
 2. Criar primeiro processo de teste
-3. Configurar stakeholders e permissões
+3. Aprovar usuários cadastrados
 4. Testar workflow completo de aprovação
-5. Personalizar variáveis do sistema
-6. Configurar notificações por email
+5. Usar o chat com Gabi (Síndica Virtual)
+6. Gerenciar usuários via interface administrativa
 
 ## Recursos Adicionais
 
-- API Documentation: http://localhost:8000/docs
-- Database Admin: Usar pgAdmin ou DBeaver
-- Logs: `docker-compose logs -f backend` ou `docker-compose logs -f frontend`
+- **Supabase Dashboard**: https://app.supabase.com
+- **Database Admin**: Supabase SQL Editor ou ferramentas externas
+- **Logs**: Supabase Dashboard → Logs
+- **Documentação**: Ver arquivos em `/specs/003-app-gestao-processos-aprovacao/`
 
 

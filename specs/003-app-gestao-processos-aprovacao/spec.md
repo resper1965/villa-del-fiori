@@ -1,8 +1,10 @@
-# Feature Specification: Aplicação de Gestão de Processos Condominiais com Workflow de Aprovação
+# Feature Specification: Gabi - Síndica Virtual
 
 **Feature Branch**: `003-app-gestao-processos-aprovacao`  
 **Created**: 2024-12-08  
-**Status**: Draft  
+**Updated**: 2025-01-09  
+**Status**: Implemented  
+**Application Name**: Gabi - Síndica Virtual  
 **Input**: User description: "Aplicação de Gestão de Processos Condominiais com Workflow de Aprovação - Sistema onde stakeholders podem revisar, aprovar ou rejeitar processos, explicar motivos de rejeição e refazer processos baseado no feedback"
 
 ## User Scenarios & Testing *(mandatory)*

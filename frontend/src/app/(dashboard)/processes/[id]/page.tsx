@@ -11,14 +11,13 @@ import { useProcess } from "@/lib/hooks/useProcesses"
 import { useApproveProcess, useRejectProcess } from "@/lib/hooks/useApprovals"
 import { ApprovalDialog } from "@/components/approvals/ApprovalDialog"
 import { RejectionDialog } from "@/components/approvals/RejectionDialog"
-import { processesData } from "@/data/processes" // Fallback
 
 export default function ProcessDetailPage() {
   const params = useParams()
   const router = useRouter()
   const processId = params.id as string
   
-  // Buscar processo da API
+  // Buscar processo da API (sem fallback mock)
   const { data: process, isLoading, error } = useProcess(processId)
   const approveMutation = useApproveProcess()
   const rejectMutation = useRejectProcess()
@@ -26,35 +25,7 @@ export default function ProcessDetailPage() {
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false)
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false)
 
-  // Fallback para dados iniciais se API não disponível
-  const initialProcess = processesData.find(p => p.id === parseInt(processId))
-  const displayProcess = process || (initialProcess ? {
-    id: initialProcess.id.toString(),
-    name: initialProcess.name,
-    category: initialProcess.category,
-    status: initialProcess.status,
-    document_type: initialProcess.documentType,
-    description: initialProcess.description,
-    workflow: initialProcess.workflow,
-    entities: initialProcess.entities,
-    variables: initialProcess.variables,
-    raci: initialProcess.raci, // Incluir matriz RACI
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    current_version_number: 1,
-    creator_id: "1",
-    current_version: initialProcess.mermaid_diagram ? {
-      id: "1",
-      process_id: initialProcess.id.toString(),
-      version_number: 1,
-      content: {
-        mermaid_diagram: initialProcess.mermaid_diagram,
-      },
-      status: initialProcess.status,
-      created_by: "1",
-      created_at: new Date().toISOString(),
-    } : undefined,
-  } : null)
+  const displayProcess = process
 
   const handleApprove = async (comment?: string) => {
     if (!displayProcess || !process?.current_version?.id) return
@@ -124,8 +95,8 @@ export default function ProcessDetailPage() {
   const statusInfo = statusConfig[displayProcess.status as keyof typeof statusConfig] || statusConfig.aprovado
   const StatusIcon = statusInfo.icon
 
-  // Encontrar número do processo na lista completa
-  const processNumber = processesData.findIndex(p => p.id === parseInt(processId)) + 1
+  // Versão do processo
+  const processVersion = displayProcess?.current_version_number || 1
 
   return (
     <div className="min-h-screen bg-background">
@@ -141,7 +112,7 @@ export default function ProcessDetailPage() {
         </Button>
         <div className="flex items-center gap-2">
           <span className="text-xs font-medium text-[#00ade8] bg-[#00ade8]/10 px-2 py-1 rounded">
-            #{processNumber}
+            v{processVersion}
           </span>
           <h1 className="text-lg font-light text-gray-200">
             {displayProcess.name}
@@ -182,9 +153,7 @@ export default function ProcessDetailPage() {
 
           {/* Mermaid Diagram Card - Sempre mostrar se houver diagrama */}
           {(() => {
-            const diagram = process?.current_version?.content?.mermaid_diagram || 
-                           displayProcess?.current_version?.content?.mermaid_diagram ||
-                           (initialProcess?.mermaid_diagram || "");
+            const diagram = process?.current_version?.content?.mermaid_diagram || "";
             return diagram ? (
               <Card>
                 <CardHeader className="pb-2">

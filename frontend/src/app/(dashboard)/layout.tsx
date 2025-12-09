@@ -11,9 +11,11 @@ import {
   Building2,
   LogOut,
   Users,
+  MessageSquare,
 } from "lucide-react"
 import { useState } from "react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/contexts/AuthContext"
+import { useRBAC } from "@/lib/hooks/useRBAC"
 import Login from "@/components/auth/Login"
 
 export default function DashboardLayout({
@@ -25,6 +27,7 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const { isAuthenticated, isLoading, login, logout } = useAuth()
+  const { canAccessDashboard, canAccessChat, canApproveUsers } = useRBAC()
 
   const handleLogin = (password: string) => {
     const success = login(password)
@@ -52,12 +55,25 @@ export default function DashboardLayout({
     return <Login onLogin={handleLogin} />
   }
 
+  // Não redirecionar moradores aqui - deixar cada página lidar com suas próprias permissões
+  // O layout sempre será mostrado se o usuário estiver autenticado
 
-  const menuItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/processes", label: "Processos", icon: FileText },
-    { href: "/entities", label: "Entidades", icon: Users },
-  ]
+  // Construir menu baseado em permissões
+  const menuItems = []
+  
+  if (canAccessDashboard()) {
+    menuItems.push({ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard })
+    menuItems.push({ href: "/processes", label: "Processos", icon: FileText })
+    menuItems.push({ href: "/entities", label: "Entidades", icon: Users })
+  }
+  
+  if (canAccessChat()) {
+    menuItems.push({ href: "/chat", label: "Chat", icon: MessageSquare })
+  }
+  
+  if (canApproveUsers()) {
+    menuItems.push({ href: "/admin/users", label: "Usuários", icon: Users })
+  }
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -68,12 +84,19 @@ export default function DashboardLayout({
         } bg-card border-r border-border transition-all duration-300 flex flex-col`}
       >
         <div className="h-[73px] p-4 border-b border-border flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-[#00ade8] stroke-1" />
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-[#00ade8] stroke-1" />
+              {sidebarOpen && (
+                <h2 className="text-sm font-semibold text-foreground tracking-wide">
+                  Gabi
+                </h2>
+              )}
+            </div>
             {sidebarOpen && (
-              <h2 className="text-sm font-medium text-foreground tracking-wide">
-                Condomínio Villa Dei Fiori
-              </h2>
+              <p className="text-xs text-muted-foreground ml-7">
+                Síndica Virtual
+              </p>
             )}
           </div>
           <Button

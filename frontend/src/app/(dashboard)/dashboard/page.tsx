@@ -1,14 +1,59 @@
 "use client"
 
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, CheckCircle, XCircle, Clock } from "lucide-react"
-import { processesData } from "@/data/processes"
+import { FileText, CheckCircle, XCircle, Clock, Loader2 } from "lucide-react"
+import { useProcesses } from "@/lib/hooks/useProcesses"
+import { useRBAC } from "@/lib/hooks/useRBAC"
 
 export default function DashboardPage() {
-  const totalProcesses = processesData.length
-  const approvedProcesses = processesData.filter(p => p.status === "aprovado").length
-  const pendingProcesses = processesData.filter(p => p.status === "em_revisao" || p.status === "rascunho").length
-  const rejectedProcesses = processesData.filter(p => p.status === "rejeitado").length
+  const router = useRouter()
+  const { canAccessDashboard } = useRBAC()
+
+  // Redirecionar moradores para o chat
+  useEffect(() => {
+    if (!canAccessDashboard()) {
+      router.push("/chat")
+    }
+  }, [canAccessDashboard, router])
+  
+  // Se não pode acessar dashboard, não mostrar nada (será redirecionado)
+  if (!canAccessDashboard()) {
+    return null
+  }
+
+  // Buscar todos os processos do Supabase
+  const { data: allProcessesData, isLoading: isLoadingAll } = useProcesses({
+    page: 1,
+    page_size: 1000, // Buscar todos
+  })
+
+  const processes = allProcessesData?.items || []
+  const totalProcesses = processes.length
+  const approvedProcesses = processes.filter(p => p.status === "aprovado").length
+  const pendingProcesses = processes.filter(p => p.status === "em_revisao" || p.status === "rascunho").length
+  const rejectedProcesses = processes.filter(p => p.status === "rejeitado").length
+
+  if (!canAccessDashboard()) {
+    return null
+  }
+
+  if (isLoadingAll) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="h-[73px] border-b border-border flex items-center px-6">
+          <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
+        </div>
+        <div className="px-1 sm:px-2 md:px-3 py-2 flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground">Carregando estatísticas...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -123,5 +168,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-
-

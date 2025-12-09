@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { approvalsApi, ApprovalCreate, RejectionCreate } from "@/lib/api/approvals"
+import { approvalsApiSupabase as approvalsApi, ApprovalCreate, RejectionCreate } from "@/lib/api/approvals-supabase"
 
 export const useApproveProcess = () => {
   const queryClient = useQueryClient()

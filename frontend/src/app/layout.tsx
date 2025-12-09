@@ -6,7 +6,7 @@ import { Providers } from "./providers"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Gestão de Processos Condominiais",
+  title: "Gabi - Síndica Virtual",
   description: "Sistema de gestão de processos condominiais com workflow de aprovação",
 }
 

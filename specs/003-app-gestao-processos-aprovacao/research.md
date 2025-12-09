@@ -1,27 +1,31 @@
-# Research: Aplicação de Gestão de Processos Condominiais
+# Research: Gabi - Síndica Virtual
 
 **Feature**: `003-app-gestao-processos-aprovacao`  
-**Date**: 2024-12-08
+**Date**: 2024-12-08  
+**Updated**: 2025-01-09  
+**Application Name**: Gabi - Síndica Virtual
 
 ## Decisões Técnicas
 
 ### 1. Stack Tecnológica
 
-**Decisão**: Python/FastAPI para backend, Next.js/React para frontend
+**Decisão**: Supabase como Backend-as-a-Service, Next.js 14/React para frontend
 
 **Rationale**: 
-- FastAPI oferece alta performance, validação automática com Pydantic, documentação automática (OpenAPI), suporte nativo a async/await
-- Next.js 14+ oferece App Router moderno, SSR/SSG, TypeScript nativo, excelente DX
-- Ambas tecnologias têm ecossistema maduro e boa documentação
+- **Supabase**: Backend completo (PostgreSQL, Auth, Storage, Edge Functions) reduz complexidade de infraestrutura, permite foco no frontend, escalável, gratuito para começar
+- **Next.js 14+**: App Router moderno, SSR/SSG, TypeScript nativo, excelente DX, deploy fácil na Vercel
+- **React Query**: Gerenciamento de estado server-side, cache automático, sincronização
+- **TanStack Table**: Tabelas avançadas com sorting, filtering, pagination
+- **shadcn/ui**: Componentes acessíveis e customizáveis
 
 **Alternativas Consideradas**:
+- FastAPI + PostgreSQL: Mais controle mas requer mais infraestrutura e manutenção
+- Firebase: Similar ao Supabase mas menos focado em PostgreSQL e relacionamentos
 - Django: Mais "baterias incluídas" mas mais pesado, menos flexível para API pura
-- Express.js: Node.js puro, mas Next.js oferece mais recursos out-of-the-box
-- Vue.js: Alternativa válida, mas React tem maior ecossistema e comunidade
 
 ### 2. Banco de Dados
 
-**Decisão**: PostgreSQL 15+
+**Decisão**: PostgreSQL 15+ via Supabase
 
 **Rationale**:
 - Suporte robusto a relacionamentos complexos (processos, versões, aprovações)
@@ -29,6 +33,8 @@
 - Transações ACID garantem consistência em workflows de aprovação
 - Full-text search nativo para busca de processos
 - Histórico completo requer integridade referencial forte
+- **Row Level Security (RLS)**: Segurança no nível do banco de dados
+- **PostgREST**: API REST automática gerada do schema
 
 **Alternativas Consideradas**:
 - MongoDB: Mais flexível para documentos, mas relacionamentos complexos são mais difíceis
@@ -36,17 +42,19 @@
 
 ### 3. Autenticação e Autorização
 
-**Decisão**: JWT (JSON Web Tokens) com refresh tokens
+**Decisão**: Supabase Auth com sistema de aprovação customizado e RBAC
 
 **Rationale**:
-- Stateless, escalável
-- Adequado para API REST
-- Refresh tokens aumentam segurança
-- python-jose (backend) e next-auth (frontend) são bibliotecas maduras
+- **Supabase Auth**: Gerenciamento completo de usuários, email/password, OAuth opcional, sessões seguras
+- **Sistema de Aprovação**: Campo `is_approved` em stakeholders para controle de acesso
+- **RBAC**: Roles (admin, syndic, subsindico, council, staff, resident) para controle granular
+- **RLS Policies**: Segurança no nível do banco de dados baseada em roles
+- Integração nativa com Supabase, sem necessidade de gerenciar tokens manualmente
 
 **Alternativas Consideradas**:
+- JWT manual: Mais controle mas mais complexidade, Supabase já oferece isso
 - Session-based: Requer estado no servidor, menos escalável
-- OAuth2: Overhead desnecessário para aplicação interna
+- OAuth2 puro: Overhead desnecessário, Supabase Auth já suporta OAuth quando necessário
 
 ### 4. Versionamento de Processos
 

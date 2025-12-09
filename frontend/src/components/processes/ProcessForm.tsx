@@ -62,6 +62,7 @@ interface ProcessFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   process?: Process
+  initialData?: Partial<ProcessFormData>
   onSubmit: (data: ProcessFormData) => Promise<void>
 }
 
@@ -87,7 +88,7 @@ const documentTypeMap: Record<string, string> = {
   politica: "Política",
 }
 
-export function ProcessForm({ open, onOpenChange, process, onSubmit }: ProcessFormProps) {
+export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit }: ProcessFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const {
     register,
@@ -126,6 +127,18 @@ export function ProcessForm({ open, onOpenChange, process, onSubmit }: ProcessFo
         variables: process.variables || [],
         mermaid_diagram: (process as any).mermaid_diagram || "",
       })
+    } else if (initialData && open) {
+      reset({
+        name: initialData.name || "",
+        category: initialData.category || "governanca",
+        subcategory: initialData.subcategory,
+        document_type: initialData.document_type || "pop",
+        description: initialData.description || "",
+        workflow: initialData.workflow || [],
+        entities: initialData.entities || [],
+        variables: initialData.variables || [],
+        mermaid_diagram: initialData.mermaid_diagram || "",
+      })
     } else if (open) {
       reset({
         name: "",
@@ -138,7 +151,7 @@ export function ProcessForm({ open, onOpenChange, process, onSubmit }: ProcessFo
         mermaid_diagram: "",
       })
     }
-  }, [process, open, reset])
+  }, [process, initialData, open, reset])
 
   const onFormSubmit = async (data: ProcessFormData) => {
     setIsSubmitting(true)

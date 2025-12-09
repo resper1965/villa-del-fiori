@@ -1,28 +1,28 @@
-# Implementation Plan: Aplicação de Gestão de Processos Condominiais com Workflow de Aprovação
+# Implementation Plan: Gabi - Síndica Virtual
 
-**Branch**: `003-app-gestao-processos-aprovacao` | **Date**: 2024-12-08 | **Spec**: [spec.md](./spec.md)
+**Branch**: `003-app-gestao-processos-aprovacao` | **Date**: 2024-12-08 | **Updated**: 2025-01-09 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/003-app-gestao-processos-aprovacao/spec.md`
 
 ## Summary
 
-Aplicação web completa para gestão de processos condominiais com workflow de aprovação por stakeholders. Sistema permite que síndico, conselho e administradora revisem, aprovem ou rejeitem processos, com capacidade de refazer processos baseado em feedback estruturado. Inclui todos os processos pré-cadastrados organizados por categorias (Governança, Acesso e Segurança, Operação, Áreas Comuns, Convivência, Eventos, Emergências).
+**Gabi - Síndica Virtual** é uma aplicação web completa para gestão de processos condominiais com workflow de aprovação por stakeholders. Sistema permite que síndico, conselho e administradora revisem, aprovem ou rejeitem processos, com capacidade de refazer processos baseado em feedback estruturado. Inclui todos os processos pré-cadastrados organizados por categorias (Governança, Acesso e Segurança, Operação, Áreas Comuns, Convivência, Eventos, Emergências).
 
-**Abordagem Técnica**: Aplicação web full-stack com backend API REST (Python/FastAPI) e frontend React/Next.js, banco de dados PostgreSQL para persistência, sistema de notificações por email, autenticação JWT e interface responsiva.
+**Abordagem Técnica**: Aplicação web full-stack com Supabase como backend (PostgreSQL, Auth, Storage), frontend Next.js 14 com React, TypeScript, Tailwind CSS, shadcn/ui, React Query, TanStack Table, e interface responsiva moderna.
 
 ## Technical Context
 
-**Language/Version**: Python 3.11+ (backend), TypeScript 5.0+ (frontend), Node.js 20+  
+**Language/Version**: TypeScript 5.3+ (frontend), Node.js 20+, Python 3.11+ (scripts)  
 **Primary Dependencies**: 
-- Backend: FastAPI, SQLAlchemy, Pydantic, Alembic, python-jose (JWT), python-multipart, email-validator
-- Frontend: Next.js 14+, React 18+, TypeScript, Tailwind CSS, shadcn/ui, React Query, Zod
-- Database: PostgreSQL 15+
-- Infrastructure: Docker, Docker Compose
+- Backend: Supabase (PostgreSQL, Auth, Storage, Edge Functions)
+- Frontend: Next.js 14.0.4, React 18.2, TypeScript 5.3, Tailwind CSS 3.3, shadcn/ui, @tanstack/react-query 5.12, @tanstack/react-table 8.21, @supabase/supabase-js 2.87
+- Database: PostgreSQL 15+ (via Supabase)
+- Infrastructure: Vercel (frontend), Supabase (backend)
 
-**Storage**: PostgreSQL 15+ para dados relacionais (processos, versões, aprovações, stakeholders, histórico)  
+**Storage**: Supabase PostgreSQL 15+ para dados relacionais (processos, versões, aprovações, stakeholders, histórico)  
+**Authentication**: Supabase Auth com sistema de aprovação de usuários e RBAC  
 **Testing**: 
-- Backend: pytest, pytest-asyncio, httpx (test client), factory-boy
-- Frontend: Jest, React Testing Library, Playwright (E2E)
-- Integration: pytest com testes de API end-to-end
+- Frontend: Jest, React Testing Library, Playwright (E2E) - planejado
+- Integration: Testes via Supabase MCP tools
 
 **Target Platform**: Web (navegadores modernos: Chrome, Firefox, Safari, Edge - últimas 2 versões)  
 **Project Type**: Web application (frontend + backend)  
@@ -74,123 +74,88 @@ specs/003-app-gestao-processos-aprovacao/
 ### Source Code (repository root)
 
 ```text
-backend/
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── v1/
-│   │   │   │   ├── endpoints/
-│   │   │   │   │   ├── processes.py      # CRUD processos
-│   │   │   │   │   ├── approvals.py      # Aprovações/rejeições
-│   │   │   │   │   ├── stakeholders.py   # Gestão stakeholders
-│   │   │   │   │   ├── notifications.py  # Notificações
-│   │   │   │   │   ├── dashboard.py      # Dashboard/estatísticas
-│   │   │   │   │   └── history.py        # Histórico
-│   │   │   │   └── router.py
-│   │   │   └── deps.py                   # Dependencies (auth, DB)
-│   │   ├── core/
-│   │   │   ├── config.py                 # Configurações
-│   │   │   ├── security.py               # JWT, password hashing
-│   │   │   └── database.py               # DB connection
-│   │   ├── models/
-│   │   │   ├── process.py                # Processo model
-│   │   │   ├── version.py                # Versão model
-│   │   │   ├── stakeholder.py            # Stakeholder model
-│   │   │   ├── approval.py               # Aprovação model
-│   │   │   ├── rejection.py              # Rejeição model
-│   │   │   ├── notification.py           # Notificação model
-│   │   │   └── history.py                # Histórico model
-│   │   ├── schemas/
-│   │   │   ├── process.py                # Pydantic schemas
-│   │   │   ├── approval.py
-│   │   │   ├── stakeholder.py
-│   │   │   └── ...
-│   │   ├── services/
-│   │   │   ├── process_service.py        # Lógica de negócio processos
-│   │   │   ├── approval_service.py       # Lógica workflow aprovação
-│   │   │   ├── notification_service.py   # Envio notificações
-│   │   │   ├── version_service.py        # Versionamento
-│   │   │   └── seed_service.py           # Seed processos pré-cadastrados
-│   │   └── main.py                       # FastAPI app
-│   ├── alembic/
-│   │   └── versions/                     # Migrations
-│   ├── tests/
-│   │   ├── unit/
-│   │   ├── integration/
-│   │   └── e2e/
-│   ├── requirements.txt
-│   └── Dockerfile
-│
 frontend/
 ├── src/
 │   ├── app/                              # Next.js App Router
-│   │   ├── (auth)/
-│   │   │   └── login/
-│   │   ├── (dashboard)/
-│   │   │   ├── dashboard/
-│   │   │   ├── processes/
-│   │   │   │   ├── [id]/
-│   │   │   │   │   ├── page.tsx          # Detalhes processo
-│   │   │   │   │   ├── edit/
-│   │   │   │   │   └── refazer/
-│   │   │   │   └── new/
-│   │   │   ├── approvals/
-│   │   │   └── history/
-│   │   └── layout.tsx
+│   │   ├── (auth)/                       # Rotas de autenticação
+│   │   │   ├── login/page.tsx            # Login com Supabase Auth
+│   │   │   ├── register/page.tsx         # Cadastro público
+│   │   │   └── waiting-approval/         # Aguardo de aprovação
+│   │   ├── (dashboard)/                  # Rotas protegidas do dashboard
+│   │   │   ├── layout.tsx                # Layout com sidebar e RBAC
+│   │   │   ├── dashboard/page.tsx        # Dashboard principal
+│   │   │   ├── processes/                # Gestão de processos
+│   │   │   │   ├── page.tsx              # Lista de processos
+│   │   │   │   └── [id]/page.tsx         # Detalhes e aprovação
+│   │   │   ├── approvals/page.tsx        # Processos pendentes
+│   │   │   ├── entities/page.tsx         # Gestão de entidades
+│   │   │   ├── chat/page.tsx             # Chat com Gabi (Síndica Virtual)
+│   │   │   └── admin/
+│   │   │       └── users/
+│   │   │           ├── page.tsx          # Gerenciamento de usuários
+│   │   │           └── data-table.tsx    # Tabela com TanStack Table
+│   │   ├── layout.tsx                    # Root layout
+│   │   ├── page.tsx                      # Home page
+│   │   └── providers.tsx                 # React Query provider
 │   ├── components/
 │   │   ├── ui/                           # shadcn/ui components
+│   │   │   ├── button.tsx, card.tsx, input.tsx
+│   │   │   ├── table.tsx, checkbox.tsx   # Componentes de tabela
+│   │   │   ├── popover.tsx, command.tsx  # Filtros avançados
+│   │   │   ├── dropdown-menu.tsx         # Menus de ação
+│   │   │   ├── avatar.tsx, badge.tsx     # Componentes visuais
+│   │   │   └── ...
+│   │   ├── auth/
+│   │   │   └── Login.tsx                 # Componente de login
 │   │   ├── processes/
 │   │   │   ├── ProcessList.tsx
 │   │   │   ├── ProcessCard.tsx
-│   │   │   ├── ProcessDetail.tsx
-│   │   │   ├── ProcessEditor.tsx
-│   │   │   └── VersionComparison.tsx
-│   │   ├── approvals/
-│   │   │   ├── ApprovalActions.tsx
-│   │   │   ├── RejectionForm.tsx
-│   │   │   └── ApprovalStatus.tsx
-│   │   ├── dashboard/
-│   │   │   ├── DashboardStats.tsx
-│   │   │   ├── PendingApprovals.tsx
-│   │   │   └── RecentActivity.tsx
-│   │   └── layout/
-│   │       ├── Header.tsx
-│   │       ├── Sidebar.tsx
-│   │       └── Notifications.tsx
+│   │   │   └── ProcessForm.tsx
+│   │   └── approvals/
+│   │       └── ApprovalActions.tsx
 │   ├── lib/
+│   │   ├── supabase/
+│   │   │   └── client.ts                 # Cliente Supabase
 │   │   ├── api/
-│   │   │   ├── client.ts                 # API client
-│   │   │   ├── processes.ts
-│   │   │   ├── approvals.ts
-│   │   │   └── ...
+│   │   │   ├── processes-supabase.ts     # API de processos (Supabase)
+│   │   │   ├── approvals-supabase.ts     # API de aprovações
+│   │   │   └── client.ts                 # Cliente HTTP (legado)
 │   │   ├── hooks/
-│   │   │   ├── useProcesses.ts
-│   │   │   ├── useApprovals.ts
-│   │   │   └── ...
-│   │   └── utils/
-│   ├── types/
-│   │   └── index.ts                      # TypeScript types
+│   │   │   ├── useProcesses.ts           # Hook para processos
+│   │   │   ├── useApprovals.ts           # Hook para aprovações
+│   │   │   └── useRBAC.ts                # Hook de RBAC
+│   │   └── utils.ts                      # Utilitários
+│   ├── contexts/
+│   │   └── AuthContext.tsx               # Context de autenticação Supabase
 │   └── styles/
 │       └── globals.css
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
 ├── package.json
 ├── next.config.js
 ├── tailwind.config.js
-└── Dockerfile
+└── tsconfig.json
 │
-docker-compose.yml
+scripts/                                  # Scripts de migração e seed
+├── migrations/                           # Migrations SQL para Supabase
+│   ├── 001_initial_migration.sql
+│   ├── 002_add_entities_table.sql
+│   ├── 003_add_validation_results_table.sql
+│   ├── 004_add_auth_to_stakeholders.sql
+│   ├── 005_seed_processes.sql
+│   └── ...
+├── seed_processes_to_supabase.py        # Script de seed
+└── parse_processes_simple.py            # Parser de processos
+│
 README.md
 .gitignore
 ```
 
-**Structure Decision**: Estrutura web application (Option 2) escolhida porque:
-- Separação clara entre frontend e backend permite desenvolvimento paralelo
-- Backend API REST pode ser consumido por outros clientes no futuro
-- Frontend Next.js oferece SSR/SSG para performance e SEO
-- Estrutura modular facilita testes e manutenção
+**Structure Decision**: Arquitetura baseada em Supabase escolhida porque:
+- Backend-as-a-Service reduz complexidade de infraestrutura
+- Supabase Auth integrado com sistema de aprovação customizado
+- PostgreSQL nativo com RLS para segurança
+- Frontend Next.js 14 com App Router para performance
+- TanStack Table para tabelas avançadas de dados
+- Estrutura modular facilita manutenção e escalabilidade
 
 ## Complexity Tracking
 

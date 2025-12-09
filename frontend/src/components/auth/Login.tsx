@@ -55,10 +55,10 @@ export default function Login({ onLogin }: LoginProps) {
             </div>
           </div>
           <CardTitle className="text-2xl font-light text-gray-200">
-            Condomínio Villa Dei Fiori
+            Gabi
           </CardTitle>
           <CardDescription className="text-gray-400 font-light">
-            Sistema de Gestão de Processos Condominiais
+            Síndica Virtual
           </CardDescription>
         </CardHeader>
         <CardContent>

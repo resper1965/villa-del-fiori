@@ -9,7 +9,6 @@ import { useProcesses } from "@/lib/hooks/useProcesses"
 import { useApproveProcess, useRejectProcess } from "@/lib/hooks/useApprovals"
 import { ApprovalDialog } from "@/components/approvals/ApprovalDialog"
 import { RejectionDialog } from "@/components/approvals/RejectionDialog"
-import { processesData } from "@/data/processes" // Fallback
 
 export default function ApprovalsPage() {
   const router = useRouter()
@@ -27,18 +26,8 @@ export default function ApprovalsPage() {
   const approveMutation = useApproveProcess()
   const rejectMutation = useRejectProcess()
 
-  // Usar dados da API ou fallback para mock
-  const pendingProcesses = apiData?.items || processesData
-    .filter(p => p.status === "em_revisao" || p.status === "rascunho")
-    .slice(0, 5)
-    .map(p => ({
-      id: p.id.toString(),
-      name: p.name,
-      category: p.category,
-      status: p.status,
-      description: p.description,
-      current_version: { id: "1" }, // Mock version ID
-    }))
+  // Usar dados da API (sem fallback mock)
+  const pendingProcesses = apiData?.items || []
 
   const handleApproveClick = (process: any) => {
     setSelectedProcess(process)
