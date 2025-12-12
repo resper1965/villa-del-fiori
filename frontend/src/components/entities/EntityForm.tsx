@@ -157,7 +157,7 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
               placeholder="Nome da entidade"
             />
             {errors.name && (
-              <p className="text-sm text-red-400">{errors.name.message}</p>
+              <p className="text-sm text-destructive">{errors.name.message}</p>
             )}
           </div>
 
@@ -226,7 +226,7 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
               placeholder="email@exemplo.com"
             />
             {errors.email && (
-              <p className="text-sm text-red-400">{errors.email.message}</p>
+              <p className="text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
 
@@ -307,7 +307,7 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
               type="checkbox"
               id="is_active"
               {...register("is_active")}
-              className="rounded border-gray-600 bg-gray-800"
+              className="rounded border-gray-600 bg-card"
             />
             <Label htmlFor="is_active" className="cursor-pointer">
               Entidade ativa

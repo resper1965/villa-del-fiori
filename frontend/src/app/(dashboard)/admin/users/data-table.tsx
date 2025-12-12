@@ -182,7 +182,7 @@ export function createColumns(
         const hasWhatsapp = row.original.has_whatsapp
         
         if (!phone && !whatsapp) {
-          return <span className="text-gray-400 text-sm">-</span>
+          return <span className="text-muted-foreground text-sm">-</span>
         }
         
         return (
@@ -191,12 +191,12 @@ export function createColumns(
               <div className="flex items-center gap-1">
                 <span>{phone}</span>
                 {hasWhatsapp && whatsapp === phone && (
-                  <span className="text-green-400 text-xs" title="Tem WhatsApp">💬</span>
+                  <span className="text-success text-xs" title="Tem WhatsApp">💬</span>
                 )}
               </div>
             )}
             {whatsapp && whatsapp !== phone && (
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-muted-foreground">
                 WA: {whatsapp}
               </div>
             )}
@@ -261,16 +261,16 @@ export function createColumns(
       cell: ({ row }) => {
         const unit = row.original.unit
         if (!unit) {
-          return <span className="text-gray-400 text-sm">-</span>
+          return <span className="text-muted-foreground text-sm">-</span>
         }
         return (
           <div className="text-sm">
             <div className="font-medium">{unit.number}</div>
             {unit.block && (
-              <div className="text-xs text-gray-400">Bloco {unit.block}</div>
+              <div className="text-xs text-muted-foreground">Bloco {unit.block}</div>
             )}
             {unit.floor && (
-              <div className="text-xs text-gray-400">{unit.floor}º andar</div>
+              <div className="text-xs text-muted-foreground">{unit.floor}º andar</div>
             )}
           </div>
         )
@@ -298,23 +298,23 @@ export function createColumns(
         if (!relationshipType) {
           // Fallback para dados antigos
           if (isOwner && isResident) {
-            return <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">Proprietário/Morador</Badge>
+            return <Badge variant="outline" className="bg-info/10 text-info border-info/20">Proprietário/Morador</Badge>
           } else if (isOwner) {
-            return <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/20">Proprietário</Badge>
+            return <Badge variant="outline" className="bg-purple/10 text-purple border-purple/20">Proprietário</Badge>
           } else if (isResident) {
-            return <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">Morador</Badge>
+            return <Badge variant="outline" className="bg-success/10 text-success border-success/20">Morador</Badge>
           }
-          return <span className="text-gray-400 text-sm">-</span>
+          return <span className="text-muted-foreground text-sm">-</span>
         }
         
         const labels: Record<string, { label: string; className: string }> = {
-          proprietario_morador: { label: "Proprietário/Morador", className: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-          proprietario: { label: "Proprietário", className: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-          morador: { label: "Locatário", className: "bg-green-500/10 text-green-400 border-green-500/20" },
+          proprietario_morador: { label: "Proprietário/Morador", className: "bg-info/10 text-info border-info/20" },
+          proprietario: { label: "Proprietário", className: "bg-purple/10 text-purple border-purple/20" },
+          morador: { label: "Locatário", className: "bg-success/10 text-success border-success/20" },
         }
         
         const config = labels[relationshipType]
-        if (!config) return <span className="text-gray-400 text-sm">-</span>
+        if (!config) return <span className="text-muted-foreground text-sm">-</span>
         
         return <Badge variant="outline" className={config.className}>{config.label}</Badge>
       },
@@ -347,14 +347,14 @@ export function createColumns(
 
         if (isApproved) {
           return (
-            <Badge className="bg-green-500/10 text-green-400 border-green-500/20">
+            <Badge className="bg-success/10 text-success border-success/20">
               Aprovado
             </Badge>
           )
         }
 
         return (
-          <Badge variant="outline" className="text-yellow-400 border-yellow-500/50">
+          <Badge variant="outline" className="text-warning border-yellow-500/50">
             Pendente
           </Badge>
         )
@@ -411,7 +411,7 @@ export function createColumns(
               {canApprove && onApprove && (
                 <DropdownMenuItem
                   onClick={() => onApprove(stakeholder.auth_user_id || stakeholder.id)}
-                  className="text-green-400"
+                  className="text-success"
                 >
                   <UserCheck className="mr-2 h-4 w-4" />
                   Aprovar
@@ -420,7 +420,7 @@ export function createColumns(
               {canReject && onReject && (
                 <DropdownMenuItem
                   onClick={() => onReject(stakeholder.auth_user_id || stakeholder.id)}
-                  className="text-red-400"
+                  className="text-destructive"
                 >
                   <UserX className="mr-2 h-4 w-4" />
                   Rejeitar
@@ -429,7 +429,7 @@ export function createColumns(
               {onDelete && (
                 <DropdownMenuItem
                   onClick={() => onDelete(stakeholder.auth_user_id || stakeholder.id)}
-                  className="text-red-400"
+                  className="text-destructive"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Deletar
@@ -593,7 +593,7 @@ export default function UsersDataTable({
           globalSearchPlaceholder="Buscar por nome, email ou unidade..."
         />
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-muted-foreground">
             Mostrando {table.getFilteredRowModel().rows.length} de {data.length} usuário(s)
             {table.getFilteredRowModel().rows.length !== data.length && (
               <span className="ml-1">(filtrados)</span>
@@ -680,7 +680,7 @@ export default function UsersDataTable({
       </div>
       <div className="flex items-center justify-between py-4 gap-4 flex-wrap">
         <div className="flex items-center gap-2">
-          <p className="text-sm text-gray-400">Linhas por página:</p>
+          <p className="text-sm text-muted-foreground">Linhas por página:</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -744,7 +744,7 @@ export default function UsersDataTable({
           </div>
         </div>
         {Object.keys(rowSelection).length > 0 && (
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-muted-foreground">
             {Object.keys(rowSelection).length} usuário(s) selecionado(s)
           </div>
         )}

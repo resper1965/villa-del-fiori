@@ -77,8 +77,8 @@ export default function ApprovalsPage() {
       {isLoading ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400 stroke-1" />
-              <p className="text-gray-400">Carregando processos pendentes...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground stroke-1" />
+              <p className="text-muted-foreground">Carregando processos pendentes...</p>
             </CardContent>
           </Card>
       ) : pendingProcesses.length === 0 ? (
@@ -90,8 +90,8 @@ export default function ApprovalsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-gray-400">
-                <Clock className="h-12 w-12 mx-auto mb-4 text-gray-400 stroke-1" />
+              <div className="text-center py-12 text-muted-foreground">
+                <Clock className="h-12 w-12 mx-auto mb-4 text-muted-foreground stroke-1" />
                 <p>Nenhum processo pendente de aprovação.</p>
               </div>
             </CardContent>
@@ -100,10 +100,10 @@ export default function ApprovalsPage() {
         <div className="space-y-4">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-sm font-medium text-gray-400 mb-1">
+                <h2 className="text-sm font-medium text-muted-foreground mb-1">
                   Processos Pendentes
                 </h2>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-muted-foreground">
                   {pendingProcesses.length} processo(s) aguardando sua aprovação
                 </p>
               </div>
@@ -117,19 +117,19 @@ export default function ApprovalsPage() {
                 : 0
               
               return (
-                <Card key={process.id} className="bg-gray-800/50 border-gray-700/50 hover:bg-gray-800/70 hover:border-[#00ade8]/50 transition-all">
+                <Card key={process.id} className="bg-card/50 border-border/50 hover:bg-card/70 hover:border-primary/50 transition-all">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4 flex-1">
                         <div className="p-3 rounded-lg bg-muted">
-                          <FileText className="h-5 w-5 text-gray-300 stroke-1" />
+                          <FileText className="h-5 w-5 text-foreground stroke-1" />
                         </div>
                         <div className="flex-1">
                           <CardTitle className="text-base mb-2">{process.name}</CardTitle>
                           <CardDescription className="mb-3">
                             {process.description ? process.description.substring(0, 150) + "..." : "Sem descrição"}
                           </CardDescription>
-                          <div className="flex items-center gap-4 text-xs text-gray-400">
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             <span>Categoria: {process.category}</span>
                             {process.created_at && (
                               <>
@@ -155,7 +155,7 @@ export default function ApprovalsPage() {
                       <Button
                         variant="default"
                         size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white"
+                        className="bg-success hover:bg-success/90 text-success-foreground"
                         onClick={() => handleApproveClick(process)}
                         disabled={approveMutation.isPending}
                       >
@@ -165,7 +165,7 @@ export default function ApprovalsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                        className="border-destructive/50 text-destructive hover:bg-destructive/10"
                         onClick={() => handleRejectClick(process)}
                         disabled={rejectMutation.isPending}
                       >

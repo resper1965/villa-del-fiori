@@ -46,7 +46,7 @@ export function RefactorProcessDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <RotateCcw className="h-5 w-5 text-yellow-400" />
+            <RotateCcw className="h-5 w-5 text-warning" />
             Refazer Processo
           </DialogTitle>
           <DialogDescription>
@@ -70,7 +70,7 @@ export function RefactorProcessDialog({
               rows={4}
               disabled={isLoading}
             />
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-muted-foreground">
               Este resumo será salvo no histórico de versões para referência futura.
             </p>
           </div>

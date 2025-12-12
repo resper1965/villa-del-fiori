@@ -54,15 +54,15 @@ const notificationTypeLabels: Record<string, string> = {
 }
 
 const notificationTypeColors: Record<string, string> = {
-  approval_pending: "bg-yellow-500/20 text-yellow-500",
-  approved: "bg-green-500/20 text-green-500",
-  rejected: "bg-red-500/20 text-red-500",
-  reminder: "bg-blue-500/20 text-blue-500",
-  process_refactored: "bg-purple-500/20 text-purple-500",
-  process_created: "bg-blue-500/20 text-blue-500",
-  process_updated: "bg-purple-500/20 text-purple-500",
-  user_approved: "bg-green-500/20 text-green-500",
-  user_rejected: "bg-red-500/20 text-red-500",
+  approval_pending: "bg-warning/20 text-warning",
+  approved: "bg-success/20 text-success",
+  rejected: "bg-destructive/20 text-destructive",
+  reminder: "bg-info/20 text-info",
+  process_refactored: "bg-purple-500/20 text-purple",
+  process_created: "bg-info/20 text-info",
+  process_updated: "bg-purple-500/20 text-purple",
+  user_approved: "bg-success/20 text-success",
+  user_rejected: "bg-destructive/20 text-destructive",
 }
 
 export function NotificationBell() {
@@ -124,8 +124,8 @@ export function NotificationBell() {
                 <button
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`w-full text-left p-4 hover:bg-slate-800 transition-colors ${
-                    !notification.is_read ? "bg-slate-800/50" : ""
+                  className={`w-full text-left p-4 hover:bg-card transition-colors ${
+                    !notification.is_read ? "bg-card/50" : ""
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -138,7 +138,7 @@ export function NotificationBell() {
                           {notificationTypeLabels[notification.type] || notification.type}
                         </Badge>
                         {!notification.is_read && (
-                          <div className="h-2 w-2 rounded-full bg-[#00ade8]" />
+                          <div className="h-2 w-2 rounded-full bg-primary" />
                         )}
                       </div>
                       <p className="font-medium text-sm mb-1">{notification.title}</p>
@@ -159,7 +159,7 @@ export function NotificationBell() {
           <div className="border-t p-2">
             <Link
               href="/notifications"
-              className="block w-full text-center text-sm text-[#00ade8] hover:underline py-2"
+              className="block w-full text-center text-sm text-primary hover:underline py-2"
               onClick={() => setOpen(false)}
             >
               Ver todas as notificações

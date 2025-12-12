@@ -221,7 +221,7 @@ export function VehicleForm({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                 {error}
               </div>
             )}
@@ -231,7 +231,7 @@ export function VehicleForm({
               name="unit_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Unidade <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel>Unidade <span className="text-destructive">*</span></FormLabel>
                   <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                     <FormControl>
                       <SelectTrigger>
@@ -262,7 +262,7 @@ export function VehicleForm({
                 name="brand"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Marca <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel>Marca <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Ex: Toyota, Honda, Fiat" {...field} disabled={isLoading} />
                     </FormControl>
@@ -276,7 +276,7 @@ export function VehicleForm({
                 name="model"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Modelo <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel>Modelo <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Ex: Corolla, Civic, Uno" {...field} disabled={isLoading} />
                     </FormControl>
@@ -292,7 +292,7 @@ export function VehicleForm({
                 name="license_plate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Placa <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel>Placa <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="ABC1234 ou ABC1D23" 

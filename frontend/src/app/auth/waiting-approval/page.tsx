@@ -59,20 +59,20 @@ export default function WaitingApprovalPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-gray-800/90 backdrop-blur-md border-gray-700/50 shadow-2xl">
+      <Card className="w-full max-w-md bg-card/90 backdrop-blur-md border-border/50 shadow-2xl">
         <CardHeader className="space-y-1 text-center">
           <div className="flex items-center justify-center mb-4">
-            <div className="p-3 rounded-full bg-yellow-500/10">
-              <Clock className="h-6 w-6 text-yellow-500 animate-pulse" />
+            <div className="p-3 rounded-full bg-warning/10">
+              <Clock className="h-6 w-6 text-warning animate-pulse" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-light text-gray-200">Aguardando Aprovação</CardTitle>
-          <CardDescription className="text-gray-400">
+          <CardTitle className="text-2xl font-light text-foreground">Aguardando Aprovação</CardTitle>
+          <CardDescription className="text-muted-foreground">
             Sua conta está aguardando aprovação de um administrador
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="text-center text-sm text-gray-300 space-y-2">
+          <div className="text-center text-sm text-foreground space-y-2">
             <p>
               Seu cadastro foi recebido com sucesso! Um administrador do sistema irá revisar
               sua solicitação e aprovar seu acesso.
@@ -83,10 +83,10 @@ export default function WaitingApprovalPage() {
             </p>
           </div>
 
-          <div className="pt-4 border-t border-gray-700">
+          <div className="pt-4 border-t border-border">
             <Button
               variant="outline"
-              className="w-full border-gray-700 text-gray-300 hover:bg-gray-700"
+              className="w-full border-border text-foreground hover:bg-accent"
               onClick={handleLogout}
             >
               <LogOut className="h-4 w-4 mr-2 stroke-1" />

@@ -17,13 +17,13 @@ import { useProcesses, useCreateProcess } from "@/lib/hooks/useProcesses"
 import { ProcessForm } from "@/components/processes/ProcessForm"
 
 const categoryColors: Record<string, string> = {
-  "Governança": "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  "Acesso e Segurança": "bg-red-500/10 text-red-400 border-red-500/20",
-  "Operação": "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-  "Áreas Comuns": "bg-green-500/10 text-green-400 border-green-500/20",
-  "Convivência": "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  "Eventos": "bg-orange-500/10 text-orange-400 border-orange-500/20",
-  "Emergências": "bg-pink-500/10 text-pink-400 border-pink-500/20",
+  "Governança": "bg-info/10 text-info border-info/20",
+  "Acesso e Segurança": "bg-destructive/10 text-destructive border-destructive/20",
+  "Operação": "bg-warning/10 text-warning border-warning/20",
+  "Áreas Comuns": "bg-success/10 text-success border-success/20",
+  "Convivência": "bg-purple/10 text-purple border-purple/20",
+  "Eventos": "bg-orange/10 text-orange border-orange/20",
+  "Emergências": "bg-pink/10 text-pink border-pink/20",
 }
 
 // Mapear categorias do backend para frontend
@@ -125,7 +125,7 @@ export default function ProcessesPage() {
         <div className="flex flex-col sm:flex-row gap-4">
             {/* Busca */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 stroke-1" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground stroke-1" />
               <Input
                 placeholder="Buscar processos..."
                 value={searchQuery}
@@ -177,7 +177,7 @@ export default function ProcessesPage() {
               <X className="h-3 w-3 mr-1" />
               Limpar Filtros
             </Button>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground">
               {filteredProcesses.length} processo(s) encontrado(s)
             </span>
           </div>
@@ -188,14 +188,14 @@ export default function ProcessesPage() {
       {isLoading ? (
           <Card className="card-elevated">
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-400">Carregando processos...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">Carregando processos...</p>
             </CardContent>
           </Card>
         ) : Object.keys(groupedProcesses).length === 0 ? (
           <Card className="card-elevated">
             <CardContent className="py-12 text-center">
-              <p className="text-gray-400">
+              <p className="text-muted-foreground">
                 Nenhum processo encontrado com os filtros aplicados.
               </p>
             </CardContent>
@@ -203,7 +203,7 @@ export default function ProcessesPage() {
       ) : (
         Object.entries(groupedProcesses).map(([category, categoryProcesses]) => (
             <div key={category} className="mb-6">
-              <h2 className="text-xs font-medium text-gray-400 mb-3 uppercase tracking-wide">
+              <h2 className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">
                 {category}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -217,10 +217,10 @@ export default function ProcessesPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3 flex-1">
                           <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-primary/10 transition-colors">
-                            <FileText className="h-4 w-4 text-gray-300 group-hover:text-primary transition-colors stroke-1" />
+                            <FileText className="h-4 w-4 text-foreground group-hover:text-primary transition-colors stroke-1" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <CardTitle className="text-sm font-medium text-gray-300 line-clamp-2 group-hover:text-primary transition-colors">
+                            <CardTitle className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                               {process.name}
                             </CardTitle>
                             <div className="mt-1">
@@ -237,7 +237,7 @@ export default function ProcessesPage() {
                         <span className={`text-xs px-2 py-1 rounded border ${categoryColors[category]}`}>
                           {category}
                         </span>
-                        <span className="text-xs text-gray-400 font-light capitalize">
+                        <span className="text-xs text-muted-foreground font-light capitalize">
                           {process.status?.replace("_", " ") || "rascunho"}
                         </span>
                       </div>

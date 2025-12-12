@@ -44,8 +44,8 @@ export default function ForgotPasswordPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
             <div className="flex items-center justify-center mb-4">
-              <div className="p-3 rounded-full bg-green-500/10">
-                <Mail className="h-6 w-6 text-green-500" />
+              <div className="p-3 rounded-full bg-success/10">
+                <Mail className="h-6 w-6 text-success" />
               </div>
             </div>
             <CardTitle className="text-2xl font-light">Email Enviado!</CardTitle>
@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
           <CardContent>
             <Button
               onClick={() => router.push("/login")}
-              className="w-full bg-[#00ade8] hover:bg-[#0099cc] text-white font-light"
+              className="w-full bg-primary hover:bg-[#0099cc] text-white font-light"
             >
               Voltar para Login
             </Button>
@@ -68,26 +68,26 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-gray-800/50 border-gray-700/50">
+      <Card className="w-full max-w-md bg-card/50 border-border/50">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <div className="rounded-full bg-[#00ade8] p-3">
+            <div className="rounded-full bg-primary p-3">
               <Mail className="h-6 w-6 text-white stroke-1" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-light text-gray-200 text-center">
+          <CardTitle className="text-2xl font-light text-foreground text-center">
             Recuperar Senha
           </CardTitle>
-          <CardDescription className="text-gray-400 font-light text-center">
+          <CardDescription className="text-muted-foreground font-light text-center">
             Digite seu email para receber instruções de recuperação
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-300 font-light">Email</Label>
+              <Label htmlFor="email" className="text-foreground font-light">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 stroke-1" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground stroke-1" />
                 <Input
                   id="email"
                   type="email"
@@ -97,20 +97,20 @@ export default function ForgotPasswordPage() {
                   disabled={loading}
                   required
                   autoFocus
-                  className="pl-10 bg-gray-900/50 border-gray-700 text-gray-200 placeholder:text-gray-500"
+                  className="pl-10 bg-input border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20">
-                <p className="text-sm text-red-400 font-light">{error}</p>
+              <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                <p className="text-sm text-destructive font-light">{error}</p>
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full bg-[#00ade8] hover:bg-[#0099cc] text-white font-light"
+              className="w-full bg-primary hover:bg-[#0099cc] text-white font-light"
               disabled={loading || !email}
             >
               {loading ? (
@@ -126,7 +126,7 @@ export default function ForgotPasswordPage() {
             <div className="text-center">
               <Link
                 href="/login"
-                className="text-sm text-[#00ade8] hover:underline inline-flex items-center gap-1"
+                className="text-sm text-primary hover:underline inline-flex items-center gap-1"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Voltar para Login

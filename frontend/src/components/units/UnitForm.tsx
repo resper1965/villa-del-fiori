@@ -193,16 +193,16 @@ export function UnitForm({ open, onOpenChange, unitId, onSuccess }: UnitFormProp
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                 {error}
               </div>
             )}
 
             {/* Single-tenant: condomínio é automático, não precisa selecionar */}
             {condominium && (
-              <div className="p-3 bg-gray-800/30 rounded-md border border-gray-700/50">
-                <p className="text-sm text-gray-400">
-                  <span className="font-medium text-gray-300">Condomínio:</span> {condominium.name}
+              <div className="p-3 bg-card/30 rounded-md border border-border/50">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">Condomínio:</span> {condominium.name}
                 </p>
               </div>
             )}
@@ -213,7 +213,7 @@ export function UnitForm({ open, onOpenChange, unitId, onSuccess }: UnitFormProp
                 name="number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Número da Unidade <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel>Número da Unidade <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Ex: 101, Apto 201, Casa 1" {...field} disabled={isLoading} />
                     </FormControl>

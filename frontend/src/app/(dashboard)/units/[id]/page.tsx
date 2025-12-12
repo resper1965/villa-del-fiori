@@ -163,19 +163,19 @@ export default function UnitDetailsPage() {
 
   const getRelationshipTypeLabel = (stakeholder: Stakeholder) => {
     if (stakeholder.relationship_type === "proprietario_morador") {
-      return { label: "Proprietário/Morador", className: "bg-blue-500/10 text-blue-400 border-blue-500/20" }
+      return { label: "Proprietário/Morador", className: "bg-info/10 text-info border-info/20" }
     } else if (stakeholder.relationship_type === "proprietario") {
-      return { label: "Proprietário", className: "bg-purple-500/10 text-purple-400 border-purple-500/20" }
+      return { label: "Proprietário", className: "bg-purple/10 text-purple border-purple/20" }
     } else if (stakeholder.relationship_type === "morador") {
-      return { label: "Locatário", className: "bg-green-500/10 text-green-400 border-green-500/20" }
+      return { label: "Locatário", className: "bg-success/10 text-success border-success/20" }
     }
     // Fallback para dados antigos
     if (stakeholder.is_owner && stakeholder.is_resident) {
-      return { label: "Proprietário/Morador", className: "bg-blue-500/10 text-blue-400 border-blue-500/20" }
+      return { label: "Proprietário/Morador", className: "bg-info/10 text-info border-info/20" }
     } else if (stakeholder.is_owner) {
-      return { label: "Proprietário", className: "bg-purple-500/10 text-purple-400 border-purple-500/20" }
+      return { label: "Proprietário", className: "bg-purple/10 text-purple border-purple/20" }
     } else if (stakeholder.is_resident) {
-      return { label: "Morador", className: "bg-green-500/10 text-green-400 border-green-500/20" }
+      return { label: "Morador", className: "bg-success/10 text-success border-success/20" }
     }
     return { label: "-", className: "" }
   }
@@ -184,8 +184,8 @@ export default function UnitDetailsPage() {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center space-y-2">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-gray-400" />
-          <div className="text-gray-400 font-light">Carregando unidade...</div>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+          <div className="text-muted-foreground font-light">Carregando unidade...</div>
         </div>
       </div>
     )
@@ -195,7 +195,7 @@ export default function UnitDetailsPage() {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="text-gray-400 font-light">Unidade não encontrada</div>
+          <div className="text-muted-foreground font-light">Unidade não encontrada</div>
           <Button onClick={() => router.push("/units")} variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar para Unidades
@@ -208,13 +208,13 @@ export default function UnitDetailsPage() {
   return (
     <div className="min-h-screen bg-transparent">
       {/* Header */}
-      <div className="h-[73px] border-b border-gray-700/50 flex items-center justify-between px-4">
+      <div className="h-[73px] border-b border-border/50 flex items-center justify-between px-4">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.push("/units")}
-            className="text-gray-400 hover:text-gray-300"
+            className="text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -223,28 +223,28 @@ export default function UnitDetailsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-5 px-2 text-xs text-gray-400 hover:text-gray-300"
+                className="h-5 px-2 text-xs text-muted-foreground hover:text-foreground"
                 onClick={() => router.push("/cadastros")}
               >
                 Cadastros
               </Button>
-              <span className="text-gray-500 text-xs">/</span>
+              <span className="text-muted-foreground text-xs">/</span>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-5 px-2 text-xs text-gray-400 hover:text-gray-300"
+                className="h-5 px-2 text-xs text-muted-foreground hover:text-foreground"
                 onClick={() => router.push("/units")}
               >
                 Unidades
               </Button>
-              <span className="text-gray-500 text-xs">/</span>
-              <span className="text-xs text-gray-400">Unidade {unit.number}</span>
+              <span className="text-muted-foreground text-xs">/</span>
+              <span className="text-xs text-muted-foreground">Unidade {unit.number}</span>
             </div>
-            <h1 className="text-lg font-semibold text-gray-300">
+            <h1 className="text-lg font-semibold text-foreground">
               Unidade {unit.number}
             </h1>
             {unit.block && (
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 Bloco {unit.block}
                 {unit.floor && ` • ${unit.floor}º andar`}
               </p>
@@ -269,35 +269,35 @@ export default function UnitDetailsPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <p className="text-sm text-gray-400 mb-1">Número</p>
-                <p className="text-gray-300 font-medium">{unit.number}</p>
+                <p className="text-sm text-muted-foreground mb-1">Número</p>
+                <p className="text-foreground font-medium">{unit.number}</p>
               </div>
               {unit.block && (
                 <div>
-                  <p className="text-sm text-gray-400 mb-1">Bloco</p>
-                  <p className="text-gray-300 font-medium">{unit.block}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Bloco</p>
+                  <p className="text-foreground font-medium">{unit.block}</p>
                 </div>
               )}
               {unit.floor && (
                 <div>
-                  <p className="text-sm text-gray-400 mb-1">Andar</p>
-                  <p className="text-gray-300 font-medium">{unit.floor}º</p>
+                  <p className="text-sm text-muted-foreground mb-1">Andar</p>
+                  <p className="text-foreground font-medium">{unit.floor}º</p>
                 </div>
               )}
               {unit.area && (
                 <div>
-                  <p className="text-sm text-gray-400 mb-1">Área</p>
-                  <p className="text-gray-300 font-medium">{unit.area} m²</p>
+                  <p className="text-sm text-muted-foreground mb-1">Área</p>
+                  <p className="text-foreground font-medium">{unit.area} m²</p>
                 </div>
               )}
               <div>
-                <p className="text-sm text-gray-400 mb-1">Vagas de Garagem</p>
-                <p className="text-gray-300 font-medium">{unit.parking_spots || 0}</p>
+                <p className="text-sm text-muted-foreground mb-1">Vagas de Garagem</p>
+                <p className="text-foreground font-medium">{unit.parking_spots || 0}</p>
               </div>
               {unit.description && (
                 <div className="md:col-span-2 lg:col-span-3">
-                  <p className="text-sm text-gray-400 mb-1">Descrição</p>
-                  <p className="text-gray-300">{unit.description}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Descrição</p>
+                  <p className="text-foreground">{unit.description}</p>
                 </div>
               )}
             </div>
@@ -326,11 +326,11 @@ export default function UnitDetailsPage() {
             <CardContent>
               {isLoadingOwners ? (
                 <div className="py-8 text-center">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-400">Carregando proprietários...</p>
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Carregando proprietários...</p>
                 </div>
               ) : owners.length === 0 ? (
-                <div className="py-8 text-center text-gray-400">
+                <div className="py-8 text-center text-muted-foreground">
                   <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">Nenhum proprietário cadastrado</p>
                 </div>
@@ -341,23 +341,23 @@ export default function UnitDetailsPage() {
                     return (
                       <div
                         key={owner.id}
-                        className="flex items-center justify-between p-3 rounded-lg border border-gray-700/50 bg-gray-800/30"
+                        className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-card/30"
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <div>
-                              <p className="text-gray-300 font-medium">{owner.name}</p>
-                              <p className="text-sm text-gray-400">{owner.email}</p>
+                              <p className="text-foreground font-medium">{owner.name}</p>
+                              <p className="text-sm text-muted-foreground">{owner.email}</p>
                               {owner.phone && (
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-muted-foreground mt-1">
                                   📞 {owner.phone}
                                   {owner.has_whatsapp && owner.whatsapp === owner.phone && (
-                                    <span className="ml-1 text-green-400">💬</span>
+                                    <span className="ml-1 text-success">💬</span>
                                   )}
                                 </p>
                               )}
                               {owner.whatsapp && owner.whatsapp !== owner.phone && (
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-muted-foreground">
                                   💬 WA: {owner.whatsapp}
                                 </p>
                               )}
@@ -408,11 +408,11 @@ export default function UnitDetailsPage() {
             <CardContent>
               {isLoadingResidents ? (
                 <div className="py-8 text-center">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-400">Carregando moradores...</p>
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Carregando moradores...</p>
                 </div>
               ) : residents.length === 0 ? (
-                <div className="py-8 text-center text-gray-400">
+                <div className="py-8 text-center text-muted-foreground">
                   <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">Nenhum morador cadastrado</p>
                 </div>
@@ -423,23 +423,23 @@ export default function UnitDetailsPage() {
                     return (
                       <div
                         key={resident.id}
-                        className="flex items-center justify-between p-3 rounded-lg border border-gray-700/50 bg-gray-800/30"
+                        className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-card/30"
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <div>
-                              <p className="text-gray-300 font-medium">{resident.name}</p>
-                              <p className="text-sm text-gray-400">{resident.email}</p>
+                              <p className="text-foreground font-medium">{resident.name}</p>
+                              <p className="text-sm text-muted-foreground">{resident.email}</p>
                               {resident.phone && (
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-muted-foreground mt-1">
                                   📞 {resident.phone}
                                   {resident.has_whatsapp && resident.whatsapp === resident.phone && (
-                                    <span className="ml-1 text-green-400">💬</span>
+                                    <span className="ml-1 text-success">💬</span>
                                   )}
                                 </p>
                               )}
                               {resident.whatsapp && resident.whatsapp !== resident.phone && (
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-muted-foreground">
                                   💬 WA: {resident.whatsapp}
                                 </p>
                               )}
@@ -451,7 +451,7 @@ export default function UnitDetailsPage() {
                             )}
                           </div>
                           {resident.relationship_type === "morador" && resident.owner && (
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-muted-foreground">
                               Proprietário: {resident.owner.name} ({resident.owner.email})
                             </p>
                           )}
@@ -495,11 +495,11 @@ export default function UnitDetailsPage() {
             <CardContent>
               {isLoadingVehicles ? (
                 <div className="py-8 text-center">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-400">Carregando veículos...</p>
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Carregando veículos...</p>
                 </div>
               ) : vehicles.length === 0 ? (
-                <div className="py-8 text-center text-gray-400">
+                <div className="py-8 text-center text-muted-foreground">
                   <Car className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">Nenhum veículo cadastrado</p>
                 </div>
@@ -508,23 +508,23 @@ export default function UnitDetailsPage() {
                   {vehicles.map((vehicle) => (
                     <div
                       key={vehicle.id}
-                      className="flex items-center justify-between p-3 rounded-lg border border-gray-700/50 bg-gray-800/30"
+                      className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-card/30"
                     >
                       <div>
-                        <p className="text-gray-300 font-medium">
+                        <p className="text-foreground font-medium">
                           {vehicle.brand} {vehicle.model}
                         </p>
                         <div className="flex items-center gap-4 mt-1">
-                          <p className="text-sm text-gray-400">Placa: {vehicle.license_plate}</p>
+                          <p className="text-sm text-muted-foreground">Placa: {vehicle.license_plate}</p>
                           {vehicle.color && (
-                            <p className="text-sm text-gray-400">Cor: {vehicle.color}</p>
+                            <p className="text-sm text-muted-foreground">Cor: {vehicle.color}</p>
                           )}
                           {vehicle.year && (
-                            <p className="text-sm text-gray-400">Ano: {vehicle.year}</p>
+                            <p className="text-sm text-muted-foreground">Ano: {vehicle.year}</p>
                           )}
                         </div>
                         {vehicle.stakeholder && (
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             Proprietário: {vehicle.stakeholder.name}
                           </p>
                         )}
@@ -566,11 +566,11 @@ export default function UnitDetailsPage() {
             <CardContent>
               {isLoadingPets ? (
                 <div className="py-8 text-center">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-400">Carregando pets...</p>
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Carregando pets...</p>
                 </div>
               ) : pets.length === 0 ? (
-                <div className="py-8 text-center text-gray-400">
+                <div className="py-8 text-center text-muted-foreground">
                   <Heart className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">Nenhum pet cadastrado</p>
                 </div>
@@ -579,21 +579,21 @@ export default function UnitDetailsPage() {
                   {pets.map((pet) => (
                     <div
                       key={pet.id}
-                      className="flex items-center justify-between p-3 rounded-lg border border-gray-700/50 bg-gray-800/30"
+                      className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-card/30"
                     >
                       <div>
-                        <p className="text-gray-300 font-medium">{pet.name}</p>
+                        <p className="text-foreground font-medium">{pet.name}</p>
                         <div className="flex items-center gap-4 mt-1">
-                          <p className="text-sm text-gray-400 capitalize">{pet.species}</p>
+                          <p className="text-sm text-muted-foreground capitalize">{pet.species}</p>
                           {pet.breed && (
-                            <p className="text-sm text-gray-400">Raça: {pet.breed}</p>
+                            <p className="text-sm text-muted-foreground">Raça: {pet.breed}</p>
                           )}
                           {pet.size && (
-                            <p className="text-sm text-gray-400 capitalize">Porte: {pet.size}</p>
+                            <p className="text-sm text-muted-foreground capitalize">Porte: {pet.size}</p>
                           )}
                         </div>
                         {pet.owner && (
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             Proprietário: {pet.owner.name}
                           </p>
                         )}
@@ -632,21 +632,21 @@ export default function UnitDetailsPage() {
               <CardContent>
                 {isLoadingEmployees ? (
                   <div className="py-8 text-center">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-400">Carregando funcionários...</p>
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Carregando funcionários...</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {employees.map((employee) => (
                       <div
                         key={employee.id}
-                        className="flex items-center justify-between p-3 rounded-lg border border-gray-700/50 bg-gray-800/30"
+                        className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-card/30"
                       >
                         <div>
-                          <p className="text-gray-300 font-medium">{employee.name}</p>
-                          <p className="text-sm text-gray-400">{employee.email}</p>
+                          <p className="text-foreground font-medium">{employee.name}</p>
+                          <p className="text-sm text-muted-foreground">{employee.email}</p>
                           {employee.employee_role && (
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                               Função: {employee.employee_role}
                             </p>
                           )}

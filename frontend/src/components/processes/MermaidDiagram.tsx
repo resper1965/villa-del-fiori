@@ -18,9 +18,9 @@ const initMermaid = () => {
     startOnLoad: false,
     theme: "dark",
     themeVariables: {
-      primaryColor: "#00ade8",
+      primaryColor: "hsl(var(--primary))",
       primaryTextColor: "#ffffff",
-      primaryBorderColor: "#00ade8",
+      primaryBorderColor: "hsl(var(--primary))",
       lineColor: "#6b7280",
       secondaryColor: "#1f2937",
       tertiaryColor: "#111827",
@@ -34,22 +34,22 @@ const initMermaid = () => {
       clusterBkg: "#1f2937",
       clusterBorder: "#374151",
       defaultLinkColor: "#60a5fa",
-      titleColor: "#00ade8",
+      titleColor: "hsl(var(--primary))",
       edgeLabelBackground: "#1f2937",
-      actorBorder: "#00ade8",
+      actorBorder: "hsl(var(--primary))",
       actorBkg: "#1f2937",
       actorTextColor: "#f9fafb",
       actorLineColor: "#6b7280",
       signalColor: "#f9fafb",
       signalTextColor: "#f9fafb",
       labelBoxBkgColor: "#1f2937",
-      labelBoxBorderColor: "#00ade8",
+      labelBoxBorderColor: "hsl(var(--primary))",
       labelTextColor: "#f9fafb",
       loopTextColor: "#f9fafb",
-      noteBorderColor: "#00ade8",
+      noteBorderColor: "hsl(var(--primary))",
       noteBkgColor: "#1f2937",
       noteTextColor: "#f9fafb",
-      activationBorderColor: "#00ade8",
+      activationBorderColor: "hsl(var(--primary))",
       activationBkgColor: "#374151",
       sequenceNumberColor: "#111827",
       sectionBkgColor: "#1f2937",
@@ -104,8 +104,8 @@ export function MermaidDiagram({ diagram, id }: MermaidDiagramProps) {
         setIsLoading(false)
         if (ref.current) {
           ref.current.innerHTML = `
-            <div class="p-4 border border-red-500/50 rounded-lg bg-red-500/10">
-              <p class="text-red-400 text-sm">Erro ao renderizar diagrama Mermaid</p>
+            <div class="p-4 border border-destructive/50 rounded-lg bg-destructive/10">
+              <p class="text-destructive text-sm">Erro ao renderizar diagrama Mermaid</p>
               <pre class="text-xs text-muted-foreground mt-2">${err.message}</pre>
             </div>
           `
@@ -125,7 +125,7 @@ export function MermaidDiagram({ diagram, id }: MermaidDiagramProps) {
     <div className="w-full overflow-x-auto">
       {isLoading && (
         <div className="flex justify-center items-center min-h-[200px] p-4">
-          <div className="h-8 w-8 border-2 border-[#00ade8] border-t-transparent rounded-full animate-spin" />
+          <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       )}
       <div ref={ref} className={`mermaid-container flex justify-center items-center min-h-[200px] p-4 ${isLoading ? 'hidden' : ''}`} />

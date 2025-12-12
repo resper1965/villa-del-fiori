@@ -79,7 +79,7 @@ export function VersionComparison({
     <Card className="card-elevated">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <GitCompare className="h-5 w-5 text-gray-400 stroke-1" />
+          <GitCompare className="h-5 w-5 text-muted-foreground stroke-1" />
           Comparação de Versões
         </CardTitle>
         <CardDescription>Compare duas versões do processo para ver as diferenças</CardDescription>
@@ -89,7 +89,7 @@ export function VersionComparison({
           {/* Seletores de Versões */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Versão 1 (Anterior)</label>
+              <label className="text-sm font-medium text-foreground">Versão 1 (Anterior)</label>
               <Select value={version1} onValueChange={setVersion1}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a versão" />
@@ -105,7 +105,7 @@ export function VersionComparison({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Versão 2 (Posterior)</label>
+              <label className="text-sm font-medium text-foreground">Versão 2 (Posterior)</label>
               <Select value={version2} onValueChange={setVersion2}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione a versão" />
@@ -127,15 +127,15 @@ export function VersionComparison({
               {/* Descrição */}
               {comparison.description.changed && (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-300">Descrição</h4>
+                  <h4 className="text-sm font-medium text-foreground">Descrição</h4>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                      <p className="text-xs font-medium text-red-400 mb-2">Versão {selectedVersion1?.version_number} (Removido/Alterado)</p>
-                      <p className="text-sm text-gray-300 whitespace-pre-wrap">{comparison.description.v1}</p>
+                    <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                      <p className="text-xs font-medium text-destructive mb-2">Versão {selectedVersion1?.version_number} (Removido/Alterado)</p>
+                      <p className="text-sm text-foreground whitespace-pre-wrap">{comparison.description.v1}</p>
                     </div>
-                    <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                      <p className="text-xs font-medium text-green-400 mb-2">Versão {selectedVersion2?.version_number} (Adicionado/Alterado)</p>
-                      <p className="text-sm text-gray-300 whitespace-pre-wrap">{comparison.description.v2}</p>
+                    <div className="p-3 rounded-lg bg-success/10 border border-success/20">
+                      <p className="text-xs font-medium text-success mb-2">Versão {selectedVersion2?.version_number} (Adicionado/Alterado)</p>
+                      <p className="text-sm text-foreground whitespace-pre-wrap">{comparison.description.v2}</p>
                     </div>
                   </div>
                 </div>
@@ -144,30 +144,30 @@ export function VersionComparison({
               {/* Workflow */}
               {(comparison.workflow.added.length > 0 || comparison.workflow.removed.length > 0) && (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-300">Fluxo do Processo</h4>
+                  <h4 className="text-sm font-medium text-foreground">Fluxo do Processo</h4>
                   <div className="space-y-2">
                     {comparison.workflow.removed.length > 0 && (
-                      <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                        <p className="text-xs font-medium text-red-400 mb-2 flex items-center gap-2">
+                      <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                        <p className="text-xs font-medium text-destructive mb-2 flex items-center gap-2">
                           <Minus className="h-3 w-3 stroke-1" />
                           Removido
                         </p>
                         <ul className="space-y-1">
                           {comparison.workflow.removed.map((item: string, index: number) => (
-                            <li key={index} className="text-sm text-gray-300">• {item}</li>
+                            <li key={index} className="text-sm text-foreground">• {item}</li>
                           ))}
                         </ul>
                       </div>
                     )}
                     {comparison.workflow.added.length > 0 && (
-                      <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                        <p className="text-xs font-medium text-green-400 mb-2 flex items-center gap-2">
+                      <div className="p-3 rounded-lg bg-success/10 border border-success/20">
+                        <p className="text-xs font-medium text-success mb-2 flex items-center gap-2">
                           <Plus className="h-3 w-3 stroke-1" />
                           Adicionado
                         </p>
                         <ul className="space-y-1">
                           {comparison.workflow.added.map((item: string, index: number) => (
-                            <li key={index} className="text-sm text-gray-300">• {item}</li>
+                            <li key={index} className="text-sm text-foreground">• {item}</li>
                           ))}
                         </ul>
                       </div>
@@ -179,12 +179,12 @@ export function VersionComparison({
               {/* Entidades */}
               {(comparison.entities.added.length > 0 || comparison.entities.removed.length > 0) && (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-300">Entidades Envolvidas</h4>
+                  <h4 className="text-sm font-medium text-foreground">Entidades Envolvidas</h4>
                   <div className="flex flex-wrap gap-2">
                           {comparison.entities.removed.map((item: string, index: number) => (
                       <span
                         key={index}
-                        className="px-2 py-1 rounded-md bg-red-500/10 text-red-400 border border-red-500/20 text-xs"
+                        className="px-2 py-1 rounded-md bg-destructive/10 text-destructive border border-destructive/20 text-xs"
                       >
                         - {item}
                       </span>
@@ -192,7 +192,7 @@ export function VersionComparison({
                           {comparison.entities.added.map((item: string, index: number) => (
                       <span
                         key={index}
-                        className="px-2 py-1 rounded-md bg-green-500/10 text-green-400 border border-green-500/20 text-xs"
+                        className="px-2 py-1 rounded-md bg-success/10 text-success border border-success/20 text-xs"
                       >
                         + {item}
                       </span>
@@ -204,12 +204,12 @@ export function VersionComparison({
               {/* Variáveis */}
               {(comparison.variables.added.length > 0 || comparison.variables.removed.length > 0) && (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-300">Variáveis do Sistema</h4>
+                  <h4 className="text-sm font-medium text-foreground">Variáveis do Sistema</h4>
                   <div className="flex flex-wrap gap-2">
                           {comparison.variables.removed.map((item: string, index: number) => (
                       <span
                         key={index}
-                        className="px-2 py-1 rounded-md bg-red-500/10 text-red-400 border border-red-500/20 text-xs"
+                        className="px-2 py-1 rounded-md bg-destructive/10 text-destructive border border-destructive/20 text-xs"
                       >
                         - {item}
                       </span>
@@ -217,7 +217,7 @@ export function VersionComparison({
                           {comparison.variables.added.map((item: string, index: number) => (
                       <span
                         key={index}
-                        className="px-2 py-1 rounded-md bg-green-500/10 text-green-400 border border-green-500/20 text-xs"
+                        className="px-2 py-1 rounded-md bg-success/10 text-success border border-success/20 text-xs"
                       >
                         + {item}
                       </span>
@@ -234,7 +234,7 @@ export function VersionComparison({
                 comparison.entities.removed.length === 0 &&
                 comparison.variables.added.length === 0 &&
                 comparison.variables.removed.length === 0 && (
-                  <div className="text-center py-6 text-gray-400">
+                  <div className="text-center py-6 text-muted-foreground">
                     <p className="text-sm">Nenhuma diferença encontrada entre as versões selecionadas</p>
                   </div>
                 )}
@@ -243,7 +243,7 @@ export function VersionComparison({
 
           {/* Mensagem quando nenhuma versão selecionada */}
           {(!version1 || !version2) && (
-            <div className="text-center py-6 text-gray-400">
+            <div className="text-center py-6 text-muted-foreground">
               <GitCompare className="h-8 w-8 mx-auto mb-2 opacity-50 stroke-1" />
               <p className="text-sm">Selecione duas versões para comparar</p>
             </div>

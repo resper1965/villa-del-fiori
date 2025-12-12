@@ -194,7 +194,7 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                 {error}
               </div>
             )}
@@ -204,7 +204,7 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome do Condomínio <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel>Nome do Condomínio <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <Input placeholder="Ex: Residencial Villa Delfiori" {...field} />
                   </FormControl>
@@ -257,8 +257,8 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
               )}
             />
 
-            <div className="space-y-4 pt-4 border-t border-gray-700/50">
-              <h3 className="text-sm font-semibold text-gray-300">Endereço</h3>
+            <div className="space-y-4 pt-4 border-t border-border/50">
+              <h3 className="text-sm font-semibold text-foreground">Endereço</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
@@ -363,8 +363,8 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
               />
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-gray-700/50">
-              <h3 className="text-sm font-semibold text-gray-300">Características</h3>
+            <div className="space-y-4 pt-4 border-t border-border/50">
+              <h3 className="text-sm font-semibold text-foreground">Características</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField

@@ -493,7 +493,7 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                 {error}
               </div>
             )}
@@ -622,7 +622,7 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
                 return (
                   <FormItem>
                     <FormLabel>
-                      Unidade {isRequired && <span className="text-red-500">*</span>}
+                      Unidade {isRequired && <span className="text-destructive">*</span>}
                     </FormLabel>
                     <Select 
                       onValueChange={(value) => {
@@ -717,7 +717,7 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Proprietário <span className="text-red-500">*</span>
+                          Proprietário <span className="text-destructive">*</span>
                         </FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
@@ -748,8 +748,8 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
             )}
 
             {/* Seção de Contato */}
-            <div className="space-y-4 pt-4 border-t border-gray-700/50">
-              <h3 className="text-sm font-semibold text-gray-300">Informações de Contato</h3>
+            <div className="space-y-4 pt-4 border-t border-border/50">
+              <h3 className="text-sm font-semibold text-foreground">Informações de Contato</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -837,7 +837,7 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
 
               {/* Endereço (se diferente da unidade) */}
               <div className="space-y-4 pt-2">
-                <h4 className="text-xs font-medium text-gray-400">Endereço (se diferente da unidade)</h4>
+                <h4 className="text-xs font-medium text-muted-foreground">Endereço (se diferente da unidade)</h4>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <FormField
@@ -973,8 +973,8 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
               </div>
 
               {/* Contato de Emergência */}
-              <div className="space-y-4 pt-2 border-t border-gray-700/30">
-                <h4 className="text-xs font-medium text-gray-400">Contato de Emergência</h4>
+              <div className="space-y-4 pt-2 border-t border-border/30">
+                <h4 className="text-xs font-medium text-muted-foreground">Contato de Emergência</h4>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <FormField
@@ -1035,8 +1035,8 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
             </div>
 
             {/* Campos de Funcionário e Cargo */}
-            <div className="space-y-4 pt-4 border-t border-gray-700/50">
-              <h3 className="text-sm font-semibold text-gray-300">Cargo e Funcionário</h3>
+            <div className="space-y-4 pt-4 border-t border-border/50">
+              <h3 className="text-sm font-semibold text-foreground">Cargo e Funcionário</h3>
               
               <FormField
                 control={form.control}

@@ -73,7 +73,7 @@ export default function EntitiesPage() {
   return (
     <div className="px-4 md:px-6 py-4 md:py-6">
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-muted-foreground">
           Serviços públicos e prestadores referenciados (sem contrato)
         </p>
         <Button onClick={() => setFormOpen(true)}>
@@ -86,7 +86,7 @@ export default function EntitiesPage() {
         <div className="flex flex-col sm:flex-row gap-4">
             {/* Busca */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 stroke-1" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground stroke-1" />
               <Input
                 placeholder="Buscar entidades..."
                 value={searchQuery}
@@ -143,7 +143,7 @@ export default function EntitiesPage() {
               <X className="h-3 w-3 mr-1 stroke-1" />
               Limpar Filtros
             </Button>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground">
               {entities.length} entidade(s) encontrada(s)
             </span>
           </div>
@@ -154,14 +154,14 @@ export default function EntitiesPage() {
       {isLoading ? (
           <Card className="card-elevated">
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400 stroke-1" />
-              <p className="text-gray-400">Carregando entidades...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground stroke-1" />
+              <p className="text-muted-foreground">Carregando entidades...</p>
             </CardContent>
           </Card>
       ) : entities.length === 0 ? (
         <Card className="card-elevated">
           <CardContent className="py-12 text-center">
-            <p className="text-gray-400">
+            <p className="text-muted-foreground">
               Nenhuma entidade encontrada com os filtros aplicados.
             </p>
           </CardContent>
@@ -179,10 +179,10 @@ export default function EntitiesPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 flex-1">
                         <div className="p-2 rounded-lg bg-muted/50">
-                          <TypeIcon className="h-4 w-4 text-gray-300 stroke-1" />
+                          <TypeIcon className="h-4 w-4 text-foreground stroke-1" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-sm font-medium text-gray-300 line-clamp-2">
+                          <CardTitle className="text-sm font-medium text-foreground line-clamp-2">
                             {entity.name}
                           </CardTitle>
                           <CardDescription className="text-xs mt-1">
@@ -213,34 +213,34 @@ export default function EntitiesPage() {
                   </CardHeader>
                   <CardContent className="pt-0 space-y-2">
                     {entity.phone && (
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Phone className="h-3 w-3 stroke-1" />
                         <span>{entity.phone}</span>
                       </div>
                     )}
                     {entity.email && (
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Mail className="h-3 w-3 stroke-1" />
                         <span className="truncate">{entity.email}</span>
                       </div>
                     )}
                     {entity.contact_person && (
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-muted-foreground">
                         Contato: {entity.contact_person}
                       </div>
                     )}
                     {entity.cnpj && (
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-muted-foreground">
                         CNPJ: {entity.cnpj}
                       </div>
                     )}
                     {entity.emergency_phone && (
-                      <div className="text-xs text-red-400">
+                      <div className="text-xs text-destructive">
                         Emergência: {entity.emergency_phone}
                       </div>
                     )}
                     {entity.meeting_point && (
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-muted-foreground">
                         Ponto de encontro: {entity.meeting_point}
                       </div>
                     )}

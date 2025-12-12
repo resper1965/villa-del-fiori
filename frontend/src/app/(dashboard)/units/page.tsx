@@ -147,7 +147,7 @@ export default function UnitsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{activeCount}</div>
-              <p className="text-xs text-gray-400">Total de unidades ativas</p>
+              <p className="text-xs text-muted-foreground">Total de unidades ativas</p>
             </CardContent>
           </Card>
         </div>
@@ -156,8 +156,8 @@ export default function UnitsPage() {
         {isLoading ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-400">Carregando unidades...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">Carregando unidades...</p>
             </CardContent>
           </Card>
         ) : (

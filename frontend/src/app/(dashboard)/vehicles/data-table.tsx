@@ -158,7 +158,7 @@ export function createColumns(
       },
       cell: ({ row }) => {
         const color = row.getValue("color") as string
-        return color ? <div className="text-sm text-gray-400">{color}</div> : <span className="text-gray-400">-</span>
+        return color ? <div className="text-sm text-muted-foreground">{color}</div> : <span className="text-muted-foreground">-</span>
       },
     },
     {
@@ -177,7 +177,7 @@ export function createColumns(
       },
       cell: ({ row }) => {
         const year = row.getValue("year") as number
-        return year ? <div className="text-sm">{year}</div> : <span className="text-gray-400">-</span>
+        return year ? <div className="text-sm">{year}</div> : <span className="text-muted-foreground">-</span>
       },
     },
     {
@@ -218,13 +218,13 @@ export function createColumns(
       cell: ({ row }) => {
         const unit = row.original.unit
         if (!unit) {
-          return <span className="text-gray-400 text-sm">-</span>
+          return <span className="text-muted-foreground text-sm">-</span>
         }
         return (
           <div className="text-sm">
             <div className="font-medium">{unit.number}</div>
             {unit.block && (
-              <div className="text-xs text-gray-400">Bloco {unit.block}</div>
+              <div className="text-xs text-muted-foreground">Bloco {unit.block}</div>
             )}
           </div>
         )
@@ -273,7 +273,7 @@ export function createColumns(
               {onDelete && (
                 <DropdownMenuItem
                   onClick={() => onDelete(vehicle.id)}
-                  className="text-red-400"
+                  className="text-destructive"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Excluir
@@ -437,7 +437,7 @@ export default function VehiclesDataTable({
           globalSearchPlaceholder="Buscar por placa, marca, modelo, cor ou unidade..."
         />
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-muted-foreground">
             Mostrando {table.getFilteredRowModel().rows.length} de {data.length} veículo(s)
             {table.getFilteredRowModel().rows.length !== data.length && (
               <span className="ml-1">(filtrados)</span>
@@ -518,7 +518,7 @@ export default function VehiclesDataTable({
       </div>
       <div className="flex items-center justify-between py-4 gap-4 flex-wrap">
         <div className="flex items-center gap-2">
-          <p className="text-sm text-gray-400">Linhas por página:</p>
+          <p className="text-sm text-muted-foreground">Linhas por página:</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -582,7 +582,7 @@ export default function VehiclesDataTable({
           </div>
         </div>
         {Object.keys(rowSelection).length > 0 && (
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-muted-foreground">
             {Object.keys(rowSelection).length} veículo(s) selecionado(s)
           </div>
         )}

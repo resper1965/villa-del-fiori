@@ -281,7 +281,7 @@ export default function AdminUsersPage() {
   return (
     <div className="px-4 md:px-6 py-4 md:py-6">
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-muted-foreground">
           Gerencie usuários do sistema e suas aprovações
         </p>
         <Button onClick={() => setFormOpen(true)}>
@@ -298,7 +298,7 @@ export default function AdminUsersPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{pendingCount}</div>
-              <p className="text-xs text-gray-400">Aguardando aprovação</p>
+              <p className="text-xs text-muted-foreground">Aguardando aprovação</p>
             </CardContent>
           </Card>
           <Card>
@@ -307,7 +307,7 @@ export default function AdminUsersPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{approvedCount}</div>
-              <p className="text-xs text-gray-400">Com acesso ao sistema</p>
+              <p className="text-xs text-muted-foreground">Com acesso ao sistema</p>
             </CardContent>
           </Card>
         </div>
@@ -316,8 +316,8 @@ export default function AdminUsersPage() {
         {isLoading ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-400">Carregando usuários...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">Carregando usuários...</p>
             </CardContent>
           </Card>
         ) : (

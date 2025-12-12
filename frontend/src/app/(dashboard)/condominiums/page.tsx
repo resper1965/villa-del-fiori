@@ -104,7 +104,7 @@ export default function CondominiumsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{activeCount}</div>
-              <p className="text-xs text-gray-400">Total de condomínios ativos</p>
+              <p className="text-xs text-muted-foreground">Total de condomínios ativos</p>
             </CardContent>
           </Card>
         </div>
@@ -113,8 +113,8 @@ export default function CondominiumsPage() {
         {isLoading ? (
           <Card className="card-elevated">
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-400">Carregando condomínios...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">Carregando condomínios...</p>
             </CardContent>
           </Card>
         ) : (

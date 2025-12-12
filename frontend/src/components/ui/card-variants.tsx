@@ -24,7 +24,7 @@ export function CardWithBorder({
   return (
     <Card
       className={cn(
-        "bg-gray-800/50 border-gray-700/50 border-l-4",
+        "bg-card/50 border-border/50 border-l-4",
         borderColorClasses[borderColor],
         className
       )}

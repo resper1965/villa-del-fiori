@@ -33,8 +33,8 @@ export default function Home() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center space-y-2">
-        <div className="text-gray-400 font-light">Carregando...</div>
-        <div className="text-xs text-gray-500">Se demorar, tente recarregar a página</div>
+        <div className="text-muted-foreground font-light">Carregando...</div>
+        <div className="text-xs text-muted-foreground">Se demorar, tente recarregar a página</div>
       </div>
     </div>
   )

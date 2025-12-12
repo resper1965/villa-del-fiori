@@ -51,10 +51,10 @@ interface VersionHistoryProps {
 }
 
 const statusConfig = {
-  aprovado: { icon: CheckCircle, color: "text-green-400", bgColor: "bg-green-500/10", borderColor: "border-green-500/20", label: "Aprovado" },
-  em_revisao: { icon: Clock, color: "text-yellow-400", bgColor: "bg-yellow-500/10", borderColor: "border-yellow-500/20", label: "Em Revisão" },
-  rascunho: { icon: FileText, color: "text-gray-400", bgColor: "bg-gray-500/10", borderColor: "border-gray-500/20", label: "Rascunho" },
-  rejeitado: { icon: XCircle, color: "text-red-400", bgColor: "bg-red-500/10", borderColor: "border-red-500/20", label: "Rejeitado" },
+  aprovado: { icon: CheckCircle, color: "text-success", bgColor: "bg-success/10", borderColor: "border-success/20", label: "Aprovado" },
+  em_revisao: { icon: Clock, color: "text-warning", bgColor: "bg-warning/10", borderColor: "border-warning/20", label: "Em Revisão" },
+  rascunho: { icon: FileText, color: "text-muted-foreground", bgColor: "bg-gray-500/10", borderColor: "border-gray-500/20", label: "Rascunho" },
+  rejeitado: { icon: XCircle, color: "text-destructive", bgColor: "bg-destructive/10", borderColor: "border-destructive/20", label: "Rejeitado" },
 }
 
 export function VersionHistory({
@@ -81,13 +81,13 @@ export function VersionHistory({
       <Card className="card-elevated">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5 text-gray-400 stroke-1" />
+            <History className="h-5 w-5 text-muted-foreground stroke-1" />
             Histórico de Versões
           </CardTitle>
           <CardDescription>Versões anteriores e histórico de alterações</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-6 text-gray-400">
+          <div className="text-center py-6 text-muted-foreground">
             <History className="h-8 w-8 mx-auto mb-2 opacity-50 stroke-1" />
             <p className="text-sm">Nenhuma versão encontrada</p>
           </div>
@@ -100,7 +100,7 @@ export function VersionHistory({
     <Card className="card-elevated">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <History className="h-5 w-5 text-gray-400 stroke-1" />
+          <History className="h-5 w-5 text-muted-foreground stroke-1" />
           Histórico de Versões
         </CardTitle>
         <CardDescription>Versões anteriores e histórico de alterações</CardDescription>
@@ -128,7 +128,7 @@ export function VersionHistory({
                   className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
                     isCurrent
                       ? "bg-primary text-primary-foreground"
-                      : "bg-gray-700 text-gray-300"
+                      : "bg-gray-700 text-foreground"
                   }`}
                 >
                   v{version.version_number}
@@ -139,7 +139,7 @@ export function VersionHistory({
                   <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
                     <div className="flex items-center gap-2">
                       <StatusIcon className={`h-4 w-4 ${statusInfo.color} stroke-1`} />
-                      <span className="text-sm font-medium text-gray-300">
+                      <span className="text-sm font-medium text-foreground">
                         Versão {version.version_number}
                       </span>
                       {isCurrent && (
@@ -156,14 +156,14 @@ export function VersionHistory({
                     </Badge>
                   </div>
 
-                  <p className="text-xs text-gray-400 mb-2">
+                  <p className="text-xs text-muted-foreground mb-2">
                     Criada em {formatDateTime(version.created_at)}
                   </p>
 
                   {version.change_summary && (
-                    <div className="mb-2 p-2 rounded bg-gray-800/50 border border-gray-700/50">
-                      <p className="text-xs font-medium text-gray-300 mb-1">Resumo das Mudanças:</p>
-                      <p className="text-xs text-gray-400 italic">{version.change_summary}</p>
+                    <div className="mb-2 p-2 rounded bg-card/50 border border-border/50">
+                      <p className="text-xs font-medium text-foreground mb-1">Resumo das Mudanças:</p>
+                      <p className="text-xs text-muted-foreground italic">{version.change_summary}</p>
                     </div>
                   )}
 
@@ -173,7 +173,7 @@ export function VersionHistory({
                       {versionApprovals.map((approval: any) => (
                         <div
                           key={approval.id}
-                          className="flex items-center gap-2 text-xs text-green-400 bg-green-500/10 border border-green-500/20 rounded px-2 py-1"
+                          className="flex items-center gap-2 text-xs text-success bg-success/10 border border-success/20 rounded px-2 py-1"
                         >
                           <CheckCircle className="h-3 w-3 stroke-1" />
                           <span>
@@ -191,18 +191,18 @@ export function VersionHistory({
                       {versionRejections.map((rejection: any) => (
                         <div
                           key={rejection.id}
-                          className="p-2 rounded bg-red-500/10 border border-red-500/20"
+                          className="p-2 rounded bg-destructive/10 border border-destructive/20"
                         >
-                          <div className="flex items-center gap-2 text-xs text-red-400 mb-1">
+                          <div className="flex items-center gap-2 text-xs text-destructive mb-1">
                             <XCircle className="h-3 w-3 stroke-1" />
                             <span className="font-medium">
                               Rejeitado por {rejection.stakeholder?.name || "Stakeholder"} em{" "}
                               {formatDateTime(rejection.rejected_at)}
                             </span>
                           </div>
-                          <p className="text-xs text-gray-300 mt-1">{rejection.reason}</p>
+                          <p className="text-xs text-foreground mt-1">{rejection.reason}</p>
                           {rejection.additional_comments && (
-                            <p className="text-xs text-gray-400 mt-1 italic">
+                            <p className="text-xs text-muted-foreground mt-1 italic">
                               {rejection.additional_comments}
                             </p>
                           )}

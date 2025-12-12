@@ -71,20 +71,20 @@ export default function LoginPage() {
               priority
             />
           </div>
-          <p className="text-gray-400 font-light text-sm">Síndica Virtual</p>
-          <p className="text-sm text-gray-400 mt-2">
+          <p className="text-muted-foreground font-light text-sm">Síndica Virtual</p>
+          <p className="text-sm text-muted-foreground mt-2">
             Entre com seu email para acessar sua conta
           </p>
         </div>
 
         {/* Card de Login */}
-        <div className="w-full max-w-md bg-gray-800/90 backdrop-blur-md border border-gray-700/50 rounded-lg shadow-2xl p-8 space-y-6">
+        <div className="w-full max-w-md bg-card/90 backdrop-blur-md border border-border/50 rounded-lg shadow-2xl p-8 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Campo Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-300 font-light">Email</Label>
+              <Label htmlFor="email" className="text-foreground font-light">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 stroke-1" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground stroke-1" />
                 <Input
                   id="email"
                   type="email"
@@ -94,7 +94,7 @@ export default function LoginPage() {
                   disabled={loading}
                   required
                   autoFocus
-                  className="pl-10 bg-gray-900/50 border-gray-700 text-gray-200 placeholder:text-gray-500"
+                  className="pl-10 bg-input border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
             </div>
@@ -102,16 +102,16 @@ export default function LoginPage() {
             {/* Campo Senha */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-gray-300 font-light">Senha</Label>
+                <Label htmlFor="password" className="text-foreground font-light">Senha</Label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-sm text-[#00ade8] hover:underline"
+                  className="text-sm text-primary hover:underline"
                 >
                   Esqueceu sua senha?
                 </Link>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 stroke-1" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground stroke-1" />
                 <Input
                   id="password"
                   type="password"
@@ -120,22 +120,22 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
                   required
-                  className="pl-10 bg-gray-900/50 border-gray-700 text-gray-200 placeholder:text-gray-500"
+                  className="pl-10 bg-input border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
             </div>
 
             {/* Mensagem de Erro */}
             {error && (
-              <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20">
-                <p className="text-sm text-red-400 font-light">{error}</p>
+              <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                <p className="text-sm text-destructive font-light">{error}</p>
               </div>
             )}
 
             {/* Botão de Login */}
             <Button
               type="submit"
-              className="w-full bg-[#00ade8] hover:bg-[#0099cc] text-white font-light"
+              className="w-full bg-primary hover:bg-[#0099cc] text-white font-light"
               disabled={loading || !email || !password}
             >
               {loading ? (
@@ -155,15 +155,15 @@ export default function LoginPage() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-gray-800/50 px-2 text-gray-400">ou</span>
+              <span className="bg-card/50 px-2 text-muted-foreground">ou</span>
             </div>
           </div>
 
           {/* Link para Registro */}
-          <div className="text-center text-sm text-gray-400">
+          <div className="text-center text-sm text-muted-foreground">
             <p>
               Não tem uma conta?{" "}
-              <Link href="/register" className="text-[#00ade8] font-medium hover:underline">
+              <Link href="/register" className="text-primary font-medium hover:underline">
                 Criar conta
               </Link>
             </p>
@@ -171,7 +171,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-gray-400">
+        <p className="text-center text-xs text-muted-foreground">
           Ao continuar, você concorda com nossos{" "}
           <Link href="/terms" className="underline hover:text-foreground">
             Termos de Serviço

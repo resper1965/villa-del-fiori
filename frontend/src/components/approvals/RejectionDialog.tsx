@@ -55,14 +55,14 @@ export function RejectionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-red-400">
+          <DialogTitle className="flex items-center gap-2 text-destructive">
             <XCircle className="h-5 w-5" />
             Rejeitar Processo
           </DialogTitle>
           <DialogDescription>
             Você está prestes a rejeitar o processo: <strong>{processName}</strong>
             <br />
-            <span className="text-yellow-400 mt-2 block">
+            <span className="text-warning mt-2 block">
               Por favor, explique o motivo da rejeição para que o processo possa ser corrigido.
             </span>
           </DialogDescription>
@@ -70,7 +70,7 @@ export function RejectionDialog({
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="reason" className="text-foreground">
-              Motivo da Rejeição <span className="text-red-400">*</span>
+              Motivo da Rejeição <span className="text-destructive">*</span>
             </Label>
             <Textarea
               id="reason"
@@ -85,7 +85,7 @@ export function RejectionDialog({
               required
             />
             {error && (
-              <div className="flex items-center gap-2 text-sm text-red-400">
+              <div className="flex items-center gap-2 text-sm text-destructive">
                 <AlertCircle className="h-4 w-4" />
                 <span>{error}</span>
               </div>

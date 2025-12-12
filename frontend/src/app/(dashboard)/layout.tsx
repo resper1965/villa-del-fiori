@@ -38,8 +38,8 @@ export default function DashboardLayout({
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center space-y-2">
-          <div className="text-gray-400 font-light">Carregando...</div>
-          <div className="text-xs text-gray-400/50">Se demorar, tente recarregar a página</div>
+          <div className="text-muted-foreground font-light">Carregando...</div>
+          <div className="text-xs text-muted-foreground/50">Se demorar, tente recarregar a página</div>
         </div>
       </div>
     )
@@ -49,7 +49,7 @@ export default function DashboardLayout({
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
-        <div className="text-gray-400 font-light">Redirecionando para login...</div>
+        <div className="text-muted-foreground font-light">Redirecionando para login...</div>
       </div>
     )
   }
@@ -62,7 +62,7 @@ export default function DashboardLayout({
       <AppSidebar />
       <SidebarInset>
         {/* Header com título e notificações */}
-        <header className="h-[73px] border-b border-gray-700/50 bg-gray-800/90 backdrop-blur-md flex items-center justify-between px-6">
+        <header className="h-[73px] border-b border-border bg-card backdrop-blur-md flex items-center justify-between px-6">
           <div className="flex items-center gap-4">
             <SidebarTrigger />
             <PageTitle />

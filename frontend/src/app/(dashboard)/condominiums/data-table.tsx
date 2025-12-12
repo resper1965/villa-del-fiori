@@ -305,7 +305,7 @@ export default function CondominiumsDataTable({
           globalSearchPlaceholder="Buscar por nome, CNPJ, email ou telefone..."
         />
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-muted-foreground">
             Mostrando {table.getFilteredRowModel().rows.length} de {data.length} condomínio(s)
             {table.getFilteredRowModel().rows.length !== data.length && (
               <span className="ml-1">(filtrados)</span>
@@ -346,7 +346,7 @@ export default function CondominiumsDataTable({
       </div>
 
       {/* Tabela */}
-      <div className="rounded-md border border-gray-700/50">
+      <div className="rounded-md border border-border/50">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -388,14 +388,14 @@ export default function CondominiumsDataTable({
       {/* Paginação */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             {table.getFilteredSelectedRowModel().rows.length} de{" "}
             {table.getFilteredRowModel().rows.length} linha(s) selecionada(s).
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-400">Linhas por página</p>
+            <p className="text-sm text-muted-foreground">Linhas por página</p>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
@@ -415,7 +415,7 @@ export default function CondominiumsDataTable({
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-muted-foreground">
               Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
             </p>
             <div className="flex items-center gap-1">

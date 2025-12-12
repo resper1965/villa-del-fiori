@@ -26,6 +26,30 @@
     --ring: 197 100% 45%;           /* #00ade8 - anel de foco */
     --radius: 0.5rem;
     
+    /* Cores semânticas adicionais */
+    --success: 142 71% 45%;         /* verde - success */
+    --success-foreground: 0 0% 100%; /* branco */
+    --warning: 38 92% 50%;          /* amarelo - warning */
+    --warning-foreground: 0 0% 3.9%; /* gray-950 */
+    --error: 0 84.2% 60.2%;         /* vermelho - error */
+    --error-foreground: 0 0% 100%;  /* branco */
+    --info: 197 100% 45%;           /* azul - info (mesmo do primary) */
+    --info-foreground: 0 0% 100%;   /* branco */
+    
+    /* Cores de status */
+    --status-approved: 142 71% 45%;     /* verde */
+    --status-pending: 38 92% 50%;       /* amarelo */
+    --status-rejected: 0 84.2% 60.2%;   /* vermelho */
+    --status-draft: 0 0% 63.9%;         /* gray-400 */
+    
+    /* Cores adicionais para categorias */
+    --purple: 270 91% 65%;          /* roxo - para categorias */
+    --purple-foreground: 0 0% 100%; /* branco */
+    --orange: 25 95% 53%;           /* laranja - para categorias */
+    --orange-foreground: 0 0% 100%; /* branco */
+    --pink: 330 81% 60%;            /* rosa - para categorias */
+    --pink-foreground: 0 0% 100%;   /* branco */
+    
     /* Sidebar variables - usando cores globais */
     --sidebar-background: 0 0% 17%;          /* gray-800 (#1f2937) - rgb(31, 41, 55) */
     --sidebar-foreground: 0 0% 90%;          /* igual ao --foreground (gray-300) */
@@ -167,7 +191,7 @@
   
   /* Card com profundidade e hover suave - mesmo estilo do login */
   .card-elevated {
-    @apply bg-gray-800/90 backdrop-blur-md border border-gray-700/50 shadow-2xl;
+    @apply bg-card backdrop-blur-md border border-border shadow-2xl;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
@@ -184,5 +208,49 @@
   /* Glass morphism effect */
   .glass {
     @apply bg-card/40 backdrop-blur-md border border-border/50;
+  }
+  
+  /* Utility classes para cores semânticas */
+  .bg-success {
+    background-color: hsl(var(--success));
+  }
+  .text-success {
+    color: hsl(var(--success));
+  }
+  .bg-warning {
+    background-color: hsl(var(--warning));
+  }
+  .text-warning {
+    color: hsl(var(--warning));
+  }
+  .bg-error {
+    background-color: hsl(var(--error));
+  }
+  .text-error {
+    color: hsl(var(--error));
+  }
+  .bg-info {
+    background-color: hsl(var(--info));
+  }
+  .text-info {
+    color: hsl(var(--info));
+  }
+  .bg-purple {
+    background-color: hsl(var(--purple));
+  }
+  .text-purple {
+    color: hsl(var(--purple));
+  }
+  .bg-orange {
+    background-color: hsl(var(--orange));
+  }
+  .text-orange {
+    color: hsl(var(--orange));
+  }
+  .bg-pink {
+    background-color: hsl(var(--pink));
+  }
+  .text-pink {
+    color: hsl(var(--pink));
   }
 }

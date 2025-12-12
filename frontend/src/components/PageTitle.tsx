@@ -30,7 +30,7 @@ export function PageTitle() {
   if (!title) return null
   
   return (
-    <h1 className="text-lg font-semibold text-gray-300">
+    <h1 className="text-lg font-semibold text-foreground">
       {title}
     </h1>
   )

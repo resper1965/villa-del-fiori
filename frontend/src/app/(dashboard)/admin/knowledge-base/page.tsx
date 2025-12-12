@@ -182,22 +182,22 @@ export default function KnowledgeBasePage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
-        return <CheckCircle className="h-4 w-4 text-green-400" />
+        return <CheckCircle className="h-4 w-4 text-success" />
       case "failed":
-        return <XCircle className="h-4 w-4 text-red-400" />
+        return <XCircle className="h-4 w-4 text-destructive" />
       case "processing":
-        return <Loader2 className="h-4 w-4 text-blue-400 animate-spin" />
+        return <Loader2 className="h-4 w-4 text-info animate-spin" />
       case "pending":
-        return <Clock className="h-4 w-4 text-yellow-400" />
+        return <Clock className="h-4 w-4 text-warning" />
       default:
-        return <AlertCircle className="h-4 w-4 text-gray-400" />
+        return <AlertCircle className="h-4 w-4 text-muted-foreground" />
     }
   }
 
   if (isLoading) {
     return (
       <div className="h-[calc(100vh-73px)] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -206,7 +206,7 @@ export default function KnowledgeBasePage() {
     <div className="px-4 md:px-6 py-4 md:py-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Monitoramento e ingestão de processos na base de conhecimento
           </p>
         </div>
@@ -222,7 +222,7 @@ export default function KnowledgeBasePage() {
           <Button
             onClick={ingestPendingProcesses}
             disabled={isIngesting}
-            className="bg-[#00ade8] hover:bg-[#00ade8]/90"
+            className="bg-primary hover:bg-primary/90"
           >
             {isIngesting ? (
               <>
@@ -250,13 +250,13 @@ export default function KnowledgeBasePage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Concluídos</CardDescription>
-            <CardTitle className="text-2xl text-green-400">{stats.completed}</CardTitle>
+            <CardTitle className="text-2xl text-success">{stats.completed}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Pendentes</CardDescription>
-            <CardTitle className="text-2xl text-yellow-400">{stats.pending}</CardTitle>
+            <CardTitle className="text-2xl text-warning">{stats.pending}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
@@ -277,7 +277,7 @@ export default function KnowledgeBasePage() {
         </CardHeader>
         <CardContent>
           {ingestionStatuses.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-muted-foreground">
               <Database className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>Nenhum processo ingerido ainda.</p>
               <p className="text-sm mt-2">Clique em "Ingerir Processos" para começar.</p>
@@ -287,16 +287,16 @@ export default function KnowledgeBasePage() {
               {ingestionStatuses.map((status) => (
                 <div
                   key={status.id}
-                  className="flex items-center justify-between p-4 border border-gray-700/50 rounded-lg hover:bg-gray-800/50 transition-colors"
+                  className="flex items-center justify-between p-4 border border-border/50 rounded-lg hover:bg-card/50 transition-colors"
                 >
                   <div className="flex items-center gap-4 flex-1">
                     {getStatusIcon(status.status)}
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-gray-300">{status.process_name}</p>
+                        <p className="font-medium text-foreground">{status.process_name}</p>
                         {getStatusBadge(status.status)}
                       </div>
-                      <div className="flex items-center gap-4 mt-1 text-xs text-gray-400">
+                      <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
                         {status.chunks_count > 0 && (
                           <span>{status.chunks_count} chunks</span>
                         )}
@@ -312,7 +312,7 @@ export default function KnowledgeBasePage() {
                         )}
                       </div>
                       {status.error_message && (
-                        <p className="text-xs text-red-400 mt-1">{status.error_message}</p>
+                        <p className="text-xs text-destructive mt-1">{status.error_message}</p>
                       )}
                     </div>
                   </div>

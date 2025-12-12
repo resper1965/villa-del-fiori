@@ -89,9 +89,9 @@ export function EntityValidation({
 
   if (!hasErrors && validEntities.length > 0) {
     return (
-      <Alert className="border-green-500/50 bg-green-500/10">
-        <CheckCircle2 className="h-4 w-4 text-green-500" />
-        <AlertTitle className="text-green-500">Todas as entidades são válidas</AlertTitle>
+      <Alert className="border-green-500/50 bg-success/10">
+        <CheckCircle2 className="h-4 w-4 text-success" />
+        <AlertTitle className="text-success">Todas as entidades são válidas</AlertTitle>
         <AlertDescription>
           {validEntities.length} entidade(s) validada(s) com sucesso.
         </AlertDescription>
@@ -235,7 +235,7 @@ function QuickEntityCreateModal({
             <Label htmlFor="name">Nome *</Label>
             <Input id="name" {...register("name")} />
             {errors.name && (
-              <p className="text-sm text-red-400">{errors.name.message}</p>
+              <p className="text-sm text-destructive">{errors.name.message}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -246,7 +246,7 @@ function QuickEntityCreateModal({
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" {...register("email")} placeholder="email@exemplo.com" />
             {errors.email && (
-              <p className="text-sm text-red-400">{errors.email.message}</p>
+              <p className="text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
           <div className="flex justify-end gap-2">

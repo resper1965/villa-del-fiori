@@ -138,7 +138,7 @@ export default function ChatPage() {
   if (authLoading || !isAuthenticated || !canAccessChat()) {
     return (
       <div className="h-[calc(100vh-73px)] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400 stroke-1" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground stroke-1" />
       </div>
     )
   }
@@ -146,14 +146,14 @@ export default function ChatPage() {
   return (
     <div className="h-[calc(100vh-73px)] flex flex-col">
       {/* Header */}
-      <div className="flex-shrink-0 border-b border-gray-700/50 bg-card px-4 py-3">
+      <div className="flex-shrink-0 border-b border-border/50 bg-card px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-full bg-[#00ade8]/10">
-            <Bot className="h-5 w-5 text-[#00ade8] stroke-1" />
+          <div className="p-2 rounded-full bg-primary/10">
+            <Bot className="h-5 w-5 text-primary stroke-1" />
           </div>
           <div>
-            <h1 className="text-base font-medium text-gray-300">Gabi</h1>
-            <p className="text-xs text-gray-400">Síndica Virtual</p>
+            <h1 className="text-base font-medium text-foreground">Gabi</h1>
+            <p className="text-xs text-muted-foreground">Síndica Virtual</p>
           </div>
         </div>
       </div>
@@ -168,16 +168,16 @@ export default function ChatPage() {
             }`}
           >
             {message.role === "bot" && (
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00ade8]/10 flex items-center justify-center">
-                <Bot className="h-4 w-4 text-[#00ade8] stroke-1" />
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Bot className="h-4 w-4 text-primary stroke-1" />
               </div>
             )}
 
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-2 ${
                 message.role === "user"
-                  ? "bg-[#00ade8] text-white"
-                  : "bg-muted text-gray-300"
+                  ? "bg-primary text-white"
+                  : "bg-muted text-foreground"
               }`}
             >
               {message.role === "bot" ? (
@@ -191,7 +191,7 @@ export default function ChatPage() {
 
             {message.role === "user" && (
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                <User className="h-4 w-4 text-gray-300 stroke-1" />
+                <User className="h-4 w-4 text-foreground stroke-1" />
               </div>
             )}
           </div>
@@ -199,11 +199,11 @@ export default function ChatPage() {
 
         {isLoading && (
           <div className="flex gap-3 justify-start">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00ade8]/10 flex items-center justify-center">
-              <Bot className="h-4 w-4 text-[#00ade8] stroke-1" />
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Bot className="h-4 w-4 text-primary stroke-1" />
             </div>
             <div className="bg-muted rounded-2xl px-4 py-2">
-              <Loader2 className="h-4 w-4 animate-spin text-gray-400 stroke-1" />
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground stroke-1" />
             </div>
           </div>
         )}
@@ -246,7 +246,7 @@ export default function ChatPage() {
           <Button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="min-w-[44px] min-h-[44px] bg-[#00ade8] hover:bg-[#00ade8]/90"
+            className="min-w-[44px] min-h-[44px] bg-primary hover:bg-primary/90"
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin stroke-1" />

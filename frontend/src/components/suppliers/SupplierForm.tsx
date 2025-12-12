@@ -212,16 +212,16 @@ export function SupplierForm({ open, onOpenChange, supplierId, defaultCondominiu
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                 {error}
               </div>
             )}
 
             {/* Single-tenant: condomínio é automático, não precisa selecionar */}
             {condominium && (
-              <div className="p-3 bg-gray-800/30 rounded-md border border-gray-700/50">
-                <p className="text-sm text-gray-400">
-                  <span className="font-medium text-gray-300">Condomínio:</span> {condominium.name}
+              <div className="p-3 bg-card/30 rounded-md border border-border/50">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium text-foreground">Condomínio:</span> {condominium.name}
                 </p>
               </div>
             )}
@@ -231,7 +231,7 @@ export function SupplierForm({ open, onOpenChange, supplierId, defaultCondominiu
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome/Razão Social <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel>Nome/Razão Social <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <Input placeholder="Nome do fornecedor" {...field} />
                   </FormControl>
@@ -277,7 +277,7 @@ export function SupplierForm({ open, onOpenChange, supplierId, defaultCondominiu
                 name="supplier_type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel>Tipo <span className="text-destructive">*</span></FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -383,8 +383,8 @@ export function SupplierForm({ open, onOpenChange, supplierId, defaultCondominiu
               />
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-gray-700/50">
-              <h3 className="text-sm font-semibold text-gray-300">Contrato</h3>
+            <div className="space-y-4 pt-4 border-t border-border/50">
+              <h3 className="text-sm font-semibold text-foreground">Contrato</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField

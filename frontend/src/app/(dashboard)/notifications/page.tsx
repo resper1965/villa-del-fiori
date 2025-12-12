@@ -27,15 +27,15 @@ const notificationTypeLabels: Record<string, string> = {
 }
 
 const notificationTypeColors: Record<string, string> = {
-  approval_pending: "bg-yellow-500/20 text-yellow-500 border-yellow-500/30",
-  approved: "bg-green-500/20 text-green-500 border-green-500/30",
-  rejected: "bg-red-500/20 text-red-500 border-red-500/30",
-  reminder: "bg-blue-500/20 text-blue-500 border-blue-500/30",
-  process_refactored: "bg-purple-500/20 text-purple-500 border-purple-500/30",
-  process_created: "bg-blue-500/20 text-blue-500 border-blue-500/30",
-  process_updated: "bg-purple-500/20 text-purple-500 border-purple-500/30",
-  user_approved: "bg-green-500/20 text-green-500 border-green-500/30",
-  user_rejected: "bg-red-500/20 text-red-500 border-red-500/30",
+  approval_pending: "bg-warning/20 text-warning border-warning/30",
+  approved: "bg-success/20 text-success border-success/30",
+  rejected: "bg-destructive/20 text-destructive border-destructive/30",
+  reminder: "bg-info/20 text-info border-info/30",
+  process_refactored: "bg-purple-500/20 text-purple border-purple/30",
+  process_created: "bg-info/20 text-info border-info/30",
+  process_updated: "bg-purple-500/20 text-purple border-purple/30",
+  user_approved: "bg-success/20 text-success border-success/30",
+  user_rejected: "bg-destructive/20 text-destructive border-destructive/30",
 }
 
 function formatRelativeTime(date: string): string {
@@ -95,7 +95,7 @@ export default function NotificationsPage() {
     <div className="px-4 md:px-6 py-4 md:py-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-gray-400">
+          <p className="text-muted-foreground">
             {unreadCount > 0
               ? `${unreadCount} notificação${unreadCount > 1 ? "ões" : ""} não lida${unreadCount > 1 ? "s" : ""}`
               : "Todas as notificações foram lidas"}
@@ -153,8 +153,8 @@ export default function NotificationsPage() {
           {notifications.map((notification) => (
             <Card
               key={notification.id}
-              className={`cursor-pointer transition-all hover:bg-slate-800/50 ${
-                !notification.is_read ? "border-l-4 border-l-[#00ade8] bg-slate-800/30" : ""
+              className={`cursor-pointer transition-all hover:bg-card/50 ${
+                !notification.is_read ? "border-l-4 border-l-primary bg-card/30" : ""
               }`}
               onClick={() => handleNotificationClick(notification)}
             >
@@ -169,7 +169,7 @@ export default function NotificationsPage() {
                         {notificationTypeLabels[notification.type] || notification.type}
                       </Badge>
                       {!notification.is_read && (
-                        <div className="h-2 w-2 rounded-full bg-[#00ade8]" />
+                        <div className="h-2 w-2 rounded-full bg-primary" />
                       )}
                     </div>
                     <CardTitle className="text-lg mb-1">{notification.title}</CardTitle>
@@ -185,7 +185,7 @@ export default function NotificationsPage() {
                   <div className="mt-2">
                     <Link
                       href={`/processes/${notification.process_id}`}
-                      className="text-sm text-[#00ade8] hover:underline"
+                      className="text-sm text-primary hover:underline"
                       onClick={(e) => e.stopPropagation()}
                     >
                       Ver processo →

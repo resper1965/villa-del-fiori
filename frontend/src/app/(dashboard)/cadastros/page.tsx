@@ -53,7 +53,7 @@ export default function CadastrosPage() {
           description: "Cadastre apartamentos e casas",
           icon: Home,
           href: "/units",
-          color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+          color: "bg-purple/10 text-purple border-purple/20",
           count: stats?.units || 0,
           quickAction: () => router.push("/units"),
         },
@@ -68,7 +68,7 @@ export default function CadastrosPage() {
           description: "Cadastre proprietários, moradores e funcionários",
           icon: Users,
           href: "/admin/users",
-          color: "bg-green-500/10 text-green-400 border-green-500/20",
+          color: "bg-success/10 text-success border-success/20",
           count: null,
           quickAction: () => router.push("/admin/users"),
           requires: "units",
@@ -78,7 +78,7 @@ export default function CadastrosPage() {
           description: "Cadastre veículos das unidades",
           icon: Car,
           href: "/vehicles",
-          color: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+          color: "bg-orange/10 text-orange border-orange/20",
           count: stats?.vehicles || 0,
           quickAction: () => router.push("/vehicles"),
           requires: "units",
@@ -88,7 +88,7 @@ export default function CadastrosPage() {
           description: "Cadastre pets dos moradores",
           icon: Heart,
           href: null,
-          color: "bg-pink-500/10 text-pink-400 border-pink-500/20",
+          color: "bg-pink/10 text-pink border-pink/20",
           count: stats?.pets || 0,
           quickAction: () => router.push("/units"),
           requires: "units",
@@ -105,7 +105,7 @@ export default function CadastrosPage() {
           description: "Cadastre administradora, portaria virtual, etc.",
           icon: Truck,
           href: "/suppliers",
-          color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+          color: "bg-warning/10 text-warning border-warning/20",
           count: stats?.suppliers || 0,
           quickAction: () => router.push("/suppliers"),
         },
@@ -114,7 +114,7 @@ export default function CadastrosPage() {
           description: "Serviços públicos e prestadores referenciados (sem contrato)",
           icon: Briefcase,
           href: "/entities",
-          color: "bg-red-500/10 text-red-400 border-red-500/20",
+          color: "bg-destructive/10 text-destructive border-destructive/20",
           count: null,
           quickAction: () => router.push("/entities"),
         },
@@ -125,12 +125,12 @@ export default function CadastrosPage() {
   return (
     <div className="px-4 md:px-6 py-4 md:py-6">
       <div className="mb-4">
-        <p className="text-sm text-gray-400">Gerencie todos os cadastros do sistema</p>
+        <p className="text-sm text-muted-foreground">Gerencie todos os cadastros do sistema</p>
       </div>
       <div className="space-y-8">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : (
           <>
@@ -146,12 +146,12 @@ export default function CadastrosPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center gap-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
+                <div className="flex items-center gap-4 p-4 bg-card/30 rounded-lg border border-border/50">
                   <div className="flex-1">
-                    <h3 className="text-sm font-medium text-gray-300 mb-1">
+                    <h3 className="text-sm font-medium text-foreground mb-1">
                       Cadastro Completo de Unidade
                     </h3>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-muted-foreground">
                       Cadastre uma unidade e adicione proprietários, moradores, veículos e pets em sequência
                     </p>
                   </div>
@@ -170,8 +170,8 @@ export default function CadastrosPage() {
             {cadastroGroups.map((group, groupIndex) => (
               <div key={groupIndex} className="space-y-4">
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-300 mb-1">{group.title}</h2>
-                  <p className="text-sm text-gray-400">{group.description}</p>
+                  <h2 className="text-xl font-semibold text-foreground mb-1">{group.title}</h2>
+                  <p className="text-sm text-muted-foreground">{group.description}</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -194,7 +194,7 @@ export default function CadastrosPage() {
                               <Icon className="h-5 w-5" />
                             </div>
                             {item.count !== null && (
-                              <div className="text-2xl font-light text-gray-300">
+                              <div className="text-2xl font-light text-foreground">
                                 {item.count}
                               </div>
                             )}
@@ -203,7 +203,7 @@ export default function CadastrosPage() {
                           <CardDescription className="text-xs">
                             {item.description}
                             {"note" in item && item.note && (
-                              <span className="block mt-1 text-gray-500 italic">
+                              <span className="block mt-1 text-muted-foreground italic">
                                 {item.note}
                               </span>
                             )}
@@ -211,7 +211,7 @@ export default function CadastrosPage() {
                         </CardHeader>
                         <CardContent>
                           {hasRequirement ? (
-                            <div className="text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 rounded p-2">
+                            <div className="text-xs text-warning bg-warning/10 border border-warning/20 rounded p-2">
                               {"requires" in item && item.requires === "units" && "Cadastre uma unidade primeiro"}
                             </div>
                           ) : (
@@ -226,7 +226,7 @@ export default function CadastrosPage() {
                                   <ArrowRight className="h-3 w-3" />
                                 </Link>
                               ) : (
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-muted-foreground">
                                   Acesse através da unidade
                                 </span>
                               )}
@@ -254,27 +254,27 @@ export default function CadastrosPage() {
             {/* Dicas de Fluxo */}
             <Card className="card-elevated border-primary/20">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-300">
+                <CardTitle className="text-sm font-medium text-foreground">
                   💡 Dicas de Fluxo
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 text-sm text-gray-400">
+                <div className="space-y-2 text-sm text-muted-foreground">
                   <div className="flex items-start gap-2">
                     <span className="text-primary">1.</span>
-                    <span>Comece cadastrando as <strong className="text-gray-300">Unidades</strong></span>
+                    <span>Comece cadastrando as <strong className="text-foreground">Unidades</strong></span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary">2.</span>
-                    <span>Para cada unidade, adicione <strong className="text-gray-300">Proprietários</strong> e <strong className="text-gray-300">Moradores</strong></span>
+                    <span>Para cada unidade, adicione <strong className="text-foreground">Proprietários</strong> e <strong className="text-foreground">Moradores</strong></span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary">3.</span>
-                    <span>Complete com <strong className="text-gray-300">Veículos</strong> e <strong className="text-gray-300">Pets</strong> relacionados à unidade</span>
+                    <span>Complete com <strong className="text-foreground">Veículos</strong> e <strong className="text-foreground">Pets</strong> relacionados à unidade</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-primary">4.</span>
-                    <span>Cadastre <strong className="text-gray-300">Fornecedores</strong> e <strong className="text-gray-300">Entidades</strong> conforme necessário</span>
+                    <span>Cadastre <strong className="text-foreground">Fornecedores</strong> e <strong className="text-foreground">Entidades</strong> conforme necessário</span>
                   </div>
                 </div>
               </CardContent>

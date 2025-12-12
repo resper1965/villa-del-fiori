@@ -152,7 +152,7 @@ export default function ProcessDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-transparent">
-        <div className="h-[73px] border-b border-gray-700/50/50 flex items-center px-4 md:px-6">
+        <div className="h-[73px] border-b border-border/50/50 flex items-center px-4 md:px-6">
           <div className="h-4 w-32 bg-muted animate-pulse rounded" />
         </div>
         <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
@@ -185,8 +185,8 @@ export default function ProcessDetailPage() {
   if (isError || error) {
     return (
       <div className="min-h-screen bg-transparent">
-        <div className="h-[73px] border-b border-gray-700/50/50 flex items-center px-4 md:px-6">
-          <h1 className="text-lg font-semibold text-gray-300">Erro ao carregar processo</h1>
+        <div className="h-[73px] border-b border-border/50/50 flex items-center px-4 md:px-6">
+          <h1 className="text-lg font-semibold text-foreground">Erro ao carregar processo</h1>
         </div>
         <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
           <Card className="card-elevated mb-4">
@@ -208,13 +208,13 @@ export default function ProcessDetailPage() {
   if (!displayProcess && !isLoading) {
     return (
       <div className="min-h-screen bg-transparent">
-        <div className="h-[73px] border-b border-gray-700/50/50 flex items-center px-4 md:px-6">
-          <h1 className="text-lg font-semibold text-gray-300">Processo não encontrado</h1>
+        <div className="h-[73px] border-b border-border/50/50 flex items-center px-4 md:px-6">
+          <h1 className="text-lg font-semibold text-foreground">Processo não encontrado</h1>
         </div>
         <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
           <Card className="card-elevated">
             <CardContent className="pt-6">
-              <p className="text-gray-400 mb-4">O processo solicitado não foi encontrado.</p>
+              <p className="text-muted-foreground mb-4">O processo solicitado não foi encontrado.</p>
               <Button onClick={() => router.push("/processes")} variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2 stroke-1" />
                 Voltar para Processos
@@ -232,10 +232,10 @@ export default function ProcessDetailPage() {
   }
 
   const statusConfig = {
-    aprovado: { icon: CheckCircle, color: "text-green-400", label: "Aprovado" },
-    em_revisao: { icon: Clock, color: "text-yellow-400", label: "Em Revisão" },
-    rascunho: { icon: FileText, color: "text-gray-400", label: "Rascunho" },
-    rejeitado: { icon: AlertCircle, color: "text-red-400", label: "Rejeitado" },
+    aprovado: { icon: CheckCircle, color: "text-success", label: "Aprovado" },
+    em_revisao: { icon: Clock, color: "text-warning", label: "Em Revisão" },
+    rascunho: { icon: FileText, color: "text-muted-foreground", label: "Rascunho" },
+    rejeitado: { icon: AlertCircle, color: "text-destructive", label: "Rejeitado" },
   }
   const statusInfo = statusConfig[displayProcess.status as keyof typeof statusConfig] || statusConfig.aprovado
   const StatusIcon = statusInfo.icon
@@ -245,7 +245,7 @@ export default function ProcessDetailPage() {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="h-[73px] border-b border-gray-700/50/50 flex items-center px-4 md:px-6">
+      <div className="h-[73px] border-b border-border/50/50 flex items-center px-4 md:px-6">
         <Button
           variant="ghost"
           size="sm"
@@ -259,7 +259,7 @@ export default function ProcessDetailPage() {
           <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
             v{processVersion}
           </span>
-          <h1 className="text-lg font-semibold text-gray-300">
+          <h1 className="text-lg font-semibold text-foreground">
             {displayProcess.name}
           </h1>
         </div>
@@ -272,14 +272,14 @@ export default function ProcessDetailPage() {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="p-2 rounded-lg bg-muted flex-shrink-0">
-                    <FileText className="h-5 w-5 text-gray-300 stroke-1" />
+                    <FileText className="h-5 w-5 text-foreground stroke-1" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <CardTitle className="text-base sm:text-lg mb-1 break-words">{displayProcess.name}</CardTitle>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs sm:text-sm text-gray-400">{displayProcess.category}</span>
-                      <span className="text-gray-400 hidden sm:inline">•</span>
-                      <span className="text-xs sm:text-sm text-gray-400">{displayProcess.document_type}</span>
+                      <span className="text-xs sm:text-sm text-muted-foreground">{displayProcess.category}</span>
+                      <span className="text-muted-foreground hidden sm:inline">•</span>
+                      <span className="text-xs sm:text-sm text-muted-foreground">{displayProcess.document_type}</span>
                     </div>
                   </div>
                 </div>
@@ -292,7 +292,7 @@ export default function ProcessDetailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-300 leading-relaxed">{displayProcess.description || "Sem descrição"}</p>
+              <p className="text-foreground leading-relaxed">{displayProcess.description || "Sem descrição"}</p>
             </CardContent>
           </Card>
 
@@ -303,7 +303,7 @@ export default function ProcessDetailPage() {
               <Card className="card-elevated">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <GitBranch className="h-4 w-4 text-gray-400 stroke-1" />
+                    <GitBranch className="h-4 w-4 text-muted-foreground stroke-1" />
                     Diagrama do Processo
                   </CardTitle>
                   <CardDescription className="text-xs">Visualização do fluxo do processo em diagrama</CardDescription>
@@ -332,7 +332,7 @@ export default function ProcessDetailPage() {
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
                         {index + 1}
                       </span>
-                      <span className="text-sm text-gray-300 pt-0.5">{step}</span>
+                      <span className="text-sm text-foreground pt-0.5">{step}</span>
                     </li>
                   ))}
                 </ol>
@@ -352,7 +352,7 @@ export default function ProcessDetailPage() {
                   {displayProcess.entities.map((entity, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 rounded-md bg-muted text-gray-300 text-xs border border-border/50"
+                      className="px-2 py-1 rounded-md bg-muted text-foreground text-xs border border-border/50"
                     >
                       {entity}
                     </span>
@@ -440,7 +440,7 @@ export default function ProcessDetailPage() {
             <Card className="card-elevated">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <History className="h-5 w-5 text-gray-400 stroke-1" />
+                  <History className="h-5 w-5 text-muted-foreground stroke-1" />
                   Histórico de Versões
                 </CardTitle>
                 <CardDescription>Versões anteriores e histórico de alterações</CardDescription>
@@ -454,22 +454,22 @@ export default function ProcessDetailPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium text-gray-300">
+                        <span className="text-xs font-medium text-foreground">
                           Versão {displayProcess.current_version_number || 1} - {statusInfo.label}
                         </span>
                         <span className={`text-xs px-1.5 py-0.5 rounded ${
                           displayProcess.status === "aprovado" 
-                            ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                            ? "bg-success/10 text-success border border-success/20"
                             : displayProcess.status === "em_revisao"
-                            ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                            ? "bg-warning/10 text-warning border border-warning/20"
                             : displayProcess.status === "rejeitado"
-                            ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                            ? "bg-destructive/10 text-destructive border border-destructive/20"
                             : "bg-primary/20 text-primary border border-primary/30"
                         }`}>
                           {statusInfo.label}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-400 mb-1">
+                      <p className="text-xs text-muted-foreground mb-1">
                         Criada em {new Date(displayProcess.created_at).toLocaleDateString("pt-BR", {
                           day: "2-digit",
                           month: "2-digit",
@@ -477,7 +477,7 @@ export default function ProcessDetailPage() {
                         })}
                       </p>
                       {displayProcess.current_version?.change_summary && (
-                        <p className="text-xs text-gray-400 italic mt-1">
+                        <p className="text-xs text-muted-foreground italic mt-1">
                           {displayProcess.current_version.change_summary}
                         </p>
                       )}
@@ -486,13 +486,13 @@ export default function ProcessDetailPage() {
 
                   {/* Mensagem se não houver histórico de aprovações */}
                   {displayProcess.status === "rascunho" && (
-                    <div className="text-center py-3 text-xs text-gray-400">
+                    <div className="text-center py-3 text-xs text-muted-foreground">
                       <History className="h-6 w-6 mx-auto mb-1 opacity-50 stroke-1" />
                       <p>Processo em rascunho - aguardando revisão e aprovação</p>
                     </div>
                   )}
                   {displayProcess.status === "em_revisao" && (
-                    <div className="text-center py-3 text-xs text-gray-400">
+                    <div className="text-center py-3 text-xs text-muted-foreground">
                       <Clock className="h-6 w-6 mx-auto mb-1 opacity-50 stroke-1" />
                       <p>Processo em revisão pelo conselho consultivo</p>
                     </div>
@@ -533,9 +533,9 @@ export default function ProcessDetailPage() {
 
           {/* Actions Card - Criador: Refazer Processo Rejeitado */}
           {canRefactor && (
-            <Card className="card-elevated border-yellow-500/30">
+            <Card className="card-elevated border-warning/30">
               <CardHeader>
-                <CardTitle className="text-yellow-400">Processo Rejeitado</CardTitle>
+                <CardTitle className="text-warning">Processo Rejeitado</CardTitle>
                 <CardDescription>Refaça o processo baseado nos motivos de rejeição</CardDescription>
               </CardHeader>
               <CardContent>
@@ -589,7 +589,7 @@ export default function ProcessDetailPage() {
                   <Button
                     onClick={() => setRejectionDialogOpen(true)}
                     variant="outline"
-                    className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                    className="border-destructive/50 text-destructive hover:bg-destructive/10"
                     disabled={rejectMutation.isPending}
                   >
                     {rejectMutation.isPending ? (

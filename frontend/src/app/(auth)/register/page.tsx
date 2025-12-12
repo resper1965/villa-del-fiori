@@ -148,11 +148,11 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-gray-800/90 backdrop-blur-md border-gray-700/50 shadow-2xl">
+        <Card className="w-full max-w-md bg-card/90 backdrop-blur-md border-border/50 shadow-2xl">
           <CardHeader className="space-y-1 text-center">
             <div className="flex items-center justify-center mb-4">
-              <div className="p-3 rounded-full bg-green-500/10">
-                <CheckCircle className="h-6 w-6 text-green-500" />
+              <div className="p-3 rounded-full bg-success/10">
+                <CheckCircle className="h-6 w-6 text-success" />
               </div>
             </div>
             <CardTitle className="text-2xl font-light">Cadastro Realizado!</CardTitle>
@@ -173,11 +173,11 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-gray-800/90 backdrop-blur-md border-gray-700/50 shadow-2xl">
+      <Card className="w-full max-w-md bg-card/90 backdrop-blur-md border-border/50 shadow-2xl">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <div className="p-3 rounded-full bg-[#00ade8]/10">
-              <UserPlus className="h-6 w-6 text-[#00ade8] stroke-1" />
+            <div className="p-3 rounded-full bg-primary/10">
+              <UserPlus className="h-6 w-6 text-primary stroke-1" />
             </div>
           </div>
           <CardTitle className="text-2xl font-light text-center">
@@ -265,14 +265,14 @@ export default function RegisterPage() {
             </div>
 
             {error && (
-              <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20">
-                <p className="text-sm text-red-400">{error}</p>
+              <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                <p className="text-sm text-destructive">{error}</p>
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full bg-[#00ade8] hover:bg-[#00ade8]/90"
+              className="w-full bg-primary hover:bg-primary/90"
               disabled={loading || !formData.name || !formData.email || !formData.password}
             >
               {loading ? (
@@ -291,7 +291,7 @@ export default function RegisterPage() {
             <div className="text-center text-sm text-muted-foreground">
               <p>
                 Já tem uma conta?{" "}
-                <Link href="/login" className="text-[#00ade8] hover:underline">
+                <Link href="/login" className="text-primary hover:underline">
                   Fazer login
                 </Link>
               </p>

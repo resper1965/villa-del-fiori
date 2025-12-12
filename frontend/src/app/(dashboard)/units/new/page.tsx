@@ -65,13 +65,13 @@ export default function NewUnitFlowPage() {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="h-[73px] border-b border-gray-700/50 flex items-center justify-between px-4">
+      <div className="h-[73px] border-b border-border/50 flex items-center justify-between px-4">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.push("/cadastros")}
-            className="text-gray-400 hover:text-gray-300"
+            className="text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -80,16 +80,16 @@ export default function NewUnitFlowPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-5 px-2 text-xs text-gray-400 hover:text-gray-300"
+                className="h-5 px-2 text-xs text-muted-foreground hover:text-foreground"
                 onClick={() => router.push("/cadastros")}
               >
                 Cadastros
               </Button>
-              <span className="text-gray-500 text-xs">/</span>
-              <span className="text-xs text-gray-400">Nova Unidade</span>
+              <span className="text-muted-foreground text-xs">/</span>
+              <span className="text-xs text-muted-foreground">Nova Unidade</span>
             </div>
-            <h1 className="text-lg font-semibold text-gray-300">Cadastro Completo de Unidade</h1>
-            <p className="text-sm text-gray-400">Cadastre uma unidade com todas as informações</p>
+            <h1 className="text-lg font-semibold text-foreground">Cadastro Completo de Unidade</h1>
+            <p className="text-sm text-muted-foreground">Cadastre uma unidade com todas as informações</p>
           </div>
         </div>
       </div>
@@ -113,8 +113,8 @@ export default function NewUnitFlowPage() {
                           isActive
                             ? "bg-primary border-primary text-white"
                             : isCompleted || isPast
-                            ? "bg-green-500/10 border-green-500 text-green-400"
-                            : "bg-gray-800 border-gray-700 text-gray-400"
+                            ? "bg-success/10 border-green-500 text-success"
+                            : "bg-card border-border text-muted-foreground"
                         }`}
                       >
                         {isCompleted || isPast ? (
@@ -126,12 +126,12 @@ export default function NewUnitFlowPage() {
                       <div className="mt-2 text-center">
                         <p
                           className={`text-xs font-medium ${
-                            isActive ? "text-gray-300" : "text-gray-500"
+                            isActive ? "text-foreground" : "text-muted-foreground"
                           }`}
                         >
                           {step.label}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">{step.description}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{step.description}</p>
                       </div>
                     </div>
                     {index < steps.length - 1 && (
@@ -152,13 +152,13 @@ export default function NewUnitFlowPage() {
         {currentStep === "complete" ? (
           <Card className="card-elevated">
             <CardContent className="py-12 text-center">
-              <div className="w-16 h-16 rounded-full bg-green-500/10 border-2 border-green-500 flex items-center justify-center mx-auto mb-4">
-                <Check className="h-8 w-8 text-green-400" />
+              <div className="w-16 h-16 rounded-full bg-success/10 border-2 border-green-500 flex items-center justify-center mx-auto mb-4">
+                <Check className="h-8 w-8 text-success" />
               </div>
-              <h2 className="text-2xl font-semibold text-gray-300 mb-2">
+              <h2 className="text-2xl font-semibold text-foreground mb-2">
                 Cadastro Concluído!
               </h2>
-              <p className="text-gray-400 mb-6">
+              <p className="text-muted-foreground mb-6">
                 A unidade foi cadastrada com sucesso. Você pode continuar adicionando informações depois.
               </p>
               <div className="flex gap-3 justify-center">
@@ -226,7 +226,7 @@ export default function NewUnitFlowPage() {
 
               {currentStep === "residents" && unitId && (
                 <div className="space-y-4">
-                  <div className="text-sm text-gray-400 mb-4">
+                  <div className="text-sm text-muted-foreground mb-4">
                     Você pode adicionar múltiplos moradores. Após adicionar um, pode adicionar mais ou continuar.
                   </div>
                   <UserForm
@@ -252,7 +252,7 @@ export default function NewUnitFlowPage() {
 
               {currentStep === "vehicles" && unitId && (
                 <div className="space-y-4">
-                  <div className="text-sm text-gray-400 mb-4">
+                  <div className="text-sm text-muted-foreground mb-4">
                     Você pode adicionar múltiplos veículos. Após adicionar um, pode adicionar mais ou continuar.
                   </div>
                   <VehicleForm
@@ -278,7 +278,7 @@ export default function NewUnitFlowPage() {
 
               {currentStep === "pets" && unitId && (
                 <div className="space-y-4">
-                  <div className="text-sm text-gray-400 mb-4">
+                  <div className="text-sm text-muted-foreground mb-4">
                     Você pode adicionar múltiplos pets. Após adicionar um, pode adicionar mais ou finalizar.
                   </div>
                   <PetForm

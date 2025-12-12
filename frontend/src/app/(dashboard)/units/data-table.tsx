@@ -113,7 +113,7 @@ export function createColumns(
       },
       cell: ({ row }) => {
         const block = row.getValue("block") as string
-        return block ? <div className="text-sm">{block}</div> : <span className="text-gray-400">-</span>
+        return block ? <div className="text-sm">{block}</div> : <span className="text-muted-foreground">-</span>
       },
     },
     {
@@ -132,7 +132,7 @@ export function createColumns(
       },
       cell: ({ row }) => {
         const floor = row.getValue("floor") as number
-        return floor ? <div className="text-sm">{floor}º</div> : <span className="text-gray-400">-</span>
+        return floor ? <div className="text-sm">{floor}º</div> : <span className="text-muted-foreground">-</span>
       },
     },
     {
@@ -151,7 +151,7 @@ export function createColumns(
       },
       cell: ({ row }) => {
         const area = row.getValue("area") as number
-        return area ? <div className="text-sm">{area.toFixed(2)}</div> : <span className="text-gray-400">-</span>
+        return area ? <div className="text-sm">{area.toFixed(2)}</div> : <span className="text-muted-foreground">-</span>
       },
     },
     {
@@ -170,7 +170,7 @@ export function createColumns(
       },
       cell: ({ row }) => {
         const spots = row.getValue("parking_spots") as number
-        return spots ? <div className="text-sm">{spots}</div> : <span className="text-gray-400">0</span>
+        return spots ? <div className="text-sm">{spots}</div> : <span className="text-muted-foreground">0</span>
       },
     },
     {
@@ -222,7 +222,7 @@ export function createColumns(
               {onDelete && (
                 <DropdownMenuItem
                   onClick={() => onDelete(unit.id)}
-                  className="text-red-400"
+                  className="text-destructive"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Excluir
@@ -369,7 +369,7 @@ export default function UnitsDataTable({
           globalSearchPlaceholder="Buscar por número, bloco ou descrição..."
         />
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-muted-foreground">
             Mostrando {table.getFilteredRowModel().rows.length} de {data.length} unidade(s)
             {table.getFilteredRowModel().rows.length !== data.length && (
               <span className="ml-1">(filtradas)</span>
@@ -448,7 +448,7 @@ export default function UnitsDataTable({
       </div>
       <div className="flex items-center justify-between py-4 gap-4 flex-wrap">
         <div className="flex items-center gap-2">
-          <p className="text-sm text-gray-400">Linhas por página:</p>
+          <p className="text-sm text-muted-foreground">Linhas por página:</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -512,7 +512,7 @@ export default function UnitsDataTable({
           </div>
         </div>
         {Object.keys(rowSelection).length > 0 && (
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-muted-foreground">
             {Object.keys(rowSelection).length} unidade(s) selecionada(s)
           </div>
         )}

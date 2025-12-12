@@ -202,7 +202,7 @@ export function PetForm({ open, onOpenChange, petId, defaultUnitId, onSuccess }:
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
                 {error}
               </div>
             )}
@@ -212,7 +212,7 @@ export function PetForm({ open, onOpenChange, petId, defaultUnitId, onSuccess }:
               name="unit_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Unidade <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel>Unidade <span className="text-destructive">*</span></FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -239,7 +239,7 @@ export function PetForm({ open, onOpenChange, petId, defaultUnitId, onSuccess }:
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nome <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel>Nome <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Nome do pet" {...field} />
                     </FormControl>
@@ -253,7 +253,7 @@ export function PetForm({ open, onOpenChange, petId, defaultUnitId, onSuccess }:
                 name="species"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Espécie <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel>Espécie <span className="text-destructive">*</span></FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>

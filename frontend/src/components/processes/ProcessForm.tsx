@@ -204,7 +204,7 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">
-              Nome do Processo <span className="text-red-400">*</span>
+              Nome do Processo <span className="text-destructive">*</span>
             </Label>
             <Input
               id="name"
@@ -212,14 +212,14 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
               placeholder="Ex: Definição e Revisão de Processos"
             />
             {errors.name && (
-              <p className="text-sm text-red-400">{errors.name.message}</p>
+              <p className="text-sm text-destructive">{errors.name.message}</p>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="category">
-                Categoria <span className="text-red-400">*</span>
+                Categoria <span className="text-destructive">*</span>
               </Label>
               <Select
                 value={category}
@@ -237,13 +237,13 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
                 </SelectContent>
               </Select>
               {errors.category && (
-                <p className="text-sm text-red-400">{errors.category.message}</p>
+                <p className="text-sm text-destructive">{errors.category.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="document_type">
-                Tipo de Documento <span className="text-red-400">*</span>
+                Tipo de Documento <span className="text-destructive">*</span>
               </Label>
               <Select
                 value={documentType}
@@ -261,7 +261,7 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
                 </SelectContent>
               </Select>
               {errors.document_type && (
-                <p className="text-sm text-red-400">{errors.document_type.message}</p>
+                <p className="text-sm text-destructive">{errors.document_type.message}</p>
               )}
             </div>
           </div>
@@ -292,13 +292,13 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
                 {entities.map((entity, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-1 px-2 py-1 bg-slate-800 rounded-md text-sm"
+                    className="flex items-center gap-1 px-2 py-1 bg-card rounded-md text-sm"
                   >
                     <span>{entity}</span>
                     <button
                       type="button"
                       onClick={() => removeEntity(index)}
-                      className="ml-1 hover:text-red-400"
+                      className="ml-1 hover:text-destructive"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -346,7 +346,7 @@ flowchart TD
                 href="https://mermaid.js.org/intro/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#00ade8] hover:underline ml-1"
+                className="text-primary hover:underline ml-1"
               >
                 Documentação Mermaid
               </a>
