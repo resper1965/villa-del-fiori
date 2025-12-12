@@ -65,9 +65,9 @@ export default function LoginPage() {
             <Image
               src="/logo.png"
               alt="Gabi - Síndica Virtual"
-              width={200}
-              height={80}
-              className="h-auto w-auto max-w-[200px]"
+              width={600}
+              height={240}
+              className="h-auto w-auto max-w-[600px]"
               priority
             />
           </div>

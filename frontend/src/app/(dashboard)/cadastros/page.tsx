@@ -27,17 +27,19 @@ export default function CadastrosPage() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ["cadastros-stats"],
     queryFn: async () => {
-      const [units, vehicles, suppliers, pets] = await Promise.all([
+      const [units, vehicles, suppliers, pets, condominiums] = await Promise.all([
         supabase.from("units").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("suppliers").select("id", { count: "exact", head: true }).eq("is_active", true),
         supabase.from("pets").select("id", { count: "exact", head: true }).eq("is_active", true),
+        supabase.from("condominiums").select("id", { count: "exact", head: true }).eq("is_active", true),
       ])
       return {
         units: units.count || 0,
         vehicles: vehicles.count || 0,
         suppliers: suppliers.count || 0,
         pets: pets.count || 0,
+        condominiums: condominiums.count || 0,
       }
     },
     staleTime: 2 * 60 * 1000,
@@ -48,6 +50,15 @@ export default function CadastrosPage() {
       title: "Estrutura do Condomínio",
       description: "Cadastre unidades e estrutura do condomínio",
       items: [
+        {
+          title: "Condomínios",
+          description: "Cadastre condomínios do sistema",
+          icon: Building2,
+          href: "/condominiums",
+          color: "bg-info/10 text-info border-info/20",
+          count: stats?.condominiums || 0,
+          quickAction: () => router.push("/condominiums"),
+        },
         {
           title: "Unidades",
           description: "Cadastre apartamentos e casas",

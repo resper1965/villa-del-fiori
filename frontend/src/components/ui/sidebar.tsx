@@ -192,7 +192,7 @@ const Sidebar = React.forwardRef<
       <div
         data-sidebar="sidebar"
         className={cn(
-          "duration-200 relative flex h-full w-[--sidebar-width] flex-col bg-sidebar border-r border-sidebar-border transition-[width] ease-linear",
+          "duration-200 relative flex h-screen w-[--sidebar-width] flex-col bg-sidebar border-r border-sidebar-border transition-[width] ease-linear",
           "group-data-[collapsible=icon]:w-[--sidebar-width-icon]",
           className
         )}
@@ -298,7 +298,7 @@ const SidebarHeader = React.forwardRef<HTMLDivElement, React.ComponentProps<"div
       <div
         ref={ref}
         data-sidebar="header"
-        className={cn("flex h-[73px] shrink-0 items-center gap-2 border-b border-sidebar-border px-4", className)}
+        className={cn("flex h-[180px] shrink-0 items-center gap-2 border-b border-sidebar-border px-4", className)}
         {...props}
       />
     )

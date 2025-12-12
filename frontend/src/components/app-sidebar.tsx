@@ -65,18 +65,18 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b border-sidebar-border">
+    <Sidebar collapsible="icon" className="flex flex-col h-screen">
+      <SidebarHeader className="border-b border-sidebar-border shrink-0">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard" className="flex items-center justify-center h-full">
-                <div className="flex aspect-square items-center justify-center rounded-lg h-[56px] w-[56px]">
+                <div className="flex aspect-square items-center justify-center rounded-lg h-[168px] w-[168px]">
                   <Image
                     src="/logo.png"
                     alt="Gabi - Síndica Virtual"
-                    width={56}
-                    height={56}
+                    width={168}
+                    height={168}
                     className="h-full w-full object-contain"
                     priority
                   />
@@ -86,7 +86,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="flex-1 min-h-0">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -108,7 +108,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="shrink-0 border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} tooltip="Sair">

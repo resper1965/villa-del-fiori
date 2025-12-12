@@ -60,16 +60,17 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        {/* Header com título e notificações */}
-        <header className="h-[73px] border-b border-border bg-card backdrop-blur-md flex items-center justify-between px-6">
+      <SidebarInset className="flex flex-col h-screen">
+        {/* Header com título e notificações - fixo no topo */}
+        <header className="h-[73px] shrink-0 border-b border-border bg-card backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-50">
           <div className="flex items-center gap-4">
             <SidebarTrigger />
             <PageTitle />
           </div>
           <NotificationBell />
         </header>
-        <main className="flex-1 overflow-auto bg-transparent">{children}</main>
+        {/* Conteúdo principal com scroll */}
+        <main className="flex-1 overflow-y-auto bg-transparent">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   )
