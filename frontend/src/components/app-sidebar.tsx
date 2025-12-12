@@ -70,14 +70,14 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/dashboard" className="flex items-center justify-center">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+              <Link href="/dashboard" className="flex items-center justify-center h-full">
+                <div className="flex aspect-square items-center justify-center rounded-lg h-[56px] w-[56px]">
                   <Image
                     src="/logo.png"
                     alt="Gabi - Síndica Virtual"
-                    width={32}
-                    height={32}
-                    className="h-auto w-auto"
+                    width={56}
+                    height={56}
+                    className="h-full w-full object-contain"
                     priority
                   />
                 </div>
