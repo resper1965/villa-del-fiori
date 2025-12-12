@@ -23,9 +23,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Loader2, Plus, X } from "lucide-react"
+import { Loader2, Plus, X, Sparkles } from "lucide-react"
 import { Process } from "@/types"
 import { EntityValidation } from "@/components/validation/EntityValidation"
+import { generateMermaidDiagram } from "@/lib/api/mermaid"
 
 const processSchema = z.object({
   name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
@@ -91,6 +92,7 @@ const documentTypeMap: Record<string, string> = {
 
 export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit }: ProcessFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isGeneratingMermaid, setIsGeneratingMermaid] = useState(false)
   const {
     register,
     handleSubmit,
@@ -115,6 +117,9 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
   const category = watch("category")
   const documentType = watch("document_type")
   const entities = watch("entities") || []
+  const workflow = watch("workflow") || []
+  const processName = watch("name")
+  const description = watch("description")
   const [isEntitiesValid, setIsEntitiesValid] = useState(true)
 
   useEffect(() => {
@@ -187,6 +192,29 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
   const removeEntity = (index: number) => {
     const currentEntities = entities || []
     setValue("entities", currentEntities.filter((_, i) => i !== index))
+  }
+
+  const handleGenerateMermaid = async () => {
+    if (!workflow || workflow.length === 0) {
+      alert("Adicione pelo menos um passo no workflow antes de gerar o diagrama")
+      return
+    }
+
+    setIsGeneratingMermaid(true)
+    try {
+      const mermaidCode = await generateMermaidDiagram({
+        workflow,
+        process_name: processName,
+        entities,
+        description,
+      })
+      setValue("mermaid_diagram", mermaidCode)
+    } catch (error: any) {
+      console.error("Erro ao gerar diagrama Mermaid:", error)
+      alert(error.message || "Erro ao gerar diagrama Mermaid. Tente novamente.")
+    } finally {
+      setIsGeneratingMermaid(false)
+    }
   }
 
   return (
@@ -326,7 +354,29 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="mermaid_diagram">Diagrama Mermaid</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="mermaid_diagram">Diagrama Mermaid</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateMermaid}
+                disabled={isGeneratingMermaid || !workflow || workflow.length === 0}
+                className="text-xs"
+              >
+                {isGeneratingMermaid ? (
+                  <>
+                    <Loader2 className="h-3 w-3 mr-1.5 animate-spin stroke-1" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-3 w-3 mr-1.5 stroke-1" />
+                    Gerar Automaticamente
+                  </>
+                )}
+              </Button>
+            </div>
             <Textarea
               id="mermaid_diagram"
               {...register("mermaid_diagram")}
@@ -336,20 +386,40 @@ flowchart TD
     B -->|Sim| C[Ação 1]
     B -->|Não| D[Ação 2]
     C --> E[Fim]
-    D --> E`}
+    D --> E
+
+Ou clique em "Gerar Automaticamente" para criar a partir do workflow.`}
               rows={8}
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              Use a sintaxe Mermaid para criar diagramas de fluxo, sequência, etc.
-              <a
-                href="https://mermaid.js.org/intro/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline ml-1"
-              >
-                Documentação Mermaid
-              </a>
+              {workflow && workflow.length > 0 ? (
+                <>
+                  Clique em "Gerar Automaticamente" para criar o diagrama a partir do workflow, ou{" "}
+                  <a
+                    href="https://mermaid.js.org/intro/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    edite manualmente
+                  </a>
+                  .
+                </>
+              ) : (
+                <>
+                  Adicione passos no workflow e clique em "Gerar Automaticamente", ou{" "}
+                  <a
+                    href="https://mermaid.js.org/intro/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    crie manualmente
+                  </a>
+                  .
+                </>
+              )}
             </p>
           </div>
 
