@@ -4,16 +4,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 serve(async (req) => {
   // CORS headers
   if (req.method === 'OPTIONS') {
-    return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      },
-    })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
@@ -43,7 +43,10 @@ serve(async (req) => {
         JSON.stringify({ error: 'Invalid or expired token' }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          },
         }
       )
     }
@@ -90,7 +93,7 @@ serve(async (req) => {
           status: 200,
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            ...corsHeaders,
           },
         }
       )
@@ -115,7 +118,7 @@ serve(async (req) => {
           status: 200,
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            ...corsHeaders,
           },
         }
       )
@@ -128,10 +131,13 @@ serve(async (req) => {
       if (!notificationId) {
         return new Response(
           JSON.stringify({ error: 'Notification ID required' }),
-          {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-          }
+        {
+          status: 400,
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          },
+        }
         )
       }
 
@@ -153,7 +159,7 @@ serve(async (req) => {
           status: 200,
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            ...corsHeaders,
           },
         }
       )
@@ -178,7 +184,7 @@ serve(async (req) => {
           status: 200,
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            ...corsHeaders,
           },
         }
       )
@@ -188,7 +194,10 @@ serve(async (req) => {
       JSON.stringify({ error: 'Endpoint not found' }),
       {
         status: 404,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...corsHeaders,
+        },
       }
     )
   } catch (error: any) {
@@ -199,13 +208,13 @@ serve(async (req) => {
         error: error.message || 'Erro ao processar notificações',
         details: error.toString(),
       }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      }
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          },
+        }
     )
   }
 })

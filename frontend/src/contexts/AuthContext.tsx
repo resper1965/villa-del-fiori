@@ -63,8 +63,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Com timeout muito curto (800ms) para não bloquear a inicialização
       // E opção de pular completamente para carregamento rápido
       let stakeholder = null
-      if (!skipStakeholderQuery) {
+      if (!skipStakeholderQuery && supabaseUser.id) {
         try {
+          // Validar que o ID é um UUID válido (remover qualquer sufixo estranho)
+          const userId = supabaseUser.id.split(':')[0].trim()
+          
+          // Verificar se é um UUID válido
+          const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+          if (!uuidRegex.test(userId)) {
+            console.warn('AuthContext: ID de usuário inválido:', supabaseUser.id)
+            throw new Error('Invalid user ID format')
+          }
+          
           const timeoutPromise = new Promise((_, reject) => 
             setTimeout(() => reject(new Error("Timeout")), 800) // Reduzido para 800ms
           )
@@ -72,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const queryPromise = supabase
             .from("stakeholders")
             .select("id, name, type, unit_id, unit:units(id, number, block, floor)")
-            .eq("auth_user_id", supabaseUser.id)
+            .eq("auth_user_id", userId)
             .maybeSingle()
           
           const result = await Promise.race([queryPromise, timeoutPromise]) as any

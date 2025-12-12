@@ -14,13 +14,17 @@ let mermaidInitialized = false
 const initMermaid = () => {
   if (mermaidInitialized) return
   
+  // Converter HSL para hex para o Mermaid
+  // --primary: 197 100% 45% = #00ade8
+  const primaryColor = "#00ade8"
+  
   mermaid.initialize({
     startOnLoad: false,
     theme: "dark",
     themeVariables: {
-      primaryColor: "hsl(var(--primary))",
+      primaryColor: primaryColor,
       primaryTextColor: "#ffffff",
-      primaryBorderColor: "hsl(var(--primary))",
+      primaryBorderColor: primaryColor,
       lineColor: "#6b7280",
       secondaryColor: "#1f2937",
       tertiaryColor: "#111827",
@@ -34,22 +38,22 @@ const initMermaid = () => {
       clusterBkg: "#1f2937",
       clusterBorder: "#374151",
       defaultLinkColor: "#60a5fa",
-      titleColor: "hsl(var(--primary))",
+      titleColor: primaryColor,
       edgeLabelBackground: "#1f2937",
-      actorBorder: "hsl(var(--primary))",
+      actorBorder: primaryColor,
       actorBkg: "#1f2937",
       actorTextColor: "#f9fafb",
       actorLineColor: "#6b7280",
       signalColor: "#f9fafb",
       signalTextColor: "#f9fafb",
       labelBoxBkgColor: "#1f2937",
-      labelBoxBorderColor: "hsl(var(--primary))",
+      labelBoxBorderColor: primaryColor,
       labelTextColor: "#f9fafb",
       loopTextColor: "#f9fafb",
-      noteBorderColor: "hsl(var(--primary))",
+      noteBorderColor: primaryColor,
       noteBkgColor: "#1f2937",
       noteTextColor: "#f9fafb",
-      activationBorderColor: "hsl(var(--primary))",
+      activationBorderColor: primaryColor,
       activationBkgColor: "#374151",
       sequenceNumberColor: "#111827",
       sectionBkgColor: "#1f2937",
