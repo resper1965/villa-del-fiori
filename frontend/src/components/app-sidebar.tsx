@@ -23,6 +23,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/contexts/AuthContext"
 import { useRBAC } from "@/lib/hooks/useRBAC"
@@ -34,6 +35,8 @@ export function AppSidebar() {
   const router = useRouter()
   const { logout } = useAuth()
   const { canAccessDashboard, canAccessChat, canApproveUsers } = useRBAC()
+  const { state } = useSidebar()
+  const isCollapsed = state === "collapsed"
 
   const handleLogout = () => {
     logout()
@@ -70,15 +73,19 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/dashboard" className="flex items-center justify-center w-full h-full p-2">
-                <Image
-                  src="/logo.png"
-                  alt="Gabi - Síndica Virtual"
-                  width={84}
-                  height={84}
-                  className="w-auto h-auto max-h-[69px] object-contain object-center"
-                  priority
-                />
+              <Link href="/dashboard" className="flex items-center justify-start w-full h-full p-2">
+                {isCollapsed ? (
+                  <span className="text-xl font-semibold text-primary">G.</span>
+                ) : (
+                  <Image
+                    src="/logo.png"
+                    alt="Gabi - Síndica Virtual"
+                    width={84}
+                    height={84}
+                    className="w-auto h-auto max-h-[69px] object-contain object-left"
+                    priority
+                  />
+                )}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
