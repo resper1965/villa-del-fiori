@@ -69,17 +69,22 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border shrink-0">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/dashboard" className="flex items-center justify-center h-full">
-                <div className="flex aspect-square items-center justify-center rounded-lg h-[84px] w-[84px] p-1">
-                  <Image
-                    src="/logo.png"
-                    alt="Gabi - Síndica Virtual"
-                    width={84}
-                    height={84}
-                    className="h-full w-full object-contain object-center"
-                    priority
-                  />
+            <SidebarMenuButton size="lg" asChild className="h-full p-0 hover:bg-transparent">
+              <Link 
+                href="/dashboard" 
+                className="flex items-center justify-center h-full w-full group/logo transition-opacity hover:opacity-90"
+              >
+                <div className="flex items-center justify-center w-full h-full px-3 py-4">
+                  <div className="relative w-full max-w-[64px] aspect-square flex items-center justify-center">
+                    <Image
+                      src="/logo.svg"
+                      alt="Gabi - Síndica Virtual"
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-contain object-center transition-transform group-hover/logo:scale-105"
+                      priority
+                    />
+                  </div>
                 </div>
               </Link>
             </SidebarMenuButton>
