@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/components/app-sidebar"
 import { useAuth } from "@/contexts/AuthContext"
 import { NotificationBell } from "@/components/notifications/NotificationBell"
+import { PageTitle } from "@/components/PageTitle"
 
 export default function DashboardLayout({
   children,
@@ -60,9 +61,12 @@ export default function DashboardLayout({
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        {/* Header com notificações */}
+        {/* Header com título e notificações */}
         <header className="h-[73px] border-b border-gray-700/50 bg-gray-800/90 backdrop-blur-md flex items-center justify-between px-6">
-          <SidebarTrigger />
+          <div className="flex items-center gap-4">
+            <SidebarTrigger />
+            <PageTitle />
+          </div>
           <NotificationBell />
         </header>
         <main className="flex-1 overflow-auto bg-transparent">{children}</main>

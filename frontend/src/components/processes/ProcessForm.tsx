@@ -23,8 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Loader2 } from "lucide-react"
+import { Loader2, Plus, X } from "lucide-react"
 import { Process } from "@/types"
+import { EntityValidation } from "@/components/validation/EntityValidation"
 
 const processSchema = z.object({
   name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
@@ -113,6 +114,8 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
 
   const category = watch("category")
   const documentType = watch("document_type")
+  const entities = watch("entities") || []
+  const [isEntitiesValid, setIsEntitiesValid] = useState(true)
 
   useEffect(() => {
     if (process && open) {
@@ -154,6 +157,11 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
   }, [process, initialData, open, reset])
 
   const onFormSubmit = async (data: ProcessFormData) => {
+    // Validar entidades antes de submeter
+    if (!isEntitiesValid) {
+      return
+    }
+
     setIsSubmitting(true)
     try {
       await onSubmit(data)
@@ -164,6 +172,21 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const addEntity = () => {
+    const newEntity = prompt("Digite o nome da entidade:")
+    if (newEntity && newEntity.trim()) {
+      const currentEntities = entities || []
+      if (!currentEntities.includes(newEntity.trim())) {
+        setValue("entities", [...currentEntities, newEntity.trim()])
+      }
+    }
+  }
+
+  const removeEntity = (index: number) => {
+    const currentEntities = entities || []
+    setValue("entities", currentEntities.filter((_, i) => i !== index))
   }
 
   return (
@@ -263,6 +286,46 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="entities">Entidades Envolvidas</Label>
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                {entities.map((entity, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-1 px-2 py-1 bg-slate-800 rounded-md text-sm"
+                  >
+                    <span>{entity}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeEntity(index)}
+                      className="ml-1 hover:text-red-400"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addEntity}
+                  className="h-8"
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  Adicionar
+                </Button>
+              </div>
+              {entities.length > 0 && (
+                <EntityValidation
+                  entityNames={entities}
+                  onValidationChange={setIsEntitiesValid}
+                  showQuickCreate={true}
+                />
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="mermaid_diagram">Diagrama Mermaid</Label>
             <Textarea
               id="mermaid_diagram"
@@ -299,7 +362,7 @@ flowchart TD
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || !isEntitiesValid}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />

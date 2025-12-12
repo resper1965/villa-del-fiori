@@ -18,6 +18,7 @@ export const useEntities = (params?: {
     staleTime: 5 * 60 * 1000, // Cache por 5 minutos
     gcTime: 10 * 60 * 1000, // Manter em cache por 10 minutos
     refetchOnWindowFocus: false,
+    refetchOnMount: false, // Usar cache se disponível
     meta: {
       errorMessage: "Erro ao carregar entidades. Tente novamente.",
     },

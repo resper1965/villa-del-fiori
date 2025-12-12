@@ -17,10 +17,11 @@ export default function ApprovalsPage() {
   const [selectedProcess, setSelectedProcess] = useState<any | null>(null)
 
   // Buscar processos pendentes de aprovação
+  // OTIMIZAÇÃO: Reduzir page_size de 100 para 30
   const { data: apiData, isLoading } = useProcesses({
     status: "em_revisao",
     page: 1,
-    page_size: 100,
+    page_size: 30, // Reduzido de 100 para 30 - OTIMIZAÇÃO
   })
 
   const approveMutation = useApproveProcess()
@@ -72,22 +73,16 @@ export default function ApprovalsPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="h-[73px] border-b border-border flex items-center px-6">
-        <h1 className="text-lg font-semibold text-foreground">
-          Aprovações
-        </h1>
-      </div>
-      <div className="p-6">
-        {isLoading ? (
+    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+      {isLoading ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground stroke-1" />
-              <p className="text-muted-foreground">Carregando processos pendentes...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400 stroke-1" />
+              <p className="text-gray-400">Carregando processos pendentes...</p>
             </CardContent>
           </Card>
-        ) : pendingProcesses.length === 0 ? (
-          <Card>
+      ) : pendingProcesses.length === 0 ? (
+        <Card>
             <CardHeader>
               <CardTitle>Aprovações Pendentes</CardTitle>
               <CardDescription>
@@ -95,20 +90,20 @@ export default function ApprovalsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <Clock className="h-12 w-12 mx-auto mb-4 text-muted-foreground stroke-1" />
+              <div className="text-center py-12 text-gray-400">
+                <Clock className="h-12 w-12 mx-auto mb-4 text-gray-400 stroke-1" />
                 <p>Nenhum processo pendente de aprovação.</p>
               </div>
             </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
+        </Card>
+      ) : (
+        <div className="space-y-4">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-sm font-medium text-muted-foreground mb-1">
+                <h2 className="text-sm font-medium text-gray-400 mb-1">
                   Processos Pendentes
                 </h2>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-gray-400">
                   {pendingProcesses.length} processo(s) aguardando sua aprovação
                 </p>
               </div>
@@ -127,14 +122,14 @@ export default function ApprovalsPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4 flex-1">
                         <div className="p-3 rounded-lg bg-muted">
-                          <FileText className="h-5 w-5 text-foreground stroke-1" />
+                          <FileText className="h-5 w-5 text-gray-300 stroke-1" />
                         </div>
                         <div className="flex-1">
                           <CardTitle className="text-base mb-2">{process.name}</CardTitle>
                           <CardDescription className="mb-3">
                             {process.description ? process.description.substring(0, 150) + "..." : "Sem descrição"}
                           </CardDescription>
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-4 text-xs text-gray-400">
                             <span>Categoria: {process.category}</span>
                             {process.created_at && (
                               <>
@@ -182,10 +177,10 @@ export default function ApprovalsPage() {
                 </Card>
               )
             })}
-          </div>
-        )}
+        </div>
+      )}
 
-        {selectedProcess && (
+      {selectedProcess && (
           <>
             <ApprovalDialog
               open={approvalDialogOpen}
@@ -200,8 +195,7 @@ export default function ApprovalsPage() {
               onReject={handleReject}
             />
           </>
-        )}
-      </div>
+      )}
     </div>
   )
 }

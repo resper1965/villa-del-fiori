@@ -1,16 +1,27 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase/client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle, XCircle, History, User, Loader2, GitBranch } from "lucide-react"
+import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle, XCircle, History, User, Loader2, GitBranch, GitCompare } from "lucide-react"
 import { MermaidDiagram } from "@/components/processes/MermaidDiagram"
 import { RACIMatrix } from "@/components/processes/RACIMatrix"
-import { useProcess } from "@/lib/hooks/useProcesses"
+import { useProcess, useSubmitProcess, useRefactorProcess } from "@/lib/hooks/useProcesses"
 import { useApproveProcess, useRejectProcess } from "@/lib/hooks/useApprovals"
 import { ApprovalDialog } from "@/components/approvals/ApprovalDialog"
 import { RejectionDialog } from "@/components/approvals/RejectionDialog"
+import { RefactorProcessDialog } from "@/components/processes/RefactorProcessDialog"
+import { VersionHistory } from "@/components/processes/VersionHistory"
+import { RejectionDetails } from "@/components/processes/RejectionDetails"
+import { ApprovalProgress } from "@/components/processes/ApprovalProgress"
+import { VersionComparison } from "@/components/processes/VersionComparison"
+import { useAuth } from "@/contexts/AuthContext"
+import { Send, RotateCcw } from "lucide-react"
+import { approvalsApiSupabase } from "@/lib/api/approvals-supabase"
+import { useQuery } from "@tanstack/react-query"
+import { validateProcessForSubmission } from "@/lib/utils/processValidation"
 
 export default function ProcessDetailPage() {
   const params = useParams()
@@ -19,13 +30,55 @@ export default function ProcessDetailPage() {
   
   // Buscar processo da API (sem fallback mock)
   const { data: process, isLoading, error, isError } = useProcess(processId)
+  const { user } = useAuth()
   const approveMutation = useApproveProcess()
   const rejectMutation = useRejectProcess()
+  const submitMutation = useSubmitProcess()
+  const refactorMutation = useRefactorProcess()
   
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false)
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false)
+  const [refactorDialogOpen, setRefactorDialogOpen] = useState(false)
+  const [showVersionComparison, setShowVersionComparison] = useState(false)
+  const [currentStakeholderId, setCurrentStakeholderId] = useState<string | null>(null)
 
   const displayProcess = process
+
+  // Buscar aprovações e rejeições do processo
+  const { data: approvals = [] } = useQuery({
+    queryKey: ["process-approvals", processId],
+    queryFn: () => approvalsApiSupabase.getProcessApprovals(processId),
+    enabled: !!processId,
+  })
+
+  const { data: rejections = [] } = useQuery({
+    queryKey: ["process-rejections", processId],
+    queryFn: () => approvalsApiSupabase.getProcessRejections(processId),
+    enabled: !!processId,
+  })
+
+  // Buscar stakeholder ID do usuário atual
+  useEffect(() => {
+    const fetchStakeholderId = async () => {
+      if (!user?.email) return
+      
+      try {
+        const { data: stakeholder } = await supabase
+          .from("stakeholders")
+          .select("id")
+          .eq("email", user.email)
+          .maybeSingle()
+
+        if (stakeholder) {
+          setCurrentStakeholderId(stakeholder.id)
+        }
+      } catch (error) {
+        console.error("Error fetching stakeholder ID:", error)
+      }
+    }
+
+    fetchStakeholderId()
+  }, [user])
 
   const handleApprove = async (comment?: string) => {
     if (!displayProcess || !process?.current_version?.id) return
@@ -57,10 +110,49 @@ export default function ProcessDetailPage() {
     }
   }
 
+  const handleSubmitForApproval = async () => {
+    if (!displayProcess) return
+    
+    // Validar processo antes de enviar
+    const validation = validateProcessForSubmission(displayProcess)
+    if (!validation.isValid) {
+      alert(validation.errors.join("\n"))
+      return
+    }
+    
+    try {
+      await submitMutation.mutateAsync(displayProcess.id)
+    } catch (error: any) {
+      console.error("Erro ao enviar para aprovação:", error)
+      alert(error.message || "Erro ao enviar processo para aprovação")
+    }
+  }
+
+  const handleRefactor = async (changeSummary?: string) => {
+    if (!displayProcess) return
+    
+    try {
+      await refactorMutation.mutateAsync({
+        id: displayProcess.id,
+        changeSummary,
+      })
+      setRefactorDialogOpen(false)
+    } catch (error: any) {
+      console.error("Erro ao refazer processo:", error)
+      alert(error.message || "Erro ao refazer processo")
+    }
+  }
+
+  // Verificar se usuário é o criador (comparar stakeholder.id com creator_id)
+  const isCreator = currentStakeholderId && displayProcess && currentStakeholderId === displayProcess.creator_id
+  const canEdit = displayProcess?.status === "rascunho" && isCreator
+  const canSubmit = displayProcess?.status === "rascunho" && isCreator
+  const canRefactor = displayProcess?.status === "rejeitado" && isCreator
+
   if (isLoading) {
     return (
-      <div className="min-h-screen">
-        <div className="h-[73px] border-b border-border/50 flex items-center px-4 md:px-6">
+      <div className="min-h-screen bg-transparent">
+        <div className="h-[73px] border-b border-gray-700/50/50 flex items-center px-4 md:px-6">
           <div className="h-4 w-32 bg-muted animate-pulse rounded" />
         </div>
         <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
@@ -92,9 +184,9 @@ export default function ProcessDetailPage() {
   // Mostrar erro se houver
   if (isError || error) {
     return (
-      <div className="min-h-screen">
-        <div className="h-[73px] border-b border-border/50 flex items-center px-4 md:px-6">
-          <h1 className="text-lg font-semibold text-foreground">Erro ao carregar processo</h1>
+      <div className="min-h-screen bg-transparent">
+        <div className="h-[73px] border-b border-gray-700/50/50 flex items-center px-4 md:px-6">
+          <h1 className="text-lg font-semibold text-gray-300">Erro ao carregar processo</h1>
         </div>
         <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
           <Card className="card-elevated mb-4">
@@ -115,14 +207,14 @@ export default function ProcessDetailPage() {
 
   if (!displayProcess && !isLoading) {
     return (
-      <div className="min-h-screen">
-        <div className="h-[73px] border-b border-border/50 flex items-center px-4 md:px-6">
-          <h1 className="text-lg font-semibold text-foreground">Processo não encontrado</h1>
+      <div className="min-h-screen bg-transparent">
+        <div className="h-[73px] border-b border-gray-700/50/50 flex items-center px-4 md:px-6">
+          <h1 className="text-lg font-semibold text-gray-300">Processo não encontrado</h1>
         </div>
         <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
           <Card className="card-elevated">
             <CardContent className="pt-6">
-              <p className="text-muted-foreground mb-4">O processo solicitado não foi encontrado.</p>
+              <p className="text-gray-400 mb-4">O processo solicitado não foi encontrado.</p>
               <Button onClick={() => router.push("/processes")} variant="outline">
                 <ArrowLeft className="h-4 w-4 mr-2 stroke-1" />
                 Voltar para Processos
@@ -142,7 +234,7 @@ export default function ProcessDetailPage() {
   const statusConfig = {
     aprovado: { icon: CheckCircle, color: "text-green-400", label: "Aprovado" },
     em_revisao: { icon: Clock, color: "text-yellow-400", label: "Em Revisão" },
-    rascunho: { icon: FileText, color: "text-muted-foreground", label: "Rascunho" },
+    rascunho: { icon: FileText, color: "text-gray-400", label: "Rascunho" },
     rejeitado: { icon: AlertCircle, color: "text-red-400", label: "Rejeitado" },
   }
   const statusInfo = statusConfig[displayProcess.status as keyof typeof statusConfig] || statusConfig.aprovado
@@ -152,8 +244,8 @@ export default function ProcessDetailPage() {
   const processVersion = displayProcess?.current_version_number || 1
 
   return (
-    <div className="min-h-screen">
-      <div className="h-[73px] border-b border-border/50 flex items-center px-4 md:px-6">
+    <div className="min-h-screen bg-transparent">
+      <div className="h-[73px] border-b border-gray-700/50/50 flex items-center px-4 md:px-6">
         <Button
           variant="ghost"
           size="sm"
@@ -167,7 +259,7 @@ export default function ProcessDetailPage() {
           <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
             v{processVersion}
           </span>
-          <h1 className="text-lg font-semibold text-foreground">
+          <h1 className="text-lg font-semibold text-gray-300">
             {displayProcess.name}
           </h1>
         </div>
@@ -180,14 +272,14 @@ export default function ProcessDetailPage() {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="p-2 rounded-lg bg-muted flex-shrink-0">
-                    <FileText className="h-5 w-5 text-foreground stroke-1" />
+                    <FileText className="h-5 w-5 text-gray-300 stroke-1" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <CardTitle className="text-base sm:text-lg mb-1 break-words">{displayProcess.name}</CardTitle>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs sm:text-sm text-muted-foreground">{displayProcess.category}</span>
-                      <span className="text-muted-foreground hidden sm:inline">•</span>
-                      <span className="text-xs sm:text-sm text-muted-foreground">{displayProcess.document_type}</span>
+                      <span className="text-xs sm:text-sm text-gray-400">{displayProcess.category}</span>
+                      <span className="text-gray-400 hidden sm:inline">•</span>
+                      <span className="text-xs sm:text-sm text-gray-400">{displayProcess.document_type}</span>
                     </div>
                   </div>
                 </div>
@@ -200,7 +292,7 @@ export default function ProcessDetailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-foreground leading-relaxed">{displayProcess.description || "Sem descrição"}</p>
+              <p className="text-gray-300 leading-relaxed">{displayProcess.description || "Sem descrição"}</p>
             </CardContent>
           </Card>
 
@@ -211,7 +303,7 @@ export default function ProcessDetailPage() {
               <Card className="card-elevated">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <GitBranch className="h-4 w-4 text-muted-foreground stroke-1" />
+                    <GitBranch className="h-4 w-4 text-gray-400 stroke-1" />
                     Diagrama do Processo
                   </CardTitle>
                   <CardDescription className="text-xs">Visualização do fluxo do processo em diagrama</CardDescription>
@@ -240,7 +332,7 @@ export default function ProcessDetailPage() {
                       <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
                         {index + 1}
                       </span>
-                      <span className="text-sm text-foreground pt-0.5">{step}</span>
+                      <span className="text-sm text-gray-300 pt-0.5">{step}</span>
                     </li>
                   ))}
                 </ol>
@@ -260,7 +352,7 @@ export default function ProcessDetailPage() {
                   {displayProcess.entities.map((entity, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 rounded-md bg-muted text-foreground text-xs border border-border/50"
+                      className="px-2 py-1 rounded-md bg-muted text-gray-300 text-xs border border-border/50"
                     >
                       {entity}
                     </span>
@@ -297,76 +389,182 @@ export default function ProcessDetailPage() {
             </Card>
           )}
 
-          {/* History Card */}
-          <Card className="card-elevated">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <History className="h-5 w-5 text-muted-foreground stroke-1" />
-                Histórico de Versões
-              </CardTitle>
-              <CardDescription>Versões anteriores e histórico de alterações</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Versão Atual */}
-                <div className="flex items-start gap-2 p-2 rounded-lg border border-primary/30 bg-primary/5">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
-                    v{displayProcess.current_version_number || 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-medium text-foreground">
-                        Versão {displayProcess.current_version_number || 1} - {statusInfo.label}
-                      </span>
-                      <span className={`text-xs px-1.5 py-0.5 rounded ${
-                        displayProcess.status === "aprovado" 
-                          ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                          : displayProcess.status === "em_revisao"
-                          ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
-                          : displayProcess.status === "rejeitado"
-                          ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                          : "bg-primary/20 text-primary border border-primary/30"
-                      }`}>
-                        {statusInfo.label}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      Criada em {new Date(displayProcess.created_at).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric"
-                      })}
-                    </p>
-                    {displayProcess.current_version?.change_summary && (
-                      <p className="text-xs text-muted-foreground italic mt-1">
-                        {displayProcess.current_version.change_summary}
-                      </p>
-                    )}
-                  </div>
+          {/* Approval Progress - Mostrar quando processo está em revisão */}
+          {displayProcess.status === "em_revisao" && process?.current_version?.id && (
+            <ApprovalProgress
+              processId={displayProcess.id}
+              versionId={process.current_version.id}
+              approvals={approvals.filter((a: any) => a.version_id === process.current_version?.id)}
+              requiredApprovals={1} // Por enquanto, 1 aprovação é suficiente
+            />
+          )}
+
+          {/* Rejection Details - Mostrar quando processo está rejeitado */}
+          {displayProcess.status === "rejeitado" && rejections.length > 0 && (
+            <RejectionDetails rejections={rejections} />
+          )}
+
+          {/* Version Comparison */}
+          {showVersionComparison && process?.versions && process.versions.length > 1 && (
+            <VersionComparison
+              processId={displayProcess.id}
+              versions={process.versions}
+              onClose={() => setShowVersionComparison(false)}
+            />
+          )}
+
+          {/* History Card - Versões */}
+          {process?.versions && process.versions.length > 0 ? (
+            <>
+              <VersionHistory
+                processId={displayProcess.id}
+                versions={process.versions}
+                approvals={approvals}
+                rejections={rejections}
+                currentVersionNumber={displayProcess.current_version_number || 1}
+              />
+              {process.versions.length > 1 && (
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowVersionComparison(!showVersionComparison)}
+                    className="text-sm"
+                  >
+                    <GitCompare className="h-4 w-4 mr-2 stroke-1" />
+                    {showVersionComparison ? "Ocultar Comparação" : "Comparar Versões"}
+                  </Button>
                 </div>
-
-                {/* Mensagem se não houver histórico de aprovações */}
-                {displayProcess.status === "rascunho" && (
-                  <div className="text-center py-3 text-xs text-muted-foreground">
-                    <History className="h-6 w-6 mx-auto mb-1 opacity-50 stroke-1" />
-                    <p>Processo em rascunho - aguardando revisão e aprovação</p>
-                  </div>
-                )}
-                {displayProcess.status === "em_revisao" && (
-                  <div className="text-center py-3 text-xs text-muted-foreground">
-                    <Clock className="h-6 w-6 mx-auto mb-1 opacity-50 stroke-1" />
-                    <p>Processo em revisão pelo conselho consultivo</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Actions Card - Mostrar apenas se processo está em revisão ou rascunho */}
-          {(displayProcess.status === "em_revisao" || displayProcess.status === "rascunho") && (
+              )}
+            </>
+          ) : (
             <Card className="card-elevated">
               <CardHeader>
-                <CardTitle>Ações</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5 text-gray-400 stroke-1" />
+                  Histórico de Versões
+                </CardTitle>
+                <CardDescription>Versões anteriores e histórico de alterações</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Versão Atual */}
+                  <div className="flex items-start gap-2 p-2 rounded-lg border border-primary/30 bg-primary/5">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
+                      v{displayProcess.current_version_number || 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium text-gray-300">
+                          Versão {displayProcess.current_version_number || 1} - {statusInfo.label}
+                        </span>
+                        <span className={`text-xs px-1.5 py-0.5 rounded ${
+                          displayProcess.status === "aprovado" 
+                            ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                            : displayProcess.status === "em_revisao"
+                            ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                            : displayProcess.status === "rejeitado"
+                            ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                            : "bg-primary/20 text-primary border border-primary/30"
+                        }`}>
+                          {statusInfo.label}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 mb-1">
+                        Criada em {new Date(displayProcess.created_at).toLocaleDateString("pt-BR", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric"
+                        })}
+                      </p>
+                      {displayProcess.current_version?.change_summary && (
+                        <p className="text-xs text-gray-400 italic mt-1">
+                          {displayProcess.current_version.change_summary}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Mensagem se não houver histórico de aprovações */}
+                  {displayProcess.status === "rascunho" && (
+                    <div className="text-center py-3 text-xs text-gray-400">
+                      <History className="h-6 w-6 mx-auto mb-1 opacity-50 stroke-1" />
+                      <p>Processo em rascunho - aguardando revisão e aprovação</p>
+                    </div>
+                  )}
+                  {displayProcess.status === "em_revisao" && (
+                    <div className="text-center py-3 text-xs text-gray-400">
+                      <Clock className="h-6 w-6 mx-auto mb-1 opacity-50 stroke-1" />
+                      <p>Processo em revisão pelo conselho consultivo</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Actions Card - Criador: Enviar para Aprovação */}
+          {canSubmit && (
+            <Card className="card-elevated">
+              <CardHeader>
+                <CardTitle>Ações do Criador</CardTitle>
+                <CardDescription>Envie o processo para revisão pelos stakeholders</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  onClick={handleSubmitForApproval}
+                  className="bg-primary hover:bg-primary/90 text-white"
+                  disabled={submitMutation.isPending}
+                >
+                  {submitMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin stroke-1" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2 stroke-1" />
+                      Enviar para Aprovação
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Actions Card - Criador: Refazer Processo Rejeitado */}
+          {canRefactor && (
+            <Card className="card-elevated border-yellow-500/30">
+              <CardHeader>
+                <CardTitle className="text-yellow-400">Processo Rejeitado</CardTitle>
+                <CardDescription>Refaça o processo baseado nos motivos de rejeição</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  onClick={() => setRefactorDialogOpen(true)}
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                  disabled={refactorMutation.isPending}
+                >
+                  {refactorMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin stroke-1" />
+                      Refazendo...
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw className="h-4 w-4 mr-2 stroke-1" />
+                      Refazer Processo
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Actions Card - Stakeholders: Aprovar ou Rejeitar */}
+          {displayProcess.status === "em_revisao" && !isCreator && (
+            <Card className="card-elevated">
+              <CardHeader>
+                <CardTitle>Ações de Revisão</CardTitle>
                 <CardDescription>Revisar e aprovar ou rejeitar este processo</CardDescription>
               </CardHeader>
               <CardContent>
@@ -426,6 +624,13 @@ export default function ProcessDetailPage() {
             onOpenChange={setRejectionDialogOpen}
             processName={displayProcess.name}
             onReject={handleReject}
+          />
+          <RefactorProcessDialog
+            open={refactorDialogOpen}
+            onOpenChange={setRefactorDialogOpen}
+            processName={displayProcess.name}
+            onRefactor={handleRefactor}
+            isLoading={refactorMutation.isPending}
           />
         </>
       )}

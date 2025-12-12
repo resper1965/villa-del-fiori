@@ -25,12 +25,13 @@ export default function EntitiesPage() {
 
   const deleteMutation = useDeleteEntity()
 
+  // OTIMIZAÇÃO: Reduzir page_size de 100 para 50
   const { data, isLoading, error } = useEntities({
     type: selectedType !== "all" ? selectedType as EntityType : undefined,
     category: selectedCategory !== "all" ? selectedCategory as EntityCategory : undefined,
     search: searchQuery || undefined,
     page: 1,
-    page_size: 100,
+    page_size: 50, // Reduzido de 100 para 50 - OTIMIZAÇÃO
   })
 
   const entities = data?.items || []
@@ -60,35 +61,32 @@ export default function EntitiesPage() {
 
   const getTypeIcon = (type: EntityType) => {
     switch (type) {
-      case EntityType.PESSOA:
-        return Users
-      case EntityType.EMPRESA:
-        return Building2
-      case EntityType.SERVICO_EMERGENCIA:
+      case EntityType.SERVICO_PUBLICO:
         return AlertCircle
+      case EntityType.PRESTADOR_REFERENCIADO:
+        return Building2
       default:
         return Building2
     }
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="h-[73px] border-b border-border/50 flex items-center justify-between px-4 md:px-6">
-        <h1 className="text-lg font-semibold text-foreground">
-          Entidades
-        </h1>
+    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-sm text-gray-400">
+          Serviços públicos e prestadores referenciados (sem contrato)
+        </p>
         <Button onClick={() => setFormOpen(true)}>
           <Plus className="h-4 w-4 mr-2 stroke-1" />
           Nova Entidade
         </Button>
       </div>
-      <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
-        {/* Filtros */}
-        <div className="mb-4 space-y-2">
-          <div className="flex flex-col sm:flex-row gap-4">
+      {/* Filtros */}
+      <div className="mb-4 space-y-2">
+        <div className="flex flex-col sm:flex-row gap-4">
             {/* Busca */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground stroke-1" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 stroke-1" />
               <Input
                 placeholder="Buscar entidades..."
                 value={searchQuery}
@@ -133,44 +131,44 @@ export default function EntitiesPage() {
             </Select>
           </div>
 
-          {/* Botão limpar filtros */}
-          {hasFilters && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearFilters}
-                className="text-xs"
-              >
-                <X className="h-3 w-3 mr-1 stroke-1" />
-                Limpar Filtros
-              </Button>
-              <span className="text-xs text-muted-foreground">
-                {entities.length} entidade(s) encontrada(s)
-              </span>
-            </div>
-          )}
-        </div>
+        {/* Botão limpar filtros */}
+        {hasFilters && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearFilters}
+              className="text-xs"
+            >
+              <X className="h-3 w-3 mr-1 stroke-1" />
+              Limpar Filtros
+            </Button>
+            <span className="text-xs text-gray-400">
+              {entities.length} entidade(s) encontrada(s)
+            </span>
+          </div>
+        )}
+      </div>
 
-        {/* Lista de entidades - Bento Grid */}
-        {isLoading ? (
+      {/* Lista de entidades - Bento Grid */}
+      {isLoading ? (
           <Card className="card-elevated">
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground stroke-1" />
-              <p className="text-muted-foreground">Carregando entidades...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400 stroke-1" />
+              <p className="text-gray-400">Carregando entidades...</p>
             </CardContent>
           </Card>
-        ) : entities.length === 0 ? (
-          <Card className="card-elevated">
-            <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">
-                Nenhuma entidade encontrada com os filtros aplicados.
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {entities.map((entity) => {
+      ) : entities.length === 0 ? (
+        <Card className="card-elevated">
+          <CardContent className="py-12 text-center">
+            <p className="text-gray-400">
+              Nenhuma entidade encontrada com os filtros aplicados.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {entities.map((entity) => {
               const TypeIcon = getTypeIcon(entity.type)
               return (
                 <Card
@@ -181,10 +179,10 @@ export default function EntitiesPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 flex-1">
                         <div className="p-2 rounded-lg bg-muted/50">
-                          <TypeIcon className="h-4 w-4 text-foreground stroke-1" />
+                          <TypeIcon className="h-4 w-4 text-gray-300 stroke-1" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-sm font-medium text-foreground line-clamp-2">
+                          <CardTitle className="text-sm font-medium text-gray-300 line-clamp-2">
                             {entity.name}
                           </CardTitle>
                           <CardDescription className="text-xs mt-1">
@@ -215,24 +213,24 @@ export default function EntitiesPage() {
                   </CardHeader>
                   <CardContent className="pt-0 space-y-2">
                     {entity.phone && (
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2 text-xs text-gray-400">
                         <Phone className="h-3 w-3 stroke-1" />
                         <span>{entity.phone}</span>
                       </div>
                     )}
                     {entity.email && (
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2 text-xs text-gray-400">
                         <Mail className="h-3 w-3 stroke-1" />
                         <span className="truncate">{entity.email}</span>
                       </div>
                     )}
                     {entity.contact_person && (
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-gray-400">
                         Contato: {entity.contact_person}
                       </div>
                     )}
                     {entity.cnpj && (
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-gray-400">
                         CNPJ: {entity.cnpj}
                       </div>
                     )}
@@ -242,17 +240,16 @@ export default function EntitiesPage() {
                       </div>
                     )}
                     {entity.meeting_point && (
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-gray-400">
                         Ponto de encontro: {entity.meeting_point}
                       </div>
                     )}
                   </CardContent>
                 </Card>
               )
-            })}
-          </div>
-        )}
-      </div>
+          })}
+        </div>
+      )}
 
       <EntityForm
         open={formOpen}

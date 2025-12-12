@@ -104,10 +104,63 @@ async function getByIdFallback(id: string | number): Promise<ProcessDetailRespon
           change_summary: currentVersion.change_summary,
         }
       : undefined,
+    versions: (versions || []).map((v: any) => ({
+      id: v.id,
+      process_id: v.process_id,
+      version_number: v.version_number,
+      content: v.content || {},
+      content_text: v.content_text,
+      variables_applied: v.variables_applied || {},
+      entities_involved: v.entities_involved || [],
+      status: v.status || processData.status,
+      created_by: v.created_by,
+      created_at: v.created_at,
+      change_summary: v.change_summary,
+    })),
   }
 }
 
 export const processesApiSupabase = {
+  // Buscar estatísticas agregadas (otimizado para dashboard)
+  getStatistics: async (): Promise<{
+    total: number
+    approved: number
+    pending: number
+    rejected: number
+    draft: number
+  }> => {
+    // Query otimizada: usar contagens agregadas no banco (muito mais rápido)
+    // Fazer queries paralelas para cada status
+    const [totalResult, approvedResult, pendingResult, rejectedResult, draftResult] = await Promise.all([
+      supabase.from("processes").select("*", { count: "exact", head: true }),
+      supabase.from("processes").select("*", { count: "exact", head: true }).eq("status", "aprovado"),
+      supabase.from("processes").select("*", { count: "exact", head: true }).eq("status", "em_revisao"),
+      supabase.from("processes").select("*", { count: "exact", head: true }).eq("status", "rejeitado"),
+      supabase.from("processes").select("*", { count: "exact", head: true }).eq("status", "rascunho"),
+    ])
+
+    // Verificar erros
+    const errors = [totalResult.error, approvedResult.error, pendingResult.error, rejectedResult.error, draftResult.error].filter(Boolean)
+    if (errors.length > 0) {
+      console.error("Error fetching process statistics:", errors)
+      throw errors[0]
+    }
+
+    const total = totalResult.count || 0
+    const approved = approvedResult.count || 0
+    const pending = (pendingResult.count || 0) + (draftResult.count || 0) // Incluir rascunhos em pendentes
+    const rejected = rejectedResult.count || 0
+    const draft = draftResult.count || 0
+
+    return {
+      total,
+      approved,
+      pending,
+      rejected,
+      draft,
+    }
+  },
+
   // Listar processos
   list: async (params?: {
     category?: string
@@ -116,19 +169,16 @@ export const processesApiSupabase = {
     page_size?: number
   }): Promise<ProcessListResponse> => {
     const page = params?.page || 1
-    const pageSize = params?.page_size || 20
+    const pageSize = Math.min(params?.page_size || 20, 50) // Limitar máximo a 50
     const from = (page - 1) * pageSize
     const to = from + pageSize - 1
 
-    // Construir query - buscar processos e suas versões
+    // Construir query - OTIMIZADO: buscar apenas campos essenciais, SEM versões
+    // Versões serão carregadas apenas na página de detalhes
+    // Isso reduz drasticamente o tamanho da resposta (90%+ de redução)
     let query = supabase
       .from("processes")
-      .select(`
-        *,
-        versions:process_versions(
-          *
-        )
-      `, { count: "exact" })
+      .select("id, name, category, subcategory, document_type, status, current_version_number, creator_id, created_at, updated_at", { count: "exact" })
 
     // Aplicar filtros
     if (params?.category) {
@@ -150,14 +200,27 @@ export const processesApiSupabase = {
       throw error
     }
 
-    // Mapear processos e encontrar versão atual baseada no current_version_number
+    // Mapear processos - sem versões (otimização de performance)
+    // Versões serão carregadas apenas na página de detalhes
     const items = (data || []).map((process: any) => {
-      const versions = process.versions || []
-      const currentVersion = versions.find(
-        (v: any) => v.version_number === process.current_version_number
-      ) || versions[versions.length - 1] || null
-      
-      return mapProcessFromDB({ ...process, current_version: currentVersion })
+      // Criar objeto básico sem versão completa (só metadados)
+      return {
+        id: process.id,
+        name: process.name,
+        category: categoryMap[process.category] || process.category,
+        subcategory: process.subcategory || undefined,
+        document_type: process.document_type,
+        status: process.status,
+        current_version_number: process.current_version_number || 1,
+        creator_id: process.creator_id,
+        created_at: process.created_at,
+        updated_at: process.updated_at,
+        description: undefined, // Não carregar na listagem
+        workflow: [],
+        entities: [],
+        variables: [],
+        raci: undefined,
+      } as Process
     })
     
     const total = count || 0
@@ -206,24 +269,37 @@ export const processesApiSupabase = {
 
       const process = mapProcessFromDB({ ...processData, current_version: currentVersion })
 
-      return {
-        ...process,
-        current_version: currentVersion
-          ? {
-              id: currentVersion.id,
-              process_id: currentVersion.process_id,
-              version_number: currentVersion.version_number,
-              content: currentVersion.content || {},
-              content_text: currentVersion.content_text,
-              variables_applied: currentVersion.variables_applied || {},
-              entities_involved: currentVersion.entities_involved || [],
-              status: currentVersion.status || processData.status,
-              created_by: currentVersion.created_by || processData.creator_id,
-              created_at: currentVersion.created_at,
-              change_summary: currentVersion.change_summary,
-            }
-          : undefined,
-      }
+  return {
+    ...process,
+    current_version: currentVersion
+      ? {
+          id: currentVersion.id,
+          process_id: currentVersion.process_id,
+          version_number: currentVersion.version_number,
+          content: currentVersion.content || {},
+          content_text: currentVersion.content_text,
+          variables_applied: currentVersion.variables_applied || {},
+          entities_involved: currentVersion.entities_involved || [],
+          status: currentVersion.status || processData.status,
+          created_by: currentVersion.created_by || processData.creator_id,
+          created_at: currentVersion.created_at,
+          change_summary: currentVersion.change_summary,
+        }
+      : undefined,
+    versions: (versions || []).map((v: any) => ({
+      id: v.id,
+      process_id: v.process_id,
+      version_number: v.version_number,
+      content: v.content || {},
+      content_text: v.content_text,
+      variables_applied: v.variables_applied || {},
+      entities_involved: v.entities_involved || [],
+      status: v.status || processData.status,
+      created_by: v.created_by,
+      created_at: v.created_at,
+      change_summary: v.change_summary,
+    })),
+  }
     } catch (error) {
       console.error("Error in getById:", error)
       // Fallback: buscar separadamente
@@ -442,6 +518,178 @@ export const processesApiSupabase = {
       console.error("Error deleting process:", error)
       throw error
     }
+  },
+
+  // Enviar processo para aprovação
+  submitForApproval: async (id: string | number): Promise<Process> => {
+    // Obter usuário atual
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      throw new Error("User not authenticated")
+    }
+
+    // Buscar processo atual
+    const { data: process, error: processError } = await supabase
+      .from("processes")
+      .select("*")
+      .eq("id", id)
+      .single()
+
+    if (processError || !process) {
+      throw new Error("Process not found")
+    }
+
+    // Validar que processo está em rascunho
+    if (process.status !== "rascunho") {
+      throw new Error("Processo deve estar em rascunho para ser enviado para aprovação")
+    }
+
+    // Buscar stakeholder do usuário
+    const { data: stakeholder } = await supabase
+      .from("stakeholders")
+      .select("id")
+      .eq("email", user.email)
+      .single()
+
+    if (!stakeholder) {
+      throw new Error("Stakeholder not found for user")
+    }
+
+    // Validar que usuário é o criador
+    if (process.creator_id !== stakeholder.id) {
+      throw new Error("Apenas o criador do processo pode enviá-lo para aprovação")
+    }
+
+    // Validar que processo tem versão atual
+    if (!process.current_version_number) {
+      throw new Error("Processo deve ter uma versão para ser enviado para aprovação")
+    }
+
+    // Atualizar status para "em_revisao"
+    const { data: updatedProcess, error: updateError } = await supabase
+      .from("processes")
+      .update({
+        status: "em_revisao",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (updateError) {
+      console.error("Error updating process status:", updateError)
+      throw updateError
+    }
+
+    // Atualizar status da versão atual
+    const { error: versionUpdateError } = await supabase
+      .from("process_versions")
+      .update({ status: "em_revisao" })
+      .eq("process_id", id)
+      .eq("version_number", process.current_version_number)
+
+    if (versionUpdateError) {
+      console.error("Error updating version status:", versionUpdateError)
+      // Não falhar se apenas a atualização de versão falhar
+    }
+
+    // Buscar processo atualizado com versão
+    return processesApiSupabase.getById(id)
+  },
+
+  // Refazer processo (criar nova versão baseada em rejeição)
+  refactorProcess: async (id: string | number, changeSummary?: string): Promise<Process> => {
+    // Obter usuário atual
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      throw new Error("User not authenticated")
+    }
+
+    // Buscar processo atual
+    const current = await processesApiSupabase.getById(id)
+
+    // Validar que processo está rejeitado
+    if (current.status !== "rejeitado") {
+      throw new Error("Apenas processos rejeitados podem ser refeitos")
+    }
+
+    // Buscar stakeholder do usuário
+    const { data: stakeholder } = await supabase
+      .from("stakeholders")
+      .select("id")
+      .eq("email", user.email)
+      .single()
+
+    if (!stakeholder) {
+      throw new Error("Stakeholder not found for user")
+    }
+
+    // Validar que usuário é o criador
+    if (current.creator_id !== stakeholder.id) {
+      throw new Error("Apenas o criador do processo pode refazê-lo")
+    }
+
+    // Validar que existe versão atual
+    if (!current.current_version) {
+      throw new Error("Processo deve ter uma versão atual para ser refeito")
+    }
+
+    // Calcular nova versão
+    const newVersionNumber = (current.current_version_number || 1) + 1
+
+    // Criar nova versão baseada na versão atual
+    const newContent = {
+      description: current.description || "",
+      workflow: current.workflow || [],
+      entities: current.entities || [],
+      variables: current.variables || [],
+    }
+
+    const { data: newVersion, error: versionError } = await supabase
+      .from("process_versions")
+      .insert({
+        process_id: id.toString(),
+        version_number: newVersionNumber,
+        content: newContent,
+        content_text: current.description || null,
+        entities_involved: current.entities || [],
+        variables_applied: current.variables || [],
+        previous_version_id: current.current_version.id,
+        change_summary: changeSummary || null,
+        created_by: stakeholder.id,
+        status: "rascunho",
+      })
+      .select()
+      .single()
+
+    if (versionError) {
+      console.error("Error creating new version:", versionError)
+      throw versionError
+    }
+
+    // Atualizar processo com nova versão e status rascunho
+    const { error: processUpdateError } = await supabase
+      .from("processes")
+      .update({
+        current_version_number: newVersionNumber,
+        status: "rascunho",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+
+    if (processUpdateError) {
+      console.error("Error updating process:", processUpdateError)
+      throw processUpdateError
+    }
+
+    // Buscar processo atualizado
+    return processesApiSupabase.getById(id)
   },
 }
 

@@ -75,19 +75,46 @@ export default function ChatPage() {
     setSuggestions([])
 
     try {
-      // Por enquanto, resposta simples do chat
-      // TODO: Integrar com Supabase Edge Function ou API de chat quando disponível
-      await new Promise((resolve) => setTimeout(resolve, 500)) // Simular delay
+      // Importar função de chat dinamicamente para evitar erro de importação circular
+      const { sendChatMessage } = await import('@/lib/api/chat')
+      
+      // Chamar API de chat com RAG
+      const response = await sendChatMessage(text)
 
-      // Resposta simples do bot
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "bot",
-        content: "Olá! Sou a Gabi, Síndica Virtual. Como posso ajudá-lo hoje? Por favor, descreva sua dúvida ou solicitação.",
-        timestamp: new Date(),
+      if (response.success && response.message) {
+        // Resposta do bot com RAG
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "bot",
+          content: response.message,
+          timestamp: new Date(),
+        }
+        setMessages((prev) => [...prev, botMessage])
+
+        // Se houver fontes, adicionar como informação adicional
+        if (response.sources && response.sources.length > 0) {
+          const sourcesText = `\n\n*Fontes: ${response.sources.map(s => s.process_name).join(', ')}*`
+          setMessages((prev) => {
+            const lastMessage = prev[prev.length - 1]
+            if (lastMessage && lastMessage.role === 'bot') {
+              return [
+                ...prev.slice(0, -1),
+                { ...lastMessage, content: lastMessage.content + sourcesText }
+              ]
+            }
+            return prev
+          })
+        }
+      } else {
+        // Erro ou resposta vazia
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "bot",
+          content: response.message || "Desculpe, não consegui processar sua mensagem. Tente novamente.",
+          timestamp: new Date(),
+        }
+        setMessages((prev) => [...prev, errorMessage])
       }
-      setMessages((prev) => [...prev, botMessage])
-      setSuggestions([])
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error)
       const errorMessage: Message = {
@@ -111,7 +138,7 @@ export default function ChatPage() {
   if (authLoading || !isAuthenticated || !canAccessChat()) {
     return (
       <div className="h-[calc(100vh-73px)] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground stroke-1" />
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400 stroke-1" />
       </div>
     )
   }
@@ -119,14 +146,14 @@ export default function ChatPage() {
   return (
     <div className="h-[calc(100vh-73px)] flex flex-col">
       {/* Header */}
-      <div className="flex-shrink-0 border-b border-border bg-card px-4 py-3">
+      <div className="flex-shrink-0 border-b border-gray-700/50 bg-card px-4 py-3">
         <div className="flex items-center gap-2">
           <div className="p-2 rounded-full bg-[#00ade8]/10">
             <Bot className="h-5 w-5 text-[#00ade8] stroke-1" />
           </div>
           <div>
-            <h1 className="text-base font-medium text-foreground">Gabi</h1>
-            <p className="text-xs text-muted-foreground">Síndica Virtual</p>
+            <h1 className="text-base font-medium text-gray-300">Gabi</h1>
+            <p className="text-xs text-gray-400">Síndica Virtual</p>
           </div>
         </div>
       </div>
@@ -150,7 +177,7 @@ export default function ChatPage() {
               className={`max-w-[80%] rounded-2xl px-4 py-2 ${
                 message.role === "user"
                   ? "bg-[#00ade8] text-white"
-                  : "bg-muted text-foreground"
+                  : "bg-muted text-gray-300"
               }`}
             >
               {message.role === "bot" ? (
@@ -164,7 +191,7 @@ export default function ChatPage() {
 
             {message.role === "user" && (
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                <User className="h-4 w-4 text-foreground stroke-1" />
+                <User className="h-4 w-4 text-gray-300 stroke-1" />
               </div>
             )}
           </div>
@@ -176,7 +203,7 @@ export default function ChatPage() {
               <Bot className="h-4 w-4 text-[#00ade8] stroke-1" />
             </div>
             <div className="bg-muted rounded-2xl px-4 py-2">
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground stroke-1" />
+              <Loader2 className="h-4 w-4 animate-spin text-gray-400 stroke-1" />
             </div>
           </div>
         )}

@@ -23,15 +23,25 @@ export default function LoginPage() {
     setError("")
     setLoading(true)
 
+    // Timeout de segurança (30 segundos)
+    const timeoutId = setTimeout(() => {
+      setLoading(false)
+      setError("Tempo de espera excedido. Tente novamente.")
+    }, 30000)
+
     try {
       const success = await login(email, password)
+      clearTimeout(timeoutId)
 
       if (success) {
-        router.push("/dashboard")
+        // Usar replace para evitar loop de navegação
+        router.replace("/dashboard")
       } else {
         setError("Credenciais inválidas. Verifique seu email e senha.")
+        setLoading(false)
       }
     } catch (err: any) {
+      clearTimeout(timeoutId)
       console.error("Login error:", err)
       let errorMessage = "Erro ao fazer login. Tente novamente."
       
@@ -42,7 +52,6 @@ export default function LoginPage() {
       }
       
       setError(errorMessage)
-    } finally {
       setLoading(false)
     }
   }

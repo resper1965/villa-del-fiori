@@ -1,39 +1,20 @@
 export enum EntityType {
-  PESSOA = "pessoa",
-  EMPRESA = "empresa",
-  SERVICO_EMERGENCIA = "servico_emergencia",
-  INFRAESTRUTURA = "infraestrutura",
+  SERVICO_PUBLICO = "servico_publico",
+  PRESTADOR_REFERENCIADO = "prestador_referenciado",
 }
 
 export enum EntityCategory {
-  // Pessoas
-  SINDICO = "sindico",
-  CONSELHEIRO = "conselheiro",
-  ADMINISTRADORA = "administradora",
-  FAXINEIRO = "faxineiro",
-  MORADOR = "morador",
-  
-  // Empresas
-  PORTARIA_ONLINE = "portaria_online",
-  SEGURANCA = "seguranca",
-  MANUTENCAO_ELEVADOR = "manutencao_elevador",
-  JARDINAGEM = "jardinagem",
-  DEDETIZACAO = "dedetizacao",
-  MANUTENCAO = "manutencao",
-  GAS = "gas",
-  ENERGIA = "energia",
-  OUTRO_FORNECEDOR = "outro_fornecedor",
-  
-  // Serviços de Emergência
+  // Serviços Públicos
   BOMBEIROS = "bombeiros",
   POLICIA = "policia",
   SAMU = "samu",
+  DEFESA_CIVIL = "defesa_civil",
+  GUARDA_MUNICIPAL = "guarda_municipal",
   
-  // Infraestrutura
-  PORTAO = "portao",
-  ELEVADOR = "elevador",
-  SISTEMA_BIOMETRIA = "sistema_biometria",
-  SISTEMA_CAMERAS = "sistema_cameras",
+  // Prestadores Referenciados (sem contrato)
+  ASSISTENCIA_TECNICA = "assistencia_tecnica",
+  CONSULTORIA = "consultoria",
+  OUTRO_PRESTADOR = "outro_prestador",
 }
 
 export interface Entity {
@@ -94,66 +75,37 @@ export interface EntityListResponse {
 
 // Labels para exibição
 export const EntityTypeLabels: Record<EntityType, string> = {
-  [EntityType.PESSOA]: "Pessoa",
-  [EntityType.EMPRESA]: "Empresa",
-  [EntityType.SERVICO_EMERGENCIA]: "Serviço de Emergência",
-  [EntityType.INFRAESTRUTURA]: "Infraestrutura",
+  [EntityType.SERVICO_PUBLICO]: "Serviço Público",
+  [EntityType.PRESTADOR_REFERENCIADO]: "Prestador Referenciado",
 }
 
 export const EntityCategoryLabels: Record<EntityCategory, string> = {
-  [EntityCategory.SINDICO]: "Síndico",
-  [EntityCategory.CONSELHEIRO]: "Conselheiro",
-  [EntityCategory.ADMINISTRADORA]: "Administradora",
-  [EntityCategory.FAXINEIRO]: "Faxineiro",
-  [EntityCategory.MORADOR]: "Morador",
-  [EntityCategory.PORTARIA_ONLINE]: "Portaria Online",
-  [EntityCategory.SEGURANCA]: "Segurança",
-  [EntityCategory.MANUTENCAO_ELEVADOR]: "Manutenção de Elevadores",
-  [EntityCategory.JARDINAGEM]: "Jardinagem",
-  [EntityCategory.DEDETIZACAO]: "Dedetização",
-  [EntityCategory.MANUTENCAO]: "Manutenção",
-  [EntityCategory.GAS]: "Gás",
-  [EntityCategory.ENERGIA]: "Energia",
-  [EntityCategory.OUTRO_FORNECEDOR]: "Outro Fornecedor",
+  // Serviços Públicos
   [EntityCategory.BOMBEIROS]: "Bombeiros",
   [EntityCategory.POLICIA]: "Polícia",
   [EntityCategory.SAMU]: "SAMU",
-  [EntityCategory.PORTAO]: "Portão",
-  [EntityCategory.ELEVADOR]: "Elevador",
-  [EntityCategory.SISTEMA_BIOMETRIA]: "Sistema de Biometria",
-  [EntityCategory.SISTEMA_CAMERAS]: "Sistema de Câmeras",
+  [EntityCategory.DEFESA_CIVIL]: "Defesa Civil",
+  [EntityCategory.GUARDA_MUNICIPAL]: "Guarda Municipal",
+  
+  // Prestadores Referenciados
+  [EntityCategory.ASSISTENCIA_TECNICA]: "Assistência Técnica",
+  [EntityCategory.CONSULTORIA]: "Consultoria",
+  [EntityCategory.OUTRO_PRESTADOR]: "Outro Prestador",
 }
 
 // Categorias por tipo
 export const CategoriesByType: Record<EntityType, EntityCategory[]> = {
-  [EntityType.PESSOA]: [
-    EntityCategory.SINDICO,
-    EntityCategory.CONSELHEIRO,
-    EntityCategory.ADMINISTRADORA,
-    EntityCategory.FAXINEIRO,
-    EntityCategory.MORADOR,
-  ],
-  [EntityType.EMPRESA]: [
-    EntityCategory.PORTARIA_ONLINE,
-    EntityCategory.SEGURANCA,
-    EntityCategory.MANUTENCAO_ELEVADOR,
-    EntityCategory.JARDINAGEM,
-    EntityCategory.DEDETIZACAO,
-    EntityCategory.MANUTENCAO,
-    EntityCategory.GAS,
-    EntityCategory.ENERGIA,
-    EntityCategory.OUTRO_FORNECEDOR,
-  ],
-  [EntityType.SERVICO_EMERGENCIA]: [
+  [EntityType.SERVICO_PUBLICO]: [
     EntityCategory.BOMBEIROS,
     EntityCategory.POLICIA,
     EntityCategory.SAMU,
+    EntityCategory.DEFESA_CIVIL,
+    EntityCategory.GUARDA_MUNICIPAL,
   ],
-  [EntityType.INFRAESTRUTURA]: [
-    EntityCategory.PORTAO,
-    EntityCategory.ELEVADOR,
-    EntityCategory.SISTEMA_BIOMETRIA,
-    EntityCategory.SISTEMA_CAMERAS,
+  [EntityType.PRESTADOR_REFERENCIADO]: [
+    EntityCategory.ASSISTENCIA_TECNICA,
+    EntityCategory.CONSULTORIA,
+    EntityCategory.OUTRO_PRESTADOR,
   ],
 }
 

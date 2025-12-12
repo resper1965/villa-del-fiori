@@ -104,6 +104,7 @@ export default function RegisterPage() {
       }
       
       // 3. Criar stakeholder no banco (para dados adicionais, opcional)
+      // Nota: unit_id não é definido no registro público - será definido pelo admin na aprovação
       try {
         await supabase.from("stakeholders").insert({
           name: formData.name,
@@ -111,6 +112,7 @@ export default function RegisterPage() {
           type: formData.type,
           user_role: userRole,
           auth_user_id: authData.user.id,
+          unit_id: null, // Será definido pelo admin na aprovação
           is_approved: false,
           is_active: true,
         })

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react"
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react"
 import { supabase } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
@@ -11,6 +11,13 @@ interface User {
   email: string
   user_role: "admin" | "syndic" | "subsindico" | "council" | "resident" | "staff"
   type: string
+  unit_id?: string | null
+  unit?: {
+    id: string
+    number: string
+    block?: string
+    floor?: number
+  } | null
   is_approved: boolean
   is_superadmin?: boolean
 }
@@ -43,29 +50,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const isProcessingLoginRef = useRef(false)
 
   // Carregar usuário do Supabase Auth (roles gerenciados via app_metadata)
-  const loadUser = useCallback(async (supabaseUser: SupabaseUser): Promise<User | null> => {
+  const loadUser = useCallback(async (supabaseUser: SupabaseUser, skipStakeholderQuery = false): Promise<User | null> => {
     try {
       // Roles e aprovação vêm do app_metadata do Supabase Auth
       const appMetadata = (supabaseUser.app_metadata || {}) as AppMetadata
       const userMetadata = supabaseUser.user_metadata || {}
 
       // Buscar dados adicionais da tabela stakeholders (se existir)
+      // Com timeout muito curto (800ms) para não bloquear a inicialização
+      // E opção de pular completamente para carregamento rápido
       let stakeholder = null
-      try {
-        const { data, error } = await supabase
-          .from("stakeholders")
-          .select("id, name, type")
-          .eq("auth_user_id", supabaseUser.id)
-          .maybeSingle()
-        
-        if (!error) {
-          stakeholder = data
+      if (!skipStakeholderQuery) {
+        try {
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error("Timeout")), 800) // Reduzido para 800ms
+          )
+          
+          const queryPromise = supabase
+            .from("stakeholders")
+            .select("id, name, type, unit_id, unit:units(id, number, block, floor)")
+            .eq("auth_user_id", supabaseUser.id)
+            .maybeSingle()
+          
+          const result = await Promise.race([queryPromise, timeoutPromise]) as any
+          
+          // Verificar se o resultado é válido (não é o timeout)
+          if (result && !result.error && result.data) {
+            stakeholder = result.data
+          } else if (result && result.data) {
+            // Resultado válido mas sem dados
+            stakeholder = result.data
+          }
+        } catch (err) {
+          // Se não encontrar na tabela ou timeout, não é crítico - usamos dados do Auth
+          // Não logar como warning para não poluir o console
         }
-      } catch (err) {
-        // Se não encontrar na tabela, não é crítico - usamos dados do Auth
-        console.warn("Stakeholder table not found or RLS blocking:", err)
       }
 
       // Verificar se é superadministrador
@@ -76,12 +98,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const userRole = isSuperadmin ? "admin" : (appMetadata.user_role || "resident")
       const isApproved = isSuperadmin ? true : (appMetadata.is_approved || false)
 
+      // Processar dados da unidade
+      const unitData = stakeholder?.unit
+        ? (Array.isArray(stakeholder.unit) ? stakeholder.unit[0] : stakeholder.unit)
+        : null
+
       return {
         id: supabaseUser.id,
         name: userMetadata.name || stakeholder?.name || supabaseUser.email?.split("@")[0] || "Usuário",
         email: supabaseUser.email || "",
         user_role: userRole,
         type: userMetadata.type || stakeholder?.type || "morador",
+        unit_id: stakeholder?.unit_id || null,
+        unit: unitData || null,
         is_approved: isApproved,
         is_superadmin: isSuperadmin,
       }
@@ -95,53 +124,97 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true
     let timeoutId: NodeJS.Timeout | null = null
+    let initCompleted = false
 
     const initAuth = async () => {
-      try {
-        // Timeout de segurança (10 segundos)
-        timeoutId = setTimeout(() => {
-          if (mounted) {
-            console.warn("Auth initialization timeout")
-            setIsLoading(false)
-          }
-        }, 10000)
+      // Timeout de segurança: sempre resetar isLoading após 3 segundos
+      timeoutId = setTimeout(() => {
+        if (mounted && !initCompleted) {
+          console.warn("Auth initialization timeout - forcing isLoading to false")
+          setIsLoading(false)
+          initCompleted = true
+        }
+      }, 3000)
 
-        // Verificar sessão atual
+      try {
+        // Verificar sessão atual com timeout próprio
+        const sessionPromise = supabase.auth.getSession()
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("Session timeout")), 2500)
+        )
+
         const {
           data: { session },
           error: sessionError,
-        } = await supabase.auth.getSession()
+        } = await Promise.race([sessionPromise, timeoutPromise]) as any
 
         if (sessionError) {
           console.error("Error getting session:", sessionError)
-          if (mounted) {
+          if (mounted && !initCompleted) {
             setIsLoading(false)
+            initCompleted = true
           }
+          if (timeoutId) clearTimeout(timeoutId)
           return
         }
 
-        if (session?.user && mounted) {
-          const loadedUser = await loadUser(session.user)
-          if (loadedUser && mounted) {
-            // Verificar se está aprovado
-            if (!loadedUser.is_approved && !loadedUser.is_superadmin) {
-              router.push("/auth/waiting-approval")
-              setIsLoading(false)
-              return
-            }
-            setUser(loadedUser)
-            setIsAuthenticated(true)
+        if (session?.user && mounted && !initCompleted) {
+          // Criar usuário básico imediatamente (sem esperar stakeholders)
+          const appMetadata = (session.user.app_metadata || {}) as AppMetadata
+          const userMetadata = session.user.user_metadata || {}
+          const isSuperadmin = session.user.id === SUPERADMIN_UID
+          const userRole = isSuperadmin ? "admin" : (appMetadata.user_role || "resident")
+          const isApproved = isSuperadmin ? true : (appMetadata.is_approved || false)
+          
+          const basicUser: User = {
+            id: session.user.id,
+            name: userMetadata.name || session.user.email?.split("@")[0] || "Usuário",
+            email: session.user.email || "",
+            user_role: userRole,
+            type: userMetadata.type || "morador",
+            is_approved: isApproved,
+            is_superadmin: isSuperadmin,
           }
+          
+          // Verificar aprovação primeiro
+          if (!basicUser.is_approved && !basicUser.is_superadmin) {
+            setIsLoading(false)
+            initCompleted = true
+            if (timeoutId) clearTimeout(timeoutId)
+            router.replace("/auth/waiting-approval")
+            return
+          }
+          
+          // Definir usuário básico imediatamente para não bloquear UI
+          setUser(basicUser)
+          setIsAuthenticated(true)
+          setIsLoading(false)
+          initCompleted = true
+          if (timeoutId) clearTimeout(timeoutId)
+          
+          // Carregar dados adicionais (stakeholder/unit) em background sem bloquear
+          loadUser(session.user, false).then((loadedUser) => {
+            if (loadedUser && mounted) {
+              // Atualizar apenas se tiver dados adicionais (unit, etc)
+              if (loadedUser.unit_id || loadedUser.unit) {
+                setUser(loadedUser)
+              }
+            }
+          }).catch(() => {
+            // Ignorar erros no carregamento em background
+          })
+        } else if (mounted && !initCompleted) {
+          setIsLoading(false)
+          initCompleted = true
+          if (timeoutId) clearTimeout(timeoutId)
         }
       } catch (error) {
         console.error("Error initializing auth:", error)
-      } finally {
-        if (timeoutId) {
-          clearTimeout(timeoutId)
-        }
-        if (mounted) {
+        if (mounted && !initCompleted) {
           setIsLoading(false)
+          initCompleted = true
         }
+        if (timeoutId) clearTimeout(timeoutId)
       }
     }
 
@@ -153,27 +226,90 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return
 
+      // Ignorar eventos durante a inicialização para evitar race conditions
+      if (event === "INITIAL_SESSION" && !initCompleted) {
+        return
+      }
+
       if (event === "SIGNED_IN" && session?.user) {
-        const loadedUser = await loadUser(session.user)
-        if (loadedUser) {
-          // Superadmin sempre tem acesso, mesmo sem aprovação
-          if (!loadedUser.is_approved && !loadedUser.is_superadmin) {
-            router.push("/auth/waiting-approval")
-            setIsLoading(false)
+        // Evitar processar se já estiver processando login (evitar duplicação)
+        if (isProcessingLoginRef.current) {
+          return
+        }
+        
+        try {
+          // Criar usuário básico primeiro para não bloquear
+          const appMetadata = (session.user.app_metadata || {}) as AppMetadata
+          const userMetadata = session.user.user_metadata || {}
+          const isSuperadmin = session.user.id === SUPERADMIN_UID
+          const userRole = isSuperadmin ? "admin" : (appMetadata.user_role || "resident")
+          const isApproved = isSuperadmin ? true : (appMetadata.is_approved || false)
+          
+          const basicUser: User = {
+            id: session.user.id,
+            name: userMetadata.name || session.user.email?.split("@")[0] || "Usuário",
+            email: session.user.email || "",
+            user_role: userRole,
+            type: userMetadata.type || "morador",
+            is_approved: isApproved,
+            is_superadmin: isSuperadmin,
+          }
+          
+          if (!basicUser.is_approved && !basicUser.is_superadmin) {
+            if (mounted) {
+              setIsLoading(false)
+              router.replace("/auth/waiting-approval")
+            }
             return
           }
-          setUser(loadedUser)
-          setIsAuthenticated(true)
+          
+          // Definir usuário básico imediatamente
+          if (mounted) {
+            setUser(basicUser)
+            setIsAuthenticated(true)
+            setIsLoading(false)
+          }
+          
+          // Carregar dados adicionais em background
+          loadUser(session.user, false).then((loadedUser) => {
+            if (loadedUser && mounted) {
+              if (loadedUser.unit_id || loadedUser.unit) {
+                setUser(loadedUser)
+              }
+            }
+          }).catch(() => {
+            // Ignorar erros
+          })
+        } catch (loadError) {
+          console.error("Error loading user in auth state change:", loadError)
+          if (mounted) {
+            setIsLoading(false)
+          }
         }
       } else if (event === "SIGNED_OUT") {
-        setUser(null)
-        setIsAuthenticated(false)
+        if (mounted) {
+          setUser(null)
+          setIsAuthenticated(false)
+          setIsLoading(false)
+        }
+      } else if (event === "TOKEN_REFRESHED" && session?.user && mounted) {
+        // Atualizar usuário silenciosamente sem resetar loading
+        loadUser(session.user, false).then((loadedUser) => {
+          if (loadedUser && mounted) {
+            setUser(loadedUser)
+          }
+        }).catch(() => {
+          // Ignorar erros
+        })
+      } else if (mounted && !initCompleted) {
+        // Apenas resetar loading se ainda não foi completado
+        setIsLoading(false)
       }
-      setIsLoading(false)
     })
 
     return () => {
       mounted = false
+      initCompleted = true
       if (timeoutId) {
         clearTimeout(timeoutId)
       }
@@ -182,7 +318,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [loadUser, router])
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+    if (isProcessingLoginRef.current) {
+      console.warn("Login already in progress")
+      return false
+    }
+
     try {
+      isProcessingLoginRef.current = true
+      setIsLoading(true)
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -190,26 +333,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error("Login error:", error)
+        setIsLoading(false)
+        isProcessingLoginRef.current = false
         return false
       }
 
       if (data.user) {
-        const loadedUser = await loadUser(data.user)
-        if (loadedUser) {
-          // Superadmin sempre tem acesso, mesmo sem aprovação
-          if (!loadedUser.is_approved && !loadedUser.is_superadmin) {
-            router.push("/auth/waiting-approval")
-            return false
-          }
-          setUser(loadedUser)
-          setIsAuthenticated(true)
-          return true
+        // Criar usuário básico imediatamente (sem esperar stakeholders)
+        const appMetadata = (data.user.app_metadata || {}) as AppMetadata
+        const userMetadata = data.user.user_metadata || {}
+        const isSuperadmin = data.user.id === SUPERADMIN_UID
+        const userRole = isSuperadmin ? "admin" : (appMetadata.user_role || "resident")
+        const isApproved = isSuperadmin ? true : (appMetadata.is_approved || false)
+        
+        const basicUser: User = {
+          id: data.user.id,
+          name: userMetadata.name || data.user.email?.split("@")[0] || "Usuário",
+          email: data.user.email || "",
+          user_role: userRole,
+          type: userMetadata.type || "morador",
+          is_approved: isApproved,
+          is_superadmin: isSuperadmin,
         }
+        
+        if (!basicUser.is_approved && !basicUser.is_superadmin) {
+          setIsLoading(false)
+          isProcessingLoginRef.current = false
+          router.replace("/auth/waiting-approval")
+          return false
+        }
+        
+        // Definir usuário básico imediatamente
+        setUser(basicUser)
+        setIsAuthenticated(true)
+        setIsLoading(false)
+        isProcessingLoginRef.current = false
+        
+        // Carregar dados adicionais em background
+        loadUser(data.user, false).then((loadedUser) => {
+          if (loadedUser) {
+            if (loadedUser.unit_id || loadedUser.unit) {
+              setUser(loadedUser)
+            }
+          }
+        }).catch(() => {
+          // Ignorar erros
+        })
+        
+        return true
       }
 
+      setIsLoading(false)
+      isProcessingLoginRef.current = false
       return false
     } catch (error: any) {
       console.error("Erro ao fazer login:", error)
+      setIsLoading(false)
+      isProcessingLoginRef.current = false
       return false
     }
   }, [loadUser, router])
@@ -231,17 +411,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (data.user) {
-        const loadedUser = await loadUser(data.user)
-        if (loadedUser) {
-          // Superadmin sempre tem acesso, mesmo sem aprovação
-          if (!loadedUser.is_approved && !loadedUser.is_superadmin) {
-            router.push("/auth/waiting-approval")
-            return false
-          }
-          setUser(loadedUser)
-          setIsAuthenticated(true)
-          return true
+        // Criar usuário básico imediatamente
+        const appMetadata = (data.user.app_metadata || {}) as AppMetadata
+        const userMetadata = data.user.user_metadata || {}
+        const isSuperadmin = data.user.id === SUPERADMIN_UID
+        const userRole = isSuperadmin ? "admin" : (appMetadata.user_role || "resident")
+        const isApproved = isSuperadmin ? true : (appMetadata.is_approved || false)
+        
+        const basicUser: User = {
+          id: data.user.id,
+          name: userMetadata.name || data.user.email?.split("@")[0] || "Usuário",
+          email: data.user.email || "",
+          user_role: userRole,
+          type: userMetadata.type || "morador",
+          is_approved: isApproved,
+          is_superadmin: isSuperadmin,
         }
+        
+        if (!basicUser.is_approved && !basicUser.is_superadmin) {
+          router.push("/auth/waiting-approval")
+          return false
+        }
+        
+        setUser(basicUser)
+        setIsAuthenticated(true)
+        
+        // Carregar dados adicionais em background
+        loadUser(data.user, false).then((loadedUser) => {
+          if (loadedUser) {
+            if (loadedUser.unit_id || loadedUser.unit) {
+              setUser(loadedUser)
+            }
+          }
+        }).catch(() => {
+          // Ignorar erros
+        })
+        
+        return true
       }
 
       return false
@@ -279,16 +485,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (session?.user) {
-        const loadedUser = await loadUser(session.user)
-        if (loadedUser) {
-          // Superadmin sempre tem acesso, mesmo sem aprovação
-          if (!loadedUser.is_approved && !loadedUser.is_superadmin) {
-            return false
-          }
-          setUser(loadedUser)
-          setIsAuthenticated(true)
-          return true
+        // Criar usuário básico imediatamente
+        const appMetadata = (session.user.app_metadata || {}) as AppMetadata
+        const userMetadata = session.user.user_metadata || {}
+        const isSuperadmin = session.user.id === SUPERADMIN_UID
+        const userRole = isSuperadmin ? "admin" : (appMetadata.user_role || "resident")
+        const isApproved = isSuperadmin ? true : (appMetadata.is_approved || false)
+        
+        const basicUser: User = {
+          id: session.user.id,
+          name: userMetadata.name || session.user.email?.split("@")[0] || "Usuário",
+          email: session.user.email || "",
+          user_role: userRole,
+          type: userMetadata.type || "morador",
+          is_approved: isApproved,
+          is_superadmin: isSuperadmin,
         }
+        
+        if (!basicUser.is_approved && !basicUser.is_superadmin) {
+          return false
+        }
+        
+        setUser(basicUser)
+        setIsAuthenticated(true)
+        
+        // Carregar dados adicionais em background
+        loadUser(session.user, false).then((loadedUser) => {
+          if (loadedUser) {
+            if (loadedUser.unit_id || loadedUser.unit) {
+              setUser(loadedUser)
+            }
+          }
+        }).catch(() => {
+          // Ignorar erros
+        })
+        
+        return true
       }
 
       return false

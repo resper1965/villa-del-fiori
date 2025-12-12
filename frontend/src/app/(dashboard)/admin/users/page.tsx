@@ -27,40 +27,112 @@ export default function AdminUsersPage() {
   const { data: allUsers, isLoading } = useQuery({
     queryKey: ["all-users"],
     queryFn: async () => {
-      // Buscar usuários do Supabase Auth via view
-      const { data, error } = await supabase
-        .from("auth_users_with_metadata")
-        .select("*")
-        .order("created_at", { ascending: false })
-
-      if (error) {
-        // Fallback: buscar da tabela stakeholders se a view não existir
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from("stakeholders")
+      // Timeout de 8 segundos
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Query timeout")), 8000)
+      )
+      
+      const queryFn = async () => {
+        // Buscar usuários do Supabase Auth via view
+        const { data, error } = await supabase
+          .from("auth_users_with_metadata")
           .select("*")
-          .eq("is_active", true)
           .order("created_at", { ascending: false })
+
+        if (error) {
+          // Fallback: buscar da tabela stakeholders com join de unidades
+          const { data: fallbackData, error: fallbackError } = await supabase
+            .from("stakeholders")
+            .select(`
+              *,
+              unit:units(*),
+              owner:stakeholders!stakeholders_owner_id_fkey(id, name, email)
+            `)
+            .eq("is_active", true)
+            .order("created_at", { ascending: false })
+          
+          if (fallbackError) throw fallbackError
+          return (fallbackData || []).map((item: any) => ({
+            ...item,
+            unit: Array.isArray(item.unit) ? item.unit[0] : item.unit,
+            owner: Array.isArray(item.owner) ? item.owner[0] : item.owner,
+            auth_user_id: item.auth_user_id || item.id,
+          }))
+        }
         
-        if (fallbackError) throw fallbackError
-        return fallbackData || []
+        // Buscar unidades separadamente para os usuários da view
+        const userIds = (data || []).map((u: any) => u.id)
+        const { data: stakeholdersData } = await supabase
+          .from("stakeholders")
+          .select(`
+            auth_user_id,
+            unit_id,
+            relationship_type,
+            is_owner,
+            is_resident,
+            owner_id,
+            phone,
+            phone_secondary,
+            whatsapp,
+            has_whatsapp,
+            unit:units(*),
+            owner:stakeholders!stakeholders_owner_id_fkey(id, name, email)
+          `)
+          .in("auth_user_id", userIds)
+        
+        const stakeholdersMap = new Map()
+        stakeholdersData?.forEach((s: any) => {
+          stakeholdersMap.set(s.auth_user_id, {
+            unit: Array.isArray(s.unit) ? s.unit[0] : s.unit,
+            relationship_type: s.relationship_type,
+            is_owner: s.is_owner,
+            is_resident: s.is_resident,
+            owner_id: s.owner_id,
+            owner: Array.isArray(s.owner) ? s.owner[0] : s.owner,
+            phone: s.phone,
+            phone_secondary: s.phone_secondary,
+            whatsapp: s.whatsapp,
+            has_whatsapp: s.has_whatsapp,
+          })
+        })
+        
+        // Mapear dados da view para o formato esperado
+        return (data || []).map((user: any) => {
+          const stakeholderData = stakeholdersMap.get(user.id) || {}
+          return {
+            id: user.id,
+            auth_user_id: user.id,
+            name: user.name || user.email?.split("@")[0] || "Usuário",
+            email: user.email,
+            type: user.type || "morador",
+            user_role: user.user_role || "resident",
+            unit_id: stakeholderData.unit?.id || null,
+            unit: stakeholderData.unit || null,
+            relationship_type: stakeholderData.relationship_type || null,
+            is_owner: stakeholderData.is_owner ?? false,
+            is_resident: stakeholderData.is_resident ?? true,
+            owner_id: stakeholderData.owner_id || null,
+            owner: stakeholderData.owner || null,
+            phone: stakeholderData.phone || null,
+            phone_secondary: stakeholderData.phone_secondary || null,
+            whatsapp: stakeholderData.whatsapp || null,
+            has_whatsapp: stakeholderData.has_whatsapp || false,
+            is_approved: user.is_approved || false,
+            approved_at: user.approved_at,
+            approved_by: user.approved_by,
+            is_active: true,
+            created_at: user.created_at,
+          }
+        })
       }
       
-      // Mapear dados da view para o formato esperado
-      return (data || []).map((user: any) => ({
-        id: user.id,
-        auth_user_id: user.id,
-        name: user.name || user.email?.split("@")[0] || "Usuário",
-        email: user.email,
-        type: user.type || "morador",
-        user_role: user.user_role || "resident",
-        is_approved: user.is_approved || false,
-        approved_at: user.approved_at,
-        approved_by: user.approved_by,
-        is_active: true,
-        created_at: user.created_at,
-      }))
+      return Promise.race([queryFn(), timeoutPromise]) as Promise<any>
     },
     enabled: canApproveUsers(), // Só busca se tiver permissão
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   })
 
   // Mutation para aprovar usuário (atualiza app_metadata no Supabase Auth)
@@ -203,18 +275,15 @@ export default function AdminUsersPage() {
     handleFormClose()
   }
 
-  const pendingCount = allUsers?.filter((u) => !u.is_approved && u.is_active).length || 0
-  const approvedCount = allUsers?.filter((u) => u.is_approved && u.is_active).length || 0
+  const pendingCount = allUsers?.filter((u: any) => !u.is_approved && u.is_active).length || 0
+  const approvedCount = allUsers?.filter((u: any) => u.is_approved && u.is_active).length || 0
 
   return (
-    <div className="min-h-screen">
-      <div className="h-[73px] border-b border-border flex items-center justify-between px-4">
-        <div>
-          <h1 className="text-lg font-semibold text-foreground">Gerenciar Usuários</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Gerencie usuários do sistema e suas aprovações
-          </p>
-        </div>
+    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-sm text-gray-400">
+          Gerencie usuários do sistema e suas aprovações
+        </p>
         <Button onClick={() => setFormOpen(true)}>
           <Plus className="h-4 w-4 mr-2 stroke-1" />
           Novo Usuário
@@ -229,7 +298,7 @@ export default function AdminUsersPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{pendingCount}</div>
-              <p className="text-xs text-muted-foreground">Aguardando aprovação</p>
+              <p className="text-xs text-gray-400">Aguardando aprovação</p>
             </CardContent>
           </Card>
           <Card>
@@ -238,7 +307,7 @@ export default function AdminUsersPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{approvedCount}</div>
-              <p className="text-xs text-muted-foreground">Com acesso ao sistema</p>
+              <p className="text-xs text-gray-400">Com acesso ao sistema</p>
             </CardContent>
           </Card>
         </div>
@@ -247,8 +316,8 @@ export default function AdminUsersPage() {
         {isLoading ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">Carregando usuários...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
+              <p className="text-gray-400">Carregando usuários...</p>
             </CardContent>
           </Card>
         ) : (

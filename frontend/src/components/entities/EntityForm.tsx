@@ -64,7 +64,7 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
   } = useForm<EntityFormData>({
     resolver: zodResolver(entitySchema),
     defaultValues: {
-      type: EntityType.PESSOA,
+      type: EntityType.SERVICO_PUBLICO,
       is_active: true,
     },
   })
@@ -90,7 +90,7 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
     } else if (!entityId && open) {
       reset({
         name: "",
-        type: EntityType.PESSOA,
+        type: EntityType.SERVICO_PUBLICO,
         category: undefined,
         phone: "",
         email: "",
@@ -143,7 +143,7 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
           <DialogDescription>
             {entityId
               ? "Atualize as informações da entidade"
-              : "Cadastre uma nova entidade (pessoa, empresa, serviço ou infraestrutura)"}
+              : "Cadastre serviços públicos ou prestadores de serviços referenciados (sem contrato)"}
           </DialogDescription>
         </DialogHeader>
 
@@ -230,8 +230,8 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
             )}
           </div>
 
-          {/* Pessoa de Contato (para empresas) */}
-          {selectedType === EntityType.EMPRESA && (
+          {/* Pessoa de Contato (para prestadores referenciados) */}
+          {selectedType === EntityType.PRESTADOR_REFERENCIADO && (
             <div className="space-y-2">
               <Label htmlFor="contact_person">Pessoa de Contato</Label>
               <Input
@@ -242,8 +242,8 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
             </div>
           )}
 
-          {/* Telefone de Emergência */}
-          {selectedType === EntityType.SERVICO_EMERGENCIA && (
+          {/* Telefone de Emergência (para serviços públicos) */}
+          {selectedType === EntityType.SERVICO_PUBLICO && (
             <div className="space-y-2">
               <Label htmlFor="emergency_phone">Telefone de Emergência</Label>
               <Input
@@ -254,8 +254,8 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
             </div>
           )}
 
-          {/* Ponto de Encontro */}
-          {(selectedType === EntityType.SERVICO_EMERGENCIA || selectedType === EntityType.EMPRESA) && (
+          {/* Ponto de Encontro (para serviços públicos) */}
+          {selectedType === EntityType.SERVICO_PUBLICO && (
             <div className="space-y-2">
               <Label htmlFor="meeting_point">Ponto de Encontro</Label>
               <Input
@@ -266,8 +266,8 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
             </div>
           )}
 
-          {/* CNPJ (para empresas) */}
-          {selectedType === EntityType.EMPRESA && (
+          {/* CNPJ (para prestadores referenciados) */}
+          {selectedType === EntityType.PRESTADOR_REFERENCIADO && (
             <div className="space-y-2">
               <Label htmlFor="cnpj">CNPJ</Label>
               <Input

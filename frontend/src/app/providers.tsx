@@ -14,14 +14,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
             retry: 1, // Tentar apenas 1 vez
             retryDelay: 1000, // 1 segundo
             refetchOnWindowFocus: false, // Não refazer fetch ao focar na janela
-            refetchOnMount: true, // Refazer fetch ao montar componente
-            refetchOnReconnect: true, // Refazer fetch ao reconectar
-            // Timeout para evitar loading infinito
+            refetchOnMount: false, // NÃO refazer fetch ao montar (usar cache se disponível) - OTIMIZAÇÃO CRÍTICA
+            refetchOnReconnect: false, // Não refazer fetch ao reconectar automaticamente
             gcTime: 10 * 60 * 1000, // 10 minutos (antes era cacheTime)
+            // Timeout global para todas as queries (10 segundos)
+            networkMode: "online",
           },
           mutations: {
             retry: 1,
             retryDelay: 1000,
+            networkMode: "online",
           },
         },
       })

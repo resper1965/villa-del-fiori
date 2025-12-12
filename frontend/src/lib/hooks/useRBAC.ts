@@ -1,83 +1,72 @@
+import { useMemo } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 
 export type UserRole = "admin" | "syndic" | "subsindico" | "council" | "resident" | "staff"
 
 /**
  * Hook para verificar permissões baseadas em roles (RBAC)
+ * Otimizado com useMemo para evitar re-renders desnecessários
  */
 export function useRBAC() {
   const { user } = useAuth()
+  
+  // Memoizar valor de superadmin
+  const isSuperadminValue = useMemo(() => user?.is_superadmin === true, [user?.is_superadmin])
+  const userRole = useMemo(() => user?.user_role, [user?.user_role])
+  const isApproved = useMemo(() => user?.is_approved, [user?.is_approved])
 
-  // Superadmin tem todas as permissões
-  const isSuperadmin = (): boolean => {
-    return user?.is_superadmin === true
-  }
+  // Funções memoizadas para evitar recriação
+  const hasRole = useMemo(() => {
+    return (role: UserRole | UserRole[]): boolean => {
+      if (!user) return false
+      // Superadmin tem todas as roles
+      if (isSuperadminValue) return true
+      const roles = Array.isArray(role) ? role : [role]
+      return roles.includes(userRole as UserRole)
+    }
+  }, [user, isSuperadminValue, userRole])
 
-  const hasRole = (role: UserRole | UserRole[]): boolean => {
-    if (!user) return false
-    // Superadmin tem todas as roles
-    if (isSuperadmin()) return true
-    const roles = Array.isArray(role) ? role : [role]
-    return roles.includes(user.user_role)
-  }
+  const isSuperadmin = useMemo(() => () => isSuperadminValue, [isSuperadminValue])
+  const hasAnyRole = useMemo(() => (roles: UserRole[]) => hasRole(roles), [hasRole])
+  const isAdmin = useMemo(() => () => hasRole("admin"), [hasRole])
+  const isSyndic = useMemo(() => () => hasRole(["admin", "syndic", "subsindico"]), [hasRole])
+  const isCouncil = useMemo(() => () => hasRole(["admin", "syndic", "subsindico", "council"]), [hasRole])
+  const isStaff = useMemo(() => () => hasRole(["admin", "syndic", "subsindico", "staff"]), [hasRole])
+  const isResident = useMemo(() => () => hasRole("resident"), [hasRole])
 
-  const hasAnyRole = (roles: UserRole[]): boolean => {
-    return hasRole(roles)
-  }
+  const canAccessDashboard = useMemo(() => {
+    return (): boolean => {
+      if (!user) return false
+      if (isSuperadminValue) return true
+      if (userRole === "resident") return false
+      return true
+    }
+  }, [user, isSuperadminValue, userRole])
 
-  const isAdmin = (): boolean => {
-    return hasRole("admin")
-  }
+  const canAccessProcesses = useMemo(() => () => canAccessDashboard(), [canAccessDashboard])
+  
+  const canAccessChat = useMemo(() => {
+    return (): boolean => {
+      if (isSuperadminValue) return true
+      return !!user && !!isApproved
+    }
+  }, [user, isSuperadminValue, isApproved])
 
-  const isSyndic = (): boolean => {
-    return hasRole(["admin", "syndic", "subsindico"])
-  }
+  const canApproveUsers = useMemo(() => {
+    return (): boolean => {
+      if (isSuperadminValue) return true
+      return hasRole(["admin", "syndic", "subsindico"])
+    }
+  }, [hasRole, isSuperadminValue])
 
-  const isCouncil = (): boolean => {
-    return hasRole(["admin", "syndic", "subsindico", "council"])
-  }
+  const canManageProcesses = useMemo(() => {
+    return (): boolean => {
+      if (isSuperadminValue) return true
+      return hasRole(["admin", "syndic", "subsindico", "council", "staff"])
+    }
+  }, [hasRole, isSuperadminValue])
 
-  const isStaff = (): boolean => {
-    return hasRole(["admin", "syndic", "subsindico", "staff"])
-  }
-
-  const isResident = (): boolean => {
-    return hasRole("resident")
-  }
-
-  const canAccessDashboard = (): boolean => {
-    if (!user) return false
-    // Superadmin sempre tem acesso
-    if (isSuperadmin()) return true
-    // Moradores só podem acessar o chat
-    if (user.user_role === "resident") return false
-    return true
-  }
-
-  const canAccessProcesses = (): boolean => {
-    return canAccessDashboard()
-  }
-
-  const canAccessChat = (): boolean => {
-    // Superadmin sempre tem acesso
-    if (isSuperadmin()) return true
-    // Todos os usuários aprovados podem acessar o chat
-    return !!user && user.is_approved
-  }
-
-  const canApproveUsers = (): boolean => {
-    // Superadmin sempre pode aprovar usuários
-    if (isSuperadmin()) return true
-    return hasRole(["admin", "syndic", "subsindico"])
-  }
-
-  const canManageProcesses = (): boolean => {
-    // Superadmin sempre pode gerenciar processos
-    if (isSuperadmin()) return true
-    return hasRole(["admin", "syndic", "subsindico", "council", "staff"])
-  }
-
-  return {
+  return useMemo(() => ({
     hasRole,
     hasAnyRole,
     isAdmin,
@@ -92,6 +81,6 @@ export function useRBAC() {
     canApproveUsers,
     canManageProcesses,
     user,
-  }
+  }), [hasRole, hasAnyRole, isAdmin, isSyndic, isCouncil, isStaff, isResident, isSuperadmin, canAccessDashboard, canAccessProcesses, canAccessChat, canApproveUsers, canManageProcesses, user])
 }
 

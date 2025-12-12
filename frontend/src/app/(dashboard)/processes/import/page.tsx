@@ -109,9 +109,9 @@ export default function ImportProcessPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="h-[73px] border-b border-border flex items-center justify-between px-4">
-        <h1 className="text-lg font-semibold text-foreground">Importar Processo de Contrato</h1>
+    <div className="min-h-screen bg-transparent">
+      <div className="h-[73px] border-b border-gray-700/50 flex items-center justify-between px-4">
+        <h1 className="text-lg font-semibold text-gray-300">Importar Processo de Contrato</h1>
         <Button variant="ghost" onClick={() => router.push("/processes")}>
           <X className="h-4 w-4 mr-2 stroke-1" />
           Cancelar
@@ -143,8 +143,8 @@ export default function ImportProcessPage() {
                   {file ? (
                     <div className="space-y-2">
                       <FileText className="h-12 w-12 mx-auto text-primary stroke-1" />
-                      <p className="font-medium text-foreground">{file.name}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="font-medium text-gray-300">{file.name}</p>
+                      <p className="text-sm text-gray-400">
                         {(file.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                       <Button variant="outline" size="sm" onClick={handleReset} className="mt-2">
@@ -153,7 +153,7 @@ export default function ImportProcessPage() {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <Upload className="h-12 w-12 mx-auto text-muted-foreground stroke-1" />
+                      <Upload className="h-12 w-12 mx-auto text-gray-400 stroke-1" />
                       <div>
                         <label
                           htmlFor="file-upload"
@@ -161,9 +161,9 @@ export default function ImportProcessPage() {
                         >
                           Clique para selecionar
                         </label>
-                        <span className="text-muted-foreground"> ou arraste o arquivo aqui</span>
+                        <span className="text-gray-400"> ou arraste o arquivo aqui</span>
                       </div>
-                      <p className="text-xs text-muted-foreground">Apenas arquivos PDF</p>
+                      <p className="text-xs text-gray-400">Apenas arquivos PDF</p>
                       <input
                         id="file-upload"
                         type="file"
@@ -214,7 +214,7 @@ export default function ImportProcessPage() {
               <Card>
                 <CardContent className="py-8 text-center">
                   <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary stroke-1" />
-                  <p className="text-muted-foreground">
+                  <p className="text-gray-400">
                     Analisando contrato com IA... Isso pode levar alguns segundos.
                   </p>
                 </CardContent>

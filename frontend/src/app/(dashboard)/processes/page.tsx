@@ -48,16 +48,19 @@ export default function ProcessesPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>("all")
   const [formOpen, setFormOpen] = useState(false)
   
+  // OTIMIZAÇÃO CRÍTICA: Reduzir page_size de 1000 para 50
+  // Paginação real será implementada se necessário
   const { data, isLoading } = useProcesses({
     category: selectedCategory !== "all" ? reverseCategoryMap[selectedCategory] || selectedCategory : undefined,
     status: selectedStatus !== "all" ? selectedStatus : undefined,
     page: 1,
-    page_size: 1000,
+    page_size: 50, // Reduzido de 1000 para 50 - OTIMIZAÇÃO CRÍTICA
   })
   
   const createMutation = useCreateProcess()
 
-  const processes = data?.items || []
+  // Memoizar processos para evitar recriação a cada render
+  const processes = useMemo(() => data?.items || [], [data?.items])
   const categories = Object.values(categoryMap)
   const statuses = ["rascunho", "em_revisao", "aprovado", "rejeitado"]
 
@@ -109,23 +112,20 @@ export default function ProcessesPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="h-[73px] border-b border-border/50 flex items-center justify-between px-4 md:px-6">
-        <h1 className="text-lg font-semibold text-foreground">
-          Processos
-        </h1>
+    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+      {/* Botão de ação */}
+      <div className="mb-4 flex justify-end">
         <Button onClick={() => setFormOpen(true)}>
           <Plus className="h-4 w-4 mr-2 stroke-1" />
           Novo Processo
         </Button>
       </div>
-      <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
-        {/* Filtros */}
-        <div className="mb-4 space-y-2">
-          <div className="flex flex-col sm:flex-row gap-4">
+      {/* Filtros */}
+      <div className="mb-4 space-y-2">
+        <div className="flex flex-col sm:flex-row gap-4">
             {/* Busca */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground stroke-1" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 stroke-1" />
               <Input
                 placeholder="Buscar processos..."
                 value={searchQuery}
@@ -165,45 +165,45 @@ export default function ProcessesPage() {
             </Select>
           </div>
 
-          {/* Botão limpar filtros */}
-          {hasFilters && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearFilters}
-                className="text-xs"
-              >
-                <X className="h-3 w-3 mr-1" />
-                Limpar Filtros
-              </Button>
-              <span className="text-xs text-muted-foreground">
-                {filteredProcesses.length} processo(s) encontrado(s)
-              </span>
-            </div>
-          )}
-        </div>
+        {/* Botão limpar filtros */}
+        {hasFilters && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearFilters}
+              className="text-xs"
+            >
+              <X className="h-3 w-3 mr-1" />
+              Limpar Filtros
+            </Button>
+            <span className="text-xs text-gray-400">
+              {filteredProcesses.length} processo(s) encontrado(s)
+            </span>
+          </div>
+        )}
+      </div>
 
-        {/* Lista de processos - Bento Grid */}
-        {isLoading ? (
+      {/* Lista de processos - Bento Grid */}
+      {isLoading ? (
           <Card className="card-elevated">
             <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">Carregando processos...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
+              <p className="text-gray-400">Carregando processos...</p>
             </CardContent>
           </Card>
         ) : Object.keys(groupedProcesses).length === 0 ? (
           <Card className="card-elevated">
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">
+              <p className="text-gray-400">
                 Nenhum processo encontrado com os filtros aplicados.
               </p>
             </CardContent>
           </Card>
-        ) : (
-          Object.entries(groupedProcesses).map(([category, categoryProcesses]) => (
+      ) : (
+        Object.entries(groupedProcesses).map(([category, categoryProcesses]) => (
             <div key={category} className="mb-6">
-              <h2 className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+              <h2 className="text-xs font-medium text-gray-400 mb-3 uppercase tracking-wide">
                 {category}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -217,10 +217,10 @@ export default function ProcessesPage() {
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3 flex-1">
                           <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-primary/10 transition-colors">
-                            <FileText className="h-4 w-4 text-foreground group-hover:text-primary transition-colors stroke-1" />
+                            <FileText className="h-4 w-4 text-gray-300 group-hover:text-primary transition-colors stroke-1" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <CardTitle className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+                            <CardTitle className="text-sm font-medium text-gray-300 line-clamp-2 group-hover:text-primary transition-colors">
                               {process.name}
                             </CardTitle>
                             <div className="mt-1">
@@ -237,7 +237,7 @@ export default function ProcessesPage() {
                         <span className={`text-xs px-2 py-1 rounded border ${categoryColors[category]}`}>
                           {category}
                         </span>
-                        <span className="text-xs text-muted-foreground font-light capitalize">
+                        <span className="text-xs text-gray-400 font-light capitalize">
                           {process.status?.replace("_", " ") || "rascunho"}
                         </span>
                       </div>
@@ -245,16 +245,15 @@ export default function ProcessesPage() {
                   </Card>
                 ))}
               </div>
-            </div>
-          ))
-        )}
+          </div>
+        ))
+      )}
 
-        <ProcessForm
-          open={formOpen}
-          onOpenChange={setFormOpen}
-          onSubmit={handleCreateProcess}
-        />
-      </div>
+      <ProcessForm
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        onSubmit={handleCreateProcess}
+      />
     </div>
   )
 }
