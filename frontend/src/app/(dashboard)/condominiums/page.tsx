@@ -85,7 +85,7 @@ export default function CondominiumsPage() {
   const activeCount = condominiums?.length || 0
 
   return (
-    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+    <div className="px-4 md:px-6 py-4 md:py-6">
       <div className="mb-4">
         <Button onClick={() => {
           setEditingId(null)
@@ -95,7 +95,7 @@ export default function CondominiumsPage() {
           Novo Condomínio
         </Button>
       </div>
-      <div className="p-4 sm:p-6">
+      <div>
         {/* Estatísticas */}
         <div className="grid gap-4 md:grid-cols-1 mb-6">
           <Card className="card-elevated">

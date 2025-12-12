@@ -123,7 +123,7 @@ export default function CadastrosPage() {
   ]
 
   return (
-    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+    <div className="px-4 md:px-6 py-4 md:py-6">
       <div className="mb-4">
         <p className="text-sm text-gray-400">Gerencie todos os cadastros do sistema</p>
       </div>

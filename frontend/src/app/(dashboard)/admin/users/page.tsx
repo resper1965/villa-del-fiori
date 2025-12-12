@@ -279,7 +279,7 @@ export default function AdminUsersPage() {
   const approvedCount = allUsers?.filter((u: any) => u.is_approved && u.is_active).length || 0
 
   return (
-    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+    <div className="px-4 md:px-6 py-4 md:py-6">
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-gray-400">
           Gerencie usuários do sistema e suas aprovações
@@ -289,7 +289,7 @@ export default function AdminUsersPage() {
           Novo Usuário
         </Button>
       </div>
-      <div className="p-4 sm:p-6">
+      <div>
         {/* Estatísticas */}
         <div className="grid gap-4 md:grid-cols-2 mb-6">
           <Card>

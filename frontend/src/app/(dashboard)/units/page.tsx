@@ -123,7 +123,7 @@ export default function UnitsPage() {
   const activeCount = units?.length || 0
 
   return (
-    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+    <div className="px-4 md:px-6 py-4 md:py-6">
       <div className="mb-4">
         <div className="flex gap-2">
           <Button 
@@ -138,7 +138,7 @@ export default function UnitsPage() {
           </Button>
         </div>
       </div>
-      <div className="p-4 sm:p-6">
+      <div>
         {/* Estatísticas */}
         <div className="grid gap-4 md:grid-cols-1 mb-6">
           <Card>

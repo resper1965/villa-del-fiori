@@ -92,7 +92,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="px-4 md:px-6 py-4 md:py-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-400">

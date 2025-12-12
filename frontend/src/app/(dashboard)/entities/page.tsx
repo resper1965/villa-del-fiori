@@ -71,7 +71,7 @@ export default function EntitiesPage() {
   }
 
   return (
-    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+    <div className="px-4 md:px-6 py-4 md:py-6">
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-gray-400">
           Serviços públicos e prestadores referenciados (sem contrato)

@@ -73,7 +73,7 @@ export default function ApprovalsPage() {
   }
 
   return (
-    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+    <div className="px-4 md:px-6 py-4 md:py-6">
       {isLoading ? (
           <Card>
             <CardContent className="py-12 text-center">

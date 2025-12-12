@@ -112,7 +112,7 @@ export default function ProcessesPage() {
   }
 
   return (
-    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+    <div className="px-4 md:px-6 py-4 md:py-6">
       {/* Botão de ação */}
       <div className="mb-4 flex justify-end">
         <Button onClick={() => setFormOpen(true)}>

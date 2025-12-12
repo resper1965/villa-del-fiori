@@ -102,14 +102,14 @@ export default function VehiclesPage() {
   const activeCount = vehicles?.length || 0
 
   return (
-    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+    <div className="px-4 md:px-6 py-4 md:py-6">
       <div className="mb-4">
         <Button onClick={() => setFormOpen(true)}>
           <Plus className="h-4 w-4 mr-2 stroke-1" />
           Novo Veículo
         </Button>
       </div>
-      <div className="p-4 sm:p-6">
+      <div>
         {/* Estatísticas */}
         <div className="grid gap-4 md:grid-cols-1 mb-6">
           <Card>

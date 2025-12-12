@@ -38,7 +38,7 @@ export default function DashboardPage() {
 
   if (isLoadingStats) {
     return (
-      <div className="px-1 sm:px-2 md:px-3 py-2 flex items-center justify-center min-h-[400px]">
+      <div className="px-4 md:px-6 py-4 md:py-6 flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
           <p className="text-gray-400">Carregando estatísticas...</p>
@@ -48,7 +48,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="px-1 sm:px-2 md:px-3 py-4 md:py-6">
+    <div className="px-4 md:px-6 py-4 md:py-6">
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {/* Card Total - Span 2 em telas grandes */}
