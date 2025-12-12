@@ -70,7 +70,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/dashboard">
+              <Link href="/dashboard" className="flex items-center justify-center">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Image
                     src="/logo.png"
@@ -80,10 +80,6 @@ export function AppSidebar() {
                     className="h-auto w-auto"
                     priority
                   />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Gabi</span>
-                  <span className="truncate text-xs">Síndica Virtual</span>
                 </div>
               </Link>
             </SidebarMenuButton>
