@@ -298,7 +298,7 @@ const SidebarHeader = React.forwardRef<HTMLDivElement, React.ComponentProps<"div
       <div
         ref={ref}
         data-sidebar="header"
-        className={cn("flex h-[180px] shrink-0 items-center gap-2 border-b border-sidebar-border px-4", className)}
+        className={cn("flex h-[100px] shrink-0 items-center gap-2 border-b border-sidebar-border px-4", className)}
         {...props}
       />
     )

@@ -61,13 +61,13 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="text-center space-y-2">
-          <div className="flex items-center justify-center mb-2">
+          <div className="flex items-center justify-center mb-2 p-2">
             <Image
               src="/logo.png"
               alt="Gabi - Síndica Virtual"
-              width={600}
-              height={240}
-              className="h-auto w-auto max-w-[600px]"
+              width={300}
+              height={120}
+              className="h-auto w-auto max-w-[300px] object-contain object-center"
               priority
             />
           </div>
