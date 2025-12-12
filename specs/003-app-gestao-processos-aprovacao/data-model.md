@@ -2,7 +2,7 @@
 
 **Feature**: `003-app-gestao-processos-aprovacao`  
 **Date**: 2024-12-08  
-**Updated**: 2025-01-09  
+**Updated**: 2025-01-15  
 **Application Name**: Gabi - Síndica Virtual
 
 ## Visão Geral
@@ -63,8 +63,88 @@ CREATE TABLE stakeholders (
 - `auth_user_id` (unique)
 - `is_approved`
 - `user_role`
+- `unit_id` (foreign key)
 
-### 2. Process
+**Relacionamentos**:
+- `auth_user_id` → `auth.users.id`
+- `unit_id` → `units.id` (opcional, obrigatório para moradores, síndicos, subsíndicos e conselheiros)
+- `approved_by` → `stakeholders.id` (self-referential)
+
+### 2. Unit
+
+Representa unidades (apartamentos/casas) do condomínio. Cada morador, síndico, subsíndico e conselheiro deve estar associado a uma unidade.
+
+**Tabela**: `units`
+
+```sql
+CREATE TABLE units (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    number VARCHAR(50) NOT NULL UNIQUE,  -- Número da unidade (ex: "101", "Apto 201", "Casa 1")
+    block VARCHAR(50),  -- Bloco (se aplicável)
+    floor INTEGER,  -- Andar (se aplicável)
+    area DECIMAL(10, 2),  -- Área em m²
+    parking_spots INTEGER DEFAULT 0,  -- Número de vagas de garagem
+    description TEXT,  -- Descrição adicional
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Índices**: 
+- `number` (unique)
+- `block`
+- `is_active`
+
+**Relacionamentos**:
+- `stakeholders` (1:N) - múltiplos stakeholders podem estar associados a uma unidade
+- `vehicles` (1:N) - múltiplos veículos podem estar associados a uma unidade
+
+### 3. Vehicle
+
+Representa veículos cadastrados no condomínio, associados a unidades ou stakeholders.
+
+**Tabela**: `vehicles`
+
+```sql
+CREATE TABLE vehicles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    unit_id UUID REFERENCES units(id) ON DELETE CASCADE,  -- Unidade associada
+    stakeholder_id UUID REFERENCES stakeholders(id) ON DELETE SET NULL,  -- Stakeholder proprietário (opcional)
+    brand VARCHAR(100) NOT NULL,  -- Marca (ex: "Toyota", "Honda", "Fiat")
+    model VARCHAR(100) NOT NULL,  -- Modelo (ex: "Corolla", "Civic", "Uno")
+    license_plate VARCHAR(10) NOT NULL UNIQUE,  -- Placa (formato: ABC1234 ou ABC1D23)
+    color VARCHAR(50),  -- Cor do veículo
+    year INTEGER,  -- Ano de fabricação
+    vehicle_type VARCHAR(50) DEFAULT 'carro',  -- Tipo: carro, moto, caminhao, van, outro
+    notes TEXT,  -- Observações adicionais
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    -- Garantir que tenha pelo menos unit_id ou stakeholder_id
+    CONSTRAINT vehicles_owner_check CHECK (
+        (unit_id IS NOT NULL) OR (stakeholder_id IS NOT NULL)
+    )
+);
+```
+
+**Índices**: 
+- `unit_id`
+- `stakeholder_id`
+- `license_plate` (unique)
+- `is_active`
+
+**Relacionamentos**:
+- `unit_id` → `units.id` (obrigatório)
+- `stakeholder_id` → `stakeholders.id` (opcional, pode ser inferido da unidade)
+
+**Notas**:
+- Placa é normalizada automaticamente (maiúsculas, sem espaços/hífens)
+- Suporta formatos antigo (ABC1234) e Mercosul (ABC1D23)
+- Validação de placa única no sistema
+
+### 4. Process
 
 Representa um processo condominial documentado.
 
@@ -98,7 +178,7 @@ CREATE TABLE processes (
 - `approvals` (1:N)
 - `rejections` (1:N)
 
-### 3. ProcessVersion
+### 5. ProcessVersion
 
 Representa uma versão específica de um processo. Versões são imutáveis após criação.
 
@@ -132,7 +212,7 @@ CREATE TABLE process_versions (
 - `created_by` → `stakeholders.id`
 - `previous_version_id` → `process_versions.id` (self-referential)
 
-### 4. Approval
+### 6. Approval
 
 Representa aprovação de processo por stakeholder.
 
@@ -158,7 +238,7 @@ CREATE TABLE approvals (
 - `stakeholder_id`
 - `approved_at`
 
-### 5. Rejection
+### 7. Rejection
 
 Representa rejeição de processo por stakeholder.
 
@@ -183,7 +263,7 @@ CREATE TABLE rejections (
 - `stakeholder_id`
 - `rejected_at`
 
-### 6. Entity
+### 8. Entity
 
 Representa entidades envolvidas nos processos (pessoas, empresas, serviços, infraestrutura).
 
@@ -211,7 +291,7 @@ CREATE TABLE entities (
 
 **Nota**: Inclui entidade do condomínio com informações completas (CNPJ, endereço, descrição).
 
-### 7. Chat Conversations
+### 9. Chat Conversations
 
 Representa conversas do chat com Gabi (Síndica Virtual).
 
@@ -227,7 +307,7 @@ CREATE TABLE chat_conversations (
 );
 ```
 
-### 8. Chat Messages
+### 10. Chat Messages
 
 Representa mensagens do chat.
 
@@ -245,7 +325,7 @@ CREATE TABLE chat_messages (
 );
 ```
 
-### 9. Documents (Base de Conhecimento)
+### 11. Documents (Base de Conhecimento)
 
 Representa documentos para base de conhecimento (usado pelo chat).
 
@@ -266,7 +346,7 @@ CREATE TABLE documents (
 );
 ```
 
-### 10. Validation Results
+### 12. Validation Results
 
 Resultados de validação de processos.
 
@@ -315,6 +395,8 @@ Todas as tabelas têm RLS habilitado. Policies garantem que:
 - Aprovações/rejeições só podem ser feitas por stakeholders autorizados
 - Processos podem ser visualizados por usuários aprovados
 - Entidades podem ser gerenciadas por administradores
+- Unidades podem ser visualizadas por usuários aprovados
+- Veículos podem ser visualizados por usuários aprovados, editados apenas por administradores
 
 ## Migrations
 
@@ -328,3 +410,5 @@ Principais migrations:
 - `009_seed_entities.sql`: Seed de entidades
 - `010_add_condominio_entity.sql`: Entidade do condomínio
 - `011_add_cnpj_to_entities.sql`: Campo CNPJ
+- `017_create_units_table.sql`: Tabela de unidades (apartamentos)
+- `018_create_vehicles_table.sql`: Tabela de veículos

@@ -12,21 +12,15 @@ Sistema de validação que garante que todas as entidades mencionadas em process
 
 ### Backend
 
-**Novos Endpoints:**
-- `POST /api/v1/processes/validate` - Valida entidades de um processo
-- `POST /api/v1/processes/validate-batch` - Validação em lote
-- `GET /api/v1/validation/dashboard` - Dashboard de integridade
-- `GET /api/v1/validation/missing-entities` - Lista entidades faltantes
+**Edge Functions:**
+- `validate-entities` - Valida entidades de um processo ou em lote
+- `integrity-metrics` - Retorna métricas de integridade
 
-**Services:**
-- `EntityValidationService` - Lógica de validação de entidades
-- `ProcessValidationService` - Validação de processos
-- `ValidationCacheService` - Cache de validações
-
-**Models:**
-- `ValidationResult` - Resultado de validação
-- `ValidationReport` - Relatório de validação em lote
-- `IntegrityMetrics` - Métricas de integridade
+**Funções SQL:**
+- `validate_process_entities()` - Valida lista de entidades
+- `validate_process_entities_by_id()` - Valida entidades de um processo
+- `validate_all_processes_entities()` - Validação em lote
+- `get_entity_integrity_metrics()` - Métricas de integridade
 
 ### Frontend
 
@@ -42,10 +36,10 @@ Sistema de validação que garante que todas as entidades mencionadas em process
 
 ## Technology Stack
 
-- **Backend**: FastAPI (Python)
+- **Backend**: Supabase Edge Functions (Deno/TypeScript)
 - **Frontend**: Next.js 14, React, TypeScript
-- **Database**: PostgreSQL (já existe)
-- **Cache**: Redis (opcional) ou cache em memória
+- **Database**: PostgreSQL (via Supabase)
+- **Cache**: Cache em memória (opcional)
 
 ## Implementation Phases
 
@@ -86,37 +80,61 @@ CREATE TABLE validation_cache (
 
 ## API Contracts
 
-### POST /api/v1/processes/validate
+### POST /functions/v1/validate-entities
 
 **Request:**
 ```json
 {
-  "process_id": "uuid",
-  "entities": ["Síndico", "Moradores"]
+  "entity_names": ["Síndico", "Moradores"]
+}
+```
+
+ou
+
+```json
+{
+  "process_id": "uuid"
+}
+```
+
+ou
+
+```json
+{
+  "batch": true
 }
 ```
 
 **Response:**
 ```json
 {
+  "success": true,
   "valid": true,
-  "missing_entities": [],
-  "incomplete_entities": [],
-  "errors": []
+  "results": [...],
+  "stats": {
+    "total": 2,
+    "valid": 2,
+    "missing": 0,
+    "incomplete": 0
+  }
 }
 ```
 
-### GET /api/v1/validation/dashboard
+### GET /functions/v1/integrity-metrics
 
 **Response:**
 ```json
 {
-  "total_entities": 50,
-  "complete_entities": 45,
-  "incomplete_entities": 5,
-  "total_processes": 35,
-  "validated_processes": 30,
-  "processes_with_issues": 5
+  "success": true,
+  "metrics": {
+    "total_entities": 50,
+    "complete_entities": 45,
+    "incomplete_entities": 5,
+    "total_processes": 35,
+    "processes_with_valid_entities": 30,
+    "processes_with_invalid_entities": 5,
+    "orphaned_entities": 2
+  }
 }
 ```
 

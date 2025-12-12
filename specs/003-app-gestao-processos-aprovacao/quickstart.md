@@ -53,6 +53,10 @@ Aplique as migrations SQL em ordem via Supabase Dashboard SQL Editor ou MCP tool
 -- 010_add_condominio_entity.sql
 -- 011_add_cnpj_to_entities.sql
 -- 012_add_condominio_entity_complete.sql
+-- 017_create_units_table.sql
+-- 018_create_vehicles_table.sql
+-- 019_rls_policies_units_vehicles.sql
+-- 020_seed_initial_units.sql (opcional - ajuste conforme seu condomínio)
 ```
 
 ### 4. Seed de Processos (Opcional)

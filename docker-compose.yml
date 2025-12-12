@@ -34,7 +34,7 @@ services:
     environment:
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-    # Não depende mais do backend FastAPI
+    # Backend via Supabase (não requer container local)
 
 volumes:
   postgres_data:

@@ -4,27 +4,37 @@
 
 @layer base {
   :root {
-    /* Tema Dark - Escala Gray do shadcn */
-    --background: 0 0% 9%;          /* gray-900 - fundo principal */
-    --foreground: 0 0% 98%;         /* gray-50 - texto principal */
-    --card: 0 0% 9%;                /* gray-900 - cards */
-    --card-foreground: 0 0% 98%;    /* gray-50 */
-    --popover: 0 0% 3.9%;           /* gray-950 */
-    --popover-foreground: 0 0% 98%; /* gray-50 */
+    /* Tema Dark - Mesmas cores da página de login */
+    --background: 0 0% 3.9%;        /* gray-950 - fundo principal (mesmo do login) */
+    --foreground: 0 0% 90%;         /* gray-300 - texto principal (mesmo do login) */
+    --card: 0 0% 14.9%;             /* gray-800/90 - cards (mesmo do login) */
+    --card-foreground: 0 0% 90%;    /* gray-300 */
+    --popover: 0 0% 14.9%;          /* gray-800 */
+    --popover-foreground: 0 0% 90%; /* gray-300 */
     --primary: 197 100% 45%;        /* #00ade8 - cor de destaque */
-    --primary-foreground: 0 0% 98%; /* gray-50 */
+    --primary-foreground: 0 0% 100%; /* branco */
     --secondary: 0 0% 14.9%;        /* gray-800 - elementos secundários */
-    --secondary-foreground: 0 0% 98%; /* gray-50 */
+    --secondary-foreground: 0 0% 90%; /* gray-300 */
     --muted: 0 0% 14.9%;            /* gray-800 - elementos muted */
-    --muted-foreground: 0 0% 63.9%; /* gray-400 - texto muted */
+    --muted-foreground: 0 0% 63.9%; /* gray-400 - texto muted (mesmo do login) */
     --accent: 0 0% 14.9%;           /* gray-800 - elementos de destaque */
-    --accent-foreground: 0 0% 98%;  /* gray-50 */
+    --accent-foreground: 0 0% 90%;  /* gray-300 */
     --destructive: 0 62.8% 30.6%;   /* vermelho para erros */
     --destructive-foreground: 0 0% 98%; /* gray-50 */
-    --border: 0 0% 14.9%;           /* gray-800 - bordas */
-    --input: 0 0% 14.9%;            /* gray-800 - inputs */
-    --ring: 0 0% 83.1%;             /* gray-200 - anel de foco */
+    --border: 0 0% 27.5%;           /* gray-700/50 - bordas (mesmo do login) */
+    --input: 0 0% 3.9%;             /* gray-900/50 - inputs (mesmo do login) */
+    --ring: 197 100% 45%;           /* #00ade8 - anel de foco */
     --radius: 0.5rem;
+    
+    /* Sidebar variables */
+    --sidebar-background: 0 0% 14.9%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 197 100% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 27.5%;
+    --sidebar-ring: 197 100% 45%;
   }
 
   .light {
@@ -47,6 +57,16 @@
     --border: 0 0% 89.8%;           /* gray-200 */
     --input: 0 0% 89.8%;            /* gray-200 */
     --ring: 0 0% 3.9%;              /* gray-950 */
+    
+    /* Sidebar variables (light mode) */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 3.9%;
+    --sidebar-primary: 0 0% 9%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 96.1%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 89.8%;
+    --sidebar-ring: 0 0% 3.9%;
   }
 }
 
@@ -61,6 +81,29 @@
     background: linear-gradient(to bottom right, hsl(0 0% 3.9%) 0%, hsl(0 0% 9%) 50%, hsl(0 0% 14.9%) 100%);
     background-attachment: fixed;
     min-height: 100vh;
+    color: hsl(0 0% 90%); /* gray-300 - mesmo do login */
+  }
+}
+
+@layer base {
+  /* Sidebar utility classes */
+  .bg-sidebar {
+    background-color: hsl(var(--sidebar-background));
+  }
+  .text-sidebar-foreground {
+    color: hsl(var(--sidebar-foreground));
+  }
+  .bg-sidebar-accent {
+    background-color: hsl(var(--sidebar-accent));
+  }
+  .text-sidebar-accent-foreground {
+    color: hsl(var(--sidebar-accent-foreground));
+  }
+  .border-sidebar-border {
+    border-color: hsl(var(--sidebar-border));
+  }
+  .ring-sidebar-ring {
+    --tw-ring-color: hsl(var(--sidebar-ring));
   }
 }
 
@@ -122,14 +165,14 @@
     }
   }
   
-  /* Card com profundidade e hover suave */
+  /* Card com profundidade e hover suave - mesmo estilo do login */
   .card-elevated {
-    @apply bg-card/50 backdrop-blur-sm border border-border/50 shadow-lg;
+    @apply bg-gray-800/90 backdrop-blur-md border border-gray-700/50 shadow-2xl;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .card-elevated:hover {
-    @apply border-primary/20 shadow-xl;
+    @apply border-primary/20 shadow-2xl;
     transform: translateY(-2px);
   }
   

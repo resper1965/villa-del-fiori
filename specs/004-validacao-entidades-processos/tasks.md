@@ -59,7 +59,7 @@
 - [ ] T028 [US2] Implement validate_all_processes() method
 - [ ] T029 [US2] Create ValidationReport model in backend/src/app/models/validation.py
 - [ ] T030 [US2] Create POST /api/v1/processes/validate-batch endpoint
-- [ ] T031 [US2] Implement background job for batch validation (Celery ou FastAPI BackgroundTasks)
+- [x] T031 [US2] Implement batch validation via Edge Function (já implementado)
 - [ ] T032 [P] [US2] Create ValidationReport component in frontend/src/components/validation/ValidationReport.tsx
 - [ ] T033 [US2] Create validation batch page in frontend/src/app/(dashboard)/validation/page.tsx
 - [ ] T034 [US2] Implement report export (CSV/JSON)

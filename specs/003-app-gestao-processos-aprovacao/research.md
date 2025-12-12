@@ -18,10 +18,10 @@
 - **TanStack Table**: Tabelas avançadas com sorting, filtering, pagination
 - **shadcn/ui**: Componentes acessíveis e customizáveis
 
-**Alternativas Consideradas**:
-- ❌ FastAPI + PostgreSQL: Mais controle mas requer mais infraestrutura e manutenção (não escolhido)
-- ❌ Firebase: Similar ao Supabase mas menos focado em PostgreSQL e relacionamentos
-- ❌ Django: Mais "baterias incluídas" mas mais pesado, menos flexível para API pura
+**Alternativas Consideradas** (não implementadas):
+- FastAPI + PostgreSQL: Mais controle mas requer mais infraestrutura e manutenção
+- Firebase: Similar ao Supabase mas menos focado em PostgreSQL e relacionamentos
+- Django: Mais "baterias incluídas" mas mais pesado, menos flexível para API pura
 
 ### 2. Banco de Dados
 
@@ -36,9 +36,9 @@
 - **Row Level Security (RLS)**: Segurança no nível do banco de dados
 - **PostgREST**: API REST automática gerada do schema
 
-**Alternativas Consideradas**:
-- ❌ MongoDB: Mais flexível para documentos, mas relacionamentos complexos são mais difíceis
-- ❌ SQLite: Simples mas não adequado para produção com múltiplos usuários simultâneos
+**Alternativas Consideradas** (não implementadas):
+- MongoDB: Mais flexível para documentos, mas relacionamentos complexos são mais difíceis
+- SQLite: Simples mas não adequado para produção com múltiplos usuários simultâneos
 
 ### 3. Autenticação e Autorização
 
@@ -131,9 +131,9 @@
 - Tailwind CSS para estilização
 - Design responsivo para mobile, tablet e desktop
 
-## Migração de FastAPI para Supabase
+## Arquitetura Backend
 
-**Decisão**: Migração completa de FastAPI para Supabase
+**Decisão**: Supabase como Backend-as-a-Service completo
 
 **Rationale**:
 - Redução de complexidade de infraestrutura
@@ -141,16 +141,11 @@
 - Deploy mais simples
 - Melhor integração entre frontend e backend
 
-**O que foi migrado**:
-- ✅ Database: PostgreSQL (mantido, agora via Supabase)
-- ✅ Auth: JWT customizado → Supabase Auth
-- ✅ API: FastAPI endpoints → Supabase PostgREST + Edge Functions
-- ✅ Storage: Local/Cloud → Supabase Storage (se necessário)
-
-**O que foi removido**:
-- ❌ Backend FastAPI (não mais necessário)
-- ❌ API client customizado (substituído por Supabase client)
-- ❌ Sistema de autenticação JWT customizado
+**Stack Atual**:
+- ✅ Database: PostgreSQL via Supabase
+- ✅ Auth: Supabase Auth
+- ✅ API: Supabase PostgREST + Edge Functions (Deno/TypeScript)
+- ✅ Storage: Supabase Storage (quando necessário)
 
 ## Performance e Escalabilidade
 

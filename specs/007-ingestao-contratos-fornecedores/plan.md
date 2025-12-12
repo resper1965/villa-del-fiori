@@ -9,10 +9,10 @@ Sistema para ingestão de contratos de fornecedores com análise automática por
 
 ## Technical Context
 
-**Language/Version**: Python 3.11 (Backend), TypeScript/React 18 (Frontend)  
-**Primary Dependencies**: FastAPI, SQLAlchemy, OpenAI API, PyPDF2/pdfplumber, python-docx, LangChain (opcional)  
-**Storage**: PostgreSQL (metadados), S3/MinIO (arquivos), Redis (cache de análises)  
-**Testing**: pytest (backend), Vitest/Jest (frontend)  
+**Language/Version**: TypeScript/Deno (Edge Functions), TypeScript/React 18 (Frontend)  
+**Primary Dependencies**: Supabase Edge Functions, OpenAI API, Deno libraries para PDF/DOCX, Supabase Storage  
+**Storage**: PostgreSQL (metadados via Supabase), Supabase Storage (arquivos)  
+**Testing**: Testes de Edge Functions (planejado)  
 **Target Platform**: Linux server (Docker), Web browser  
 **Project Type**: Web application (monorepo com backend e frontend)  
 **Performance Goals**: Processamento de contrato < 2 min, API response < 500ms  
@@ -36,32 +36,25 @@ specs/007-ingestao-contratos-fornecedores/
 ### Source Code (repository root)
 
 ```text
-backend/
-├── src/
-│   ├── app/
-│   │   ├── api/v1/endpoints/
-│   │   │   └── contracts.py          # Novos endpoints de contratos
-│   │   ├── models/
-│   │   │   ├── contract.py           # Modelo Contract
-│   │   │   ├── contract_analysis.py  # Modelo ContractAnalysis
-│   │   │   └── suggested_process.py  # Modelo SuggestedProcess
-│   │   ├── schemas/
-│   │   │   └── contract.py           # Schemas Pydantic
-│   │   └── services/
-│   │       ├── contract_service.py           # Upload, processamento
-│   │       ├── document_extraction_service.py # Extração de texto
-│   │       ├── ai_analysis_service.py        # Análise por IA
-│   │       └── process_generation_service.py # Geração de processos
-│   └── alembic/
-│       └── versions/
-│           └── 004_add_contracts_tables.py   # Migração
-└── tests/
+supabase/
+├── functions/
+│   ├── upload-contract/
+│   │   └── index.ts              # Edge Function de upload
+│   ├── extract-document-text/
+│   │   └── index.ts              # Edge Function de extração
+│   ├── analyze-contract/
+│   │   └── index.ts              # Edge Function de análise IA
+│   └── generate-process-from-contract/
+│       └── index.ts              # Edge Function de geração
+└── migrations/
+    └── XXX_create_contracts_tables.sql   # Migration SQL
+└── tests/ (planejado)
     ├── unit/
-    │   ├── test_document_extraction.py
-    │   ├── test_ai_analysis.py
-    │   └── test_process_generation.py
+    │   ├── test_document_extraction.ts
+    │   ├── test_ai_analysis.ts
+    │   └── test_process_generation.ts
     └── integration/
-        └── test_contract_workflow.py
+        └── test_contract_workflow.ts
 
 frontend/
 ├── src/
@@ -90,7 +83,7 @@ frontend/
         └── ContractUpload.test.tsx
 ```
 
-**Structure Decision**: Web application com separação clara entre backend (FastAPI) e frontend (Next.js). Novos endpoints e modelos integrados à estrutura existente.
+**Structure Decision**: Web application com backend via Supabase (Edge Functions + PostgreSQL) e frontend (Next.js). Novos endpoints via Edge Functions integrados à estrutura existente.
 
 ## Architecture Overview
 
@@ -106,12 +99,11 @@ frontend/
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              BACKEND (FastAPI)                              │
+│                    BACKEND (Supabase Edge Functions)                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │                         API Endpoints                                 │   │
-│  │  POST /contracts/upload    GET /contracts/{id}/analysis              │   │
-│  │  POST /contracts/{id}/analyze   POST /contracts/{id}/generate       │   │
+│  │                      Edge Functions                                   │   │
+│  │  upload-contract    analyze-contract    generate-process             │   │
 │  └──────────────────────────────────────────────────────────────────────┘   │
 │                                    │                                        │
 │  ┌─────────────────────────────────▼────────────────────────────────────┐   │
@@ -131,8 +123,9 @@ frontend/
           ┌─────────────────────────┼─────────────────────────┐
           ▼                         ▼                         ▼
     ┌───────────┐            ┌───────────┐            ┌───────────┐
-    │PostgreSQL │            │  S3/MinIO │            │  OpenAI   │
-    │ (metadata)│            │  (files)  │            │   API     │
+    │PostgreSQL │            │ Supabase  │            │  OpenAI   │
+    │ (metadata)│            │  Storage  │            │   API     │
+    │ (Supabase)│            │  (files)  │            │           │
     └───────────┘            └───────────┘            └───────────┘
 ```
 
@@ -143,10 +136,10 @@ frontend/
 **Objetivo**: Configurar dependências, modelos de dados e infraestrutura básica.
 
 **Tarefas**:
-1. Adicionar dependências: `openai`, `pdfplumber`, `python-docx`, `langchain` (opcional)
-2. Criar migração de banco de dados para novas tabelas
-3. Configurar armazenamento de arquivos (S3 ou local)
-4. Configurar variáveis de ambiente para OpenAI API
+1. Adicionar dependências Deno para extração de documentos (PDF/DOCX)
+2. Criar migração SQL para novas tabelas no Supabase
+3. Configurar Supabase Storage para arquivos
+4. Configurar variáveis de ambiente para OpenAI API nas Edge Functions
 
 **Entregável**: Infraestrutura pronta para desenvolvimento.
 
@@ -158,14 +151,14 @@ frontend/
 
 **Tarefas**:
 
-1. **Backend: Modelo Contract**
-   - Criar modelo SQLAlchemy `Contract`
-   - Criar schemas Pydantic para request/response
-   - Criar migração Alembic
+1. **Backend: Tabela Contract**
+   - Criar tabela SQL `contracts` via migration
+   - Criar tipos TypeScript para request/response
+   - Criar migration SQL no Supabase
 
 2. **Backend: Serviço de Extração de Documentos**
-   - Implementar extração de PDF (`pdfplumber`)
-   - Implementar extração de DOC/DOCX (`python-docx`)
+   - Implementar extração de PDF (bibliotecas Deno)
+   - Implementar extração de DOC/DOCX (bibliotecas Deno)
    - Criar interface unificada para diferentes formatos
 
 3. **Backend: Serviço de Contratos**
@@ -195,12 +188,12 @@ frontend/
 
 **Tarefas**:
 
-1. **Backend: Modelo ContractAnalysis e SuggestedProcess**
-   - Criar modelos para análise e sugestões
-   - Migração Alembic
+1. **Backend: Tabelas ContractAnalysis e SuggestedProcess**
+   - Criar tabelas SQL para análise e sugestões
+   - Migration SQL no Supabase
 
-2. **Backend: Serviço de Análise por IA**
-   - Configurar cliente OpenAI
+2. **Backend: Edge Function de Análise por IA**
+   - Configurar cliente OpenAI (Deno)
    - Criar prompts estruturados para análise
    - Implementar extração de:
      - Identificação do fornecedor

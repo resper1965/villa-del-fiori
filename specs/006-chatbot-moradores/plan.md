@@ -19,7 +19,7 @@ Chatbot inteligente que responde perguntas dos moradores baseado no conteúdo do
    - Renderização de markdown e links
 
 2. **Backend - API de Chat**
-   - FastAPI endpoints
+   - Supabase Edge Functions
    - Gerenciamento de sessões
    - Integração com RAG system
    - Integração com LLM
@@ -43,9 +43,8 @@ Chatbot inteligente que responde perguntas dos moradores baseado no conteúdo do
 - WebSocket client (opcional)
 
 **Backend:**
-- FastAPI (Python)
-- WebSocket support (opcional)
-- Celery para processamento assíncrono (opcional)
+- Supabase Edge Functions (Deno/TypeScript)
+- WebSocket support (opcional, via Supabase Realtime)
 
 **LLM:**
 - OpenAI GPT-4 (recomendado para produção)

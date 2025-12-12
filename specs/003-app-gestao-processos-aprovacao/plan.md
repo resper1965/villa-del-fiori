@@ -11,17 +11,17 @@
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.3+ (frontend), Node.js 20+, Python 3.11+ (scripts)  
+**Language/Version**: TypeScript 5.6+ (frontend e Edge Functions), Node.js 20+, Deno (Edge Functions)  
 **Primary Dependencies**: 
 - **Backend**: Supabase (PostgreSQL, Auth, Storage, Edge Functions)
-- **Frontend**: Next.js 14.0.4, React 18.2, TypeScript 5.3, Tailwind CSS 3.3, shadcn/ui, @tanstack/react-query 5.12, @tanstack/react-table 8.21, @supabase/supabase-js 2.87
+- **Frontend**: Next.js 14.2.18, React 18.3, TypeScript 5.6, Tailwind CSS 3.4, shadcn/ui, @tanstack/react-query 5.62, @tanstack/react-table 8.21, @supabase/supabase-js 2.47
 - **Database**: PostgreSQL 15+ (via Supabase)
 - **Infrastructure**: Vercel (frontend), Supabase (backend)
 
 **Storage**: Supabase PostgreSQL 15+ para dados relacionais (processos, versões, aprovações, stakeholders, histórico)  
 **Authentication**: Supabase Auth com sistema de aprovação de usuários e RBAC  
 **Testing**: 
-- Frontend: Jest, React Testing Library, Playwright (E2E) - planejado
+- Frontend: Testes automatizados - planejado (não implementado)
 - Integration: Testes via Supabase MCP tools
 
 **Target Platform**: Web (navegadores modernos: Chrome, Firefox, Safari, Edge - últimas 2 versões)  

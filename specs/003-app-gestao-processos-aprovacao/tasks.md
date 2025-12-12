@@ -16,7 +16,7 @@
 **Purpose**: Project initialization and basic structure
 
 - [ ] T001 Create project structure per implementation plan (backend/, frontend/, docker-compose.yml)
-- [ ] T002 [P] Initialize backend Python project with FastAPI dependencies in backend/
+- [x] T002 [P] Backend via Supabase (Edge Functions + PostgreSQL) - já implementado
 - [ ] T003 [P] Initialize frontend Next.js project with TypeScript in frontend/
 - [ ] T004 [P] Configure linting and formatting tools (black, ruff, eslint, prettier)
 - [ ] T005 [P] Setup Docker and Docker Compose configuration

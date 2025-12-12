@@ -13,105 +13,88 @@ Tarefas organizadas por fase de implementação, seguindo o plano técnico.
 ## Phase 0: Preparação e Infraestrutura
 
 ### T0.1 - Configurar Dependências
-- [ ] Adicionar ao `backend/requirements.txt`:
-  - `openai>=1.0.0`
-  - `pdfplumber>=0.10.0`
-  - `python-docx>=1.0.0`
-  - `boto3>=1.28.0` (para S3)
-  - `python-multipart>=0.0.6` (para upload)
-- [ ] Instalar dependências: `pip install -r requirements.txt`
-- [ ] Verificar compatibilidade com dependências existentes
+- [ ] Adicionar dependências Deno nas Edge Functions:
+  - `openai` (via npm ou deno.land/x)
+  - Bibliotecas Deno para extração de PDF/DOCX
+- [ ] Configurar import map para Edge Functions
+- [ ] Verificar compatibilidade com Supabase Edge Functions runtime
 
 ### T0.2 - Configurar Variáveis de Ambiente
-- [ ] Adicionar ao `.env`:
+- [ ] Adicionar variáveis de ambiente no Supabase Dashboard:
   ```
   OPENAI_API_KEY=sk-...
-  OPENAI_MODEL=gpt-4
-  AWS_ACCESS_KEY_ID=...
-  AWS_SECRET_ACCESS_KEY=...
-  S3_BUCKET_NAME=contracts
-  S3_REGION=us-east-1
-  # ou para storage local:
-  STORAGE_TYPE=local
-  LOCAL_STORAGE_PATH=/data/contracts
+  OPENAI_MODEL=gpt-4o-mini
   ```
-- [ ] Atualizar `backend/src/app/core/config.py` com novas configurações
+- [ ] Configurar Supabase Storage bucket para contratos
+- [ ] Configurar políticas de acesso ao Storage
 
 ### T0.3 - Configurar Storage de Arquivos
-- [ ] Criar serviço de storage abstrato (`storage_service.py`)
-- [ ] Implementar adapter para S3
-- [ ] Implementar adapter para storage local (dev)
-- [ ] Criar pasta de uploads se storage local
+- [ ] Criar bucket no Supabase Storage para contratos
+- [ ] Configurar políticas RLS no Storage
+- [ ] Implementar funções de upload/download usando Supabase Storage client
 
 ### T0.4 - Criar Migração de Banco de Dados
-- [ ] Criar arquivo `backend/alembic/versions/004_add_contracts_tables.py`
-- [ ] Implementar upgrade() conforme data-model.md
-- [ ] Implementar downgrade()
-- [ ] Executar migração: `alembic upgrade head`
+- [ ] Criar arquivo `supabase/migrations/XXX_create_contracts_tables.sql`
+- [ ] Implementar CREATE TABLE conforme data-model.md
+- [ ] Adicionar índices e constraints
+- [ ] Aplicar migração via Supabase Dashboard ou MCP
 - [ ] Verificar tabelas criadas
 
 ---
 
 ## Phase 1: Ingestão de Contratos (US-1)
 
-### T1.1 - Criar Modelo Contract
-- [ ] Criar `backend/src/app/models/contract.py`
-- [ ] Implementar classe `Contract` com todos os campos
-- [ ] Implementar enums `ContractStatus`, `ContractType`
-- [ ] Adicionar relacionamentos
-- [ ] Registrar no `__init__.py`
+### T1.1 - Criar Tabela Contract
+- [ ] Criar migration SQL para tabela `contracts`
+- [ ] Implementar todos os campos conforme data-model.md
+- [ ] Criar enums `ContractStatus`, `ContractType` no PostgreSQL
+- [ ] Adicionar foreign keys e relacionamentos
+- [ ] Adicionar índices para performance
 
-### T1.2 - Criar Schemas de Contrato
-- [ ] Criar `backend/src/app/schemas/contract.py`
-- [ ] Implementar `ContractBase`, `ContractCreate`, `ContractResponse`
+### T1.2 - Criar Tipos TypeScript
+- [ ] Criar `frontend/src/types/contract.ts`
+- [ ] Implementar interfaces `Contract`, `ContractCreate`, `ContractResponse`
 - [ ] Implementar `ContractUploadResponse`
 - [ ] Implementar `ContractListResponse` (paginado)
-- [ ] Adicionar validações Pydantic
+- [ ] Adicionar validações Zod (se necessário)
 
 ### T1.3 - Implementar Serviço de Extração de Documentos
-- [ ] Criar `backend/src/app/services/document_extraction_service.py`
-- [ ] Implementar `extract_text_from_pdf()` usando pdfplumber
-- [ ] Implementar `extract_text_from_docx()` usando python-docx
+- [ ] Criar Edge Function `extract-document-text`
+- [ ] Implementar `extract_text_from_pdf()` usando bibliotecas Deno
+- [ ] Implementar `extract_text_from_docx()` usando bibliotecas Deno
 - [ ] Implementar `extract_text()` com roteamento por tipo
 - [ ] Implementar extração de metadados (páginas, palavras, etc.)
 - [ ] Adicionar tratamento de erros
 
-### T1.4 - Implementar Serviço de Contratos
-- [ ] Criar `backend/src/app/services/contract_service.py`
-- [ ] Implementar `upload_contract()`:
+### T1.4 - Implementar Edge Function de Contratos
+- [ ] Criar Edge Function `upload-contract`
+- [ ] Implementar upload:
   - Validar arquivo (tipo, tamanho)
-  - Salvar no storage
+  - Salvar no Supabase Storage
   - Calcular hash
-  - Criar registro no banco
-  - Iniciar extração de texto
-- [ ] Implementar `get_contracts()` com paginação e filtros
-- [ ] Implementar `get_contract_by_id()`
-- [ ] Implementar `update_contract_metadata()`
+  - Criar registro no banco via Supabase client
+  - Iniciar extração de texto (chamar outra Edge Function)
+- [ ] Criar Edge Function `get-contracts` com paginação e filtros
+- [ ] Criar Edge Function `get-contract` para buscar por ID
+- [ ] Criar Edge Function `update-contract` para atualizar metadados
 
-### T1.5 - Criar Endpoints de Contrato
-- [ ] Criar `backend/src/app/api/v1/endpoints/contracts.py`
-- [ ] Implementar `POST /contracts/upload`:
-  ```python
-  @router.post("/upload")
-  async def upload_contract(
-      file: UploadFile,
-      contract_number: str | None = None,
-      contract_type: ContractType | None = None,
-      current_user: Stakeholder = Depends(get_current_user)
-  ):
-  ```
-- [ ] Implementar `GET /contracts` com paginação
-- [ ] Implementar `GET /contracts/{contract_id}`
-- [ ] Implementar `PATCH /contracts/{contract_id}` para metadados
-- [ ] Registrar router no `api/v1/router.py`
+### T1.5 - Criar Edge Functions de Contrato
+- [ ] Criar Edge Function `upload-contract`:
+  - Receber arquivo via FormData
+  - Validar autenticação via Supabase Auth
+  - Validar permissões do usuário
+  - Processar upload
+- [ ] Criar Edge Function `get-contracts` com paginação
+- [ ] Criar Edge Function `get-contract` para buscar por ID
+- [ ] Criar Edge Function `update-contract` para atualizar metadados
 
-### T1.6 - Criar Modelo e Serviço de Histórico
-- [ ] Criar `backend/src/app/models/contract_history.py`
-- [ ] Implementar registro automático de eventos
-- [ ] Criar helper `log_contract_event()`
+### T1.6 - Criar Tabela de Histórico
+- [ ] Criar migration SQL para tabela `contract_history`
+- [ ] Implementar trigger para registro automático de eventos
+- [ ] Criar função SQL `log_contract_event()`
 
-### T1.7 - Testes Unitários - Extração
-- [ ] Criar `backend/tests/unit/test_document_extraction.py`
+### T1.7 - Testes - Extração
+- [ ] Criar testes para Edge Function `extract-document-text`
 - [ ] Testar extração de PDF simples
 - [ ] Testar extração de DOCX
 - [ ] Testar arquivo corrompido
@@ -146,53 +129,53 @@ Tarefas organizadas por fase de implementação, seguindo o plano técnico.
 
 ## Phase 2: Análise por IA (US-2)
 
-### T2.1 - Criar Modelo ContractAnalysis
-- [ ] Criar `backend/src/app/models/contract_analysis.py`
-- [ ] Implementar classe `ContractAnalysis`
-- [ ] Implementar enum `AnalysisStatus`
-- [ ] Adicionar relacionamentos
+### T2.1 - Criar Tabela ContractAnalysis
+- [ ] Criar migration SQL para tabela `contract_analysis`
+- [ ] Implementar todos os campos conforme data-model.md
+- [ ] Criar enum `AnalysisStatus` no PostgreSQL
+- [ ] Adicionar foreign keys e relacionamentos
 
-### T2.2 - Criar Modelo SuggestedProcess
-- [ ] Criar `backend/src/app/models/suggested_process.py`
-- [ ] Implementar classe `SuggestedProcess`
+### T2.2 - Criar Tabela SuggestedProcess
+- [ ] Criar migration SQL para tabela `suggested_processes`
+- [ ] Implementar todos os campos conforme data-model.md
 - [ ] Adicionar campos JSONB para workflow e RACI
-- [ ] Adicionar relacionamentos
+- [ ] Adicionar foreign keys e relacionamentos
 
-### T2.3 - Criar Schemas de Análise
-- [ ] Criar `backend/src/app/schemas/analysis.py`
-- [ ] Implementar `ContractAnalysisResponse`
-- [ ] Implementar `SuggestedProcessResponse`
-- [ ] Implementar `AnalysisStatusResponse`
+### T2.3 - Criar Tipos TypeScript de Análise
+- [ ] Criar `frontend/src/types/contract-analysis.ts`
+- [ ] Implementar interfaces `ContractAnalysis`, `ContractAnalysisResponse`
+- [ ] Implementar `SuggestedProcess`, `SuggestedProcessResponse`
+- [ ] Implementar `AnalysisStatus`
 
-### T2.4 - Implementar Serviço de Análise por IA
-- [ ] Criar `backend/src/app/services/ai_analysis_service.py`
-- [ ] Configurar cliente OpenAI
+### T2.4 - Implementar Edge Function de Análise por IA
+- [ ] Criar Edge Function `analyze-contract`
+- [ ] Configurar cliente OpenAI (via npm ou deno.land/x)
 - [ ] Implementar prompts de sistema:
-  ```python
-  SYSTEM_PROMPT = """
+  ```typescript
+  const SYSTEM_PROMPT = `
   Você é um especialista em gestão de processos condominiais...
-  """
+  `;
   ```
 - [ ] Implementar `analyze_contract()`:
   - Preparar texto do contrato
   - Chamar API OpenAI
   - Parsear resposta JSON
   - Calcular confidence scores
-  - Salvar análise no banco
+  - Salvar análise no banco via Supabase client
 - [ ] Implementar `identify_supplier()`
 - [ ] Implementar `identify_services()`
 - [ ] Implementar `suggest_process_categories()`
 - [ ] Implementar tratamento de rate limits e retries
 
-### T2.5 - Criar Endpoints de Análise
-- [ ] Adicionar ao `contracts.py`:
-  - `POST /contracts/{id}/analyze` - Iniciar análise
-  - `GET /contracts/{id}/analysis` - Obter resultado
-- [ ] Implementar processamento assíncrono (background task)
-- [ ] Implementar polling de status
+### T2.5 - Criar Edge Functions de Análise
+- [ ] Criar Edge Function `analyze-contract`:
+  - `POST /functions/v1/analyze-contract` - Iniciar análise
+  - `GET /functions/v1/analyze-contract?contract_id=...` - Obter resultado
+- [ ] Implementar processamento assíncrono (Edge Function pode ser chamada de forma assíncrona)
+- [ ] Implementar polling de status no frontend
 
-### T2.6 - Testes Unitários - Análise IA
-- [ ] Criar `backend/tests/unit/test_ai_analysis.py`
+### T2.6 - Testes - Análise IA
+- [ ] Criar testes para Edge Function `analyze-contract`
 - [ ] Testar parsing de resposta do LLM
 - [ ] Testar cálculo de confidence score
 - [ ] Testar mapeamento de categorias
@@ -282,23 +265,25 @@ Tarefas organizadas por fase de implementação, seguindo o plano técnico.
 
 ## Phase 5: Geração de Processo (US-5)
 
-### T5.1 - Implementar Serviço de Geração de Processo
-- [ ] Criar `backend/src/app/services/process_generation_service.py`
+### T5.1 - Implementar Edge Function de Geração de Processo
+- [ ] Criar Edge Function `generate-process-from-contract`
 - [ ] Implementar `generate_process_from_suggestion()`:
   - Montar objeto Process completo
   - Preencher todos os campos do template
   - Selecionar ícone por categoria
   - Identificar variáveis aplicáveis
   - Definir tipo de documento
-  - Criar com status "rascunho"
-- [ ] Implementar validação de entidades antes de salvar
+  - Criar com status "rascunho" via Supabase client
+- [ ] Integrar com validação de entidades (Edge Function `validate-entities`)
 - [ ] Registrar vínculo com contrato
 
-### T5.2 - Criar Endpoints de Geração
-- [ ] Adicionar ao `contracts.py`:
-  - `POST /contracts/{id}/suggested-processes/{sp_id}/accept`
-  - `POST /contracts/{id}/suggested-processes/{sp_id}/reject`
-  - `POST /contracts/{id}/generate` (gerar todos aceitos)
+### T5.2 - Criar Edge Functions de Geração
+- [ ] Criar Edge Function `accept-suggested-process`:
+  - `POST /functions/v1/accept-suggested-process`
+- [ ] Criar Edge Function `reject-suggested-process`:
+  - `POST /functions/v1/reject-suggested-process`
+- [ ] Criar Edge Function `generate-processes-from-contract`:
+  - `POST /functions/v1/generate-processes-from-contract` (gerar todos aceitos)
 
 ### T5.3 - Frontend: Preview de Processo
 - [ ] Criar `frontend/src/components/contracts/ProcessPreview.tsx`
@@ -324,17 +309,17 @@ Tarefas organizadas por fase de implementação, seguindo o plano técnico.
 
 ## Phase 6: Vinculação e Rastreabilidade (US-6)
 
-### T6.1 - Adicionar Campos no Modelo Process
-- [ ] Adicionar `source_contract_id` ao modelo Process
-- [ ] Adicionar `is_ai_generated` ao modelo Process
-- [ ] Criar migração para alteração
-- [ ] Atualizar relacionamentos
+### T6.1 - Adicionar Campos na Tabela Process
+- [ ] Criar migration SQL para adicionar `source_contract_id` à tabela `processes`
+- [ ] Adicionar `is_ai_generated` à tabela `processes`
+- [ ] Adicionar foreign key para `contracts`
+- [ ] Atualizar índices se necessário
 
-### T6.2 - Implementar Endpoints de Rastreabilidade
-- [ ] Adicionar ao `contracts.py`:
-  - `GET /contracts/{id}/processes` - Processos do contrato
-- [ ] Adicionar ao `entities.py`:
-  - `GET /entities/{id}/contracts` - Contratos do fornecedor
+### T6.2 - Implementar Edge Functions de Rastreabilidade
+- [ ] Criar Edge Function `get-contract-processes`:
+  - `GET /functions/v1/get-contract-processes?contract_id=...` - Processos do contrato
+- [ ] Criar Edge Function `get-supplier-contracts`:
+  - `GET /functions/v1/get-supplier-contracts?supplier_id=...` - Contratos do fornecedor
 
 ### T6.3 - Frontend: Navegação Bidirecional
 - [ ] Adicionar link para contrato na página de processo
@@ -373,8 +358,9 @@ Tarefas organizadas por fase de implementação, seguindo o plano técnico.
 
 ## Phase 8: Dashboard e Métricas (US-8)
 
-### T8.1 - Implementar Endpoints de Dashboard
-- [ ] Criar `GET /contracts/dashboard`:
+### T8.1 - Implementar Edge Function de Dashboard
+- [ ] Criar Edge Function `contracts-dashboard`:
+  - `GET /functions/v1/contracts-dashboard`:
   - Total de contratos por status
   - Processos gerados por período
   - Taxa de aceitação de sugestões
@@ -389,14 +375,13 @@ Tarefas organizadas por fase de implementação, seguindo o plano técnico.
 - [ ] Filtros por período
 
 ### T8.3 - Testes de Integração
-- [ ] Criar `backend/tests/integration/test_contract_workflow.py`
-- [ ] Testar fluxo completo:
-  1. Upload de contrato
-  2. Extração de texto
-  3. Análise por IA
+- [ ] Criar testes E2E para fluxo completo:
+  1. Upload de contrato (via Edge Function)
+  2. Extração de texto (via Edge Function)
+  3. Análise por IA (via Edge Function)
   4. Sugestão de processos
-  5. Aceitação de sugestão
-  6. Geração de processo
+  5. Aceitação de sugestão (via Edge Function)
+  6. Geração de processo (via Edge Function)
   7. Vinculação contrato-processo
 
 ---
@@ -404,9 +389,9 @@ Tarefas organizadas por fase de implementação, seguindo o plano técnico.
 ## Tarefas Adicionais
 
 ### Documentação
-- [ ] Atualizar OpenAPI com novos endpoints
+- [ ] Documentar Edge Functions criadas
 - [ ] Documentar prompts de IA
-- [ ] Documentar configurações de ambiente
+- [ ] Documentar configurações de ambiente (Supabase)
 - [ ] Criar guia de uso para usuários
 
 ### Segurança

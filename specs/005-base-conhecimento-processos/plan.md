@@ -60,8 +60,8 @@ Sistema de base de conhecimento que ingere processos aprovados e permite busca s
 - Indexação: PostgreSQL GIN indexes
 
 **Backend:**
-- FastAPI (Python)
-- Background jobs: Celery ou FastAPI BackgroundTasks
+- Supabase Edge Functions (Deno/TypeScript)
+- Background jobs: Edge Functions assíncronas
 
 **Frontend:**
 - Next.js 14, React, TypeScript

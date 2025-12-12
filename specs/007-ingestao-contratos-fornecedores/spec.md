@@ -37,7 +37,7 @@ Após ingestão, IA deve analisar o contrato e inferir automaticamente quais pro
 
 1. **Given** que contrato de empresa de limpeza foi ingerido, **When** IA analisa, **Then** deve sugerir processos da categoria "Operação" relacionados a limpeza (Limpeza de Áreas Comuns, Gestão de Materiais de Limpeza)
 2. **Given** que contrato de empresa de manutenção de elevador foi ingerido, **When** IA analisa, **Then** deve sugerir processos de "Operação" e "Emergências" relacionados a elevadores
-3. **Given** que contrato de portaria online foi ingerido, **When** IA analisa, **Then** deve sugerir processos de "Acesso e Segurança" e "Operação"
+3. **Given** que contrato de portaria online foi ingerido, **When** IA analisa, **Then** deve sugerir processos de "Operação" (processos sobre portaria podem ser documentados, mas o sistema não integra com portaria online)
 4. **Given** que IA identificou processos, **When** usuário visualiza sugestões, **Then** deve ver lista de processos com score de confiança e justificativa
 5. **Given** que IA não consegue inferir processos, **When** usuário visualiza, **Then** deve ver mensagem indicando necessidade de revisão manual
 
@@ -267,7 +267,7 @@ Sistema deve exibir dashboard com visão geral de contratos ingeridos, processos
 - Workflow de aprovação (já existe - spec 003)
 - Validação de entidades em processos (spec 004)
 - API de LLM (OpenAI GPT-4 ou equivalente)
-- Serviço de extração de texto de documentos (PyPDF, python-docx)
+- Serviço de extração de texto de documentos (bibliotecas Deno para PDF/DOCX)
 - Armazenamento de arquivos (S3 ou sistema local)
 
 ## Out of Scope
@@ -276,7 +276,7 @@ Sistema deve exibir dashboard com visão geral de contratos ingeridos, processos
 - Reconhecimento de assinaturas ou carimbos
 - Validação jurídica de cláusulas contratuais
 - Integração com sistemas de ERP de fornecedores
-- Gestão financeira de contratos (valores, pagamentos)
+- Gestão financeira de contratos (valores, pagamentos) - **Nota**: Valores e pagamentos são de responsabilidade da administradora. O sistema pode apenas documentar processos relacionados a contratos.
 - Alertas de vencimento de contratos (pode ser feature futura)
 - OCR avançado para documentos escaneados de baixa qualidade
 - Análise de múltiplos contratos em lote

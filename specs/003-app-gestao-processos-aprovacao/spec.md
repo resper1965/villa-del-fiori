@@ -2,7 +2,7 @@
 
 **Feature Branch**: `003-app-gestao-processos-aprovacao`  
 **Created**: 2024-12-08  
-**Updated**: 2025-01-09  
+**Updated**: 2025-01-15  
 **Status**: ✅ Implemented  
 **Application Name**: Gabi - Síndica Virtual  
 **Input**: User description: "Aplicação de Gestão de Processos Condominiais com Workflow de Aprovação - Sistema onde stakeholders podem revisar, aprovar ou rejeitar processos, explicar motivos de rejeição e refazer processos baseado no feedback"
@@ -26,6 +26,8 @@
 ✅ **Workflow de Aprovação** completo (aprovar/rejeitar com comentários)  
 ✅ **Sistema de Aprovação de Usuários** com RBAC  
 ✅ **CRUD Completo de Usuários** (criar, editar, aprovar, deletar)  
+✅ **Gestão de Unidades** (apartamentos/casas do condomínio)  
+✅ **Gestão de Veículos** (cadastro de veículos com marca, modelo e placa)  
 ✅ **Gestão de Entidades** (pessoas, empresas, serviços, infraestrutura)  
 ✅ **Chat com Gabi** (Síndica Virtual) - assistente inteligente  
 ✅ **Autenticação Segura** com Supabase Auth  
@@ -39,7 +41,9 @@ Stakeholders podem visualizar todos os processos do condomínio organizados por 
 
 **Acceptance Scenarios**:
 
-1. ✅ **Given** que stakeholder acessa a aplicação, **When** visualiza lista de processos, **Then** deve ver processos organizados por categorias (Governança, Acesso e Segurança, Operação, Áreas Comuns, Convivência, Eventos, Emergências)
+1. ✅ **Given** que stakeholder acessa a aplicação, **When** visualiza lista de processos, **Then** deve ver processos organizados por categorias (Governança, Operação, Áreas Comuns, Convivência, Eventos, Emergências)
+
+**Nota**: Processos sobre "Acesso e Segurança" podem existir como documentação, mas o sistema não opera sistemas de segurança física ou portaria online.
 2. ✅ **Given** que stakeholder seleciona um processo, **When** visualiza detalhes, **Then** deve ver conteúdo completo, variáveis aplicadas, entidades envolvidas e histórico de versões
 3. ✅ **Given** que processo está em diferentes status, **When** stakeholder visualiza, **Then** deve ver claramente status atual (rascunho, em revisão, aprovado, rejeitado) com indicadores visuais
 4. ✅ **Given** que processo foi rejeitado anteriormente, **When** stakeholder visualiza, **Then** deve ver histórico de rejeições com motivos e versões anteriores
@@ -156,8 +160,8 @@ Administradores podem criar, editar, aprovar e deletar usuários do sistema.
 
 - Geração automática de documentos para publicação
 - Execução ou automação dos processos (apenas gestão e aprovação)
-- Integração com sistemas externos (portaria, câmeras, etc.)
+- Integração com sistemas externos (portaria, câmeras, etc.) - **Nunca fará parte do sistema**
 - Sistema de comunicação em tempo real entre stakeholders
-- Gestão financeira ou contábil
+- Gestão financeira ou contábil - **Nota**: O sistema pode ter módulo de acompanhamento orçamentário no futuro, mas gestão operacional financeira (contas a pagar/receber, boletos) é de responsabilidade da administradora.
 - Sistema de votação eletrônica
 - Aplicativo mobile nativo (apenas web responsiva)

@@ -1,10 +1,21 @@
 # Gabi - Síndica Virtual
 
-Sistema de gestão de processos condominiais com workflow de aprovação e assistente virtual inteligente.
+Sistema de gestão documental e conhecimento sobre processos condominiais com workflow de aprovação e assistente virtual inteligente.
 
 ## 🚀 Visão Geral
 
-**Gabi - Síndica Virtual** é uma aplicação web completa para gestão de processos condominiais. O sistema permite que stakeholders (síndico, conselho, administradora) revisem, aprovem ou rejeitem processos, com capacidade de refazer processos baseado em feedback estruturado.
+**Gabi - Síndica Virtual** é uma plataforma web de **gestão documental e conhecimento** sobre processos condominiais. O sistema permite que stakeholders (síndico, conselho, administradora) documentem, revisem, aprovem e consultem processos operacionais, administrativos e de convivência do condomínio.
+
+### Propósito
+
+O sistema é uma plataforma de **documentação e conhecimento**, não uma plataforma de **operação condominial**. Ele documenta processos, gerencia aprovações, mantém base de conhecimento e responde perguntas via chat assistente inteligente.
+
+**O sistema NUNCA**:
+- ❌ Integrará com sistemas de segurança física (biometria, câmeras)
+- ❌ Integrará com portaria online operacionalmente
+- ❌ Operará sistemas físicos do condomínio
+
+**Ver descrição completa**: [`docs/DESCRICAO_SISTEMA.md`](docs/DESCRICAO_SISTEMA.md)
 
 ### Funcionalidades Principais
 
@@ -12,6 +23,8 @@ Sistema de gestão de processos condominiais com workflow de aprovação e assis
 - ✅ **Workflow de Aprovação** completo (aprovar/rejeitar com comentários)
 - ✅ **Sistema de Aprovação de Usuários** com RBAC
 - ✅ **CRUD Completo de Usuários** (criar, editar, aprovar, deletar)
+- ✅ **Gestão de Unidades** (apartamentos/casas do condomínio)
+- ✅ **Gestão de Veículos** (cadastro de veículos com marca, modelo e placa)
 - ✅ **Gestão de Entidades** (pessoas, empresas, serviços, infraestrutura)
 - ✅ **Chat com Gabi** (Síndica Virtual) - assistente inteligente
 - ✅ **Autenticação Segura** com Supabase Auth
@@ -46,7 +59,7 @@ villadelfiori/
 - Node.js 20+
 - Conta no Supabase (gratuita)
 - Git
-- Python 3.11+ (apenas para scripts de seed)
+- Python 3.11+ (opcional, apenas para scripts de seed)
 
 ### 1. Clone o Repositório
 
@@ -73,6 +86,10 @@ Aplique as migrations SQL em ordem via Supabase Dashboard SQL Editor ou MCP tool
 - `003_sync_auth_users.sql`
 - `005_seed_processes.sql`
 - `009_seed_entities.sql`
+- `017_create_units_table.sql` - Tabela de unidades (apartamentos)
+- `018_create_vehicles_table.sql` - Tabela de veículos
+- `019_rls_policies_units_vehicles.sql` - RLS policies para unidades e veículos
+- `020_seed_initial_units.sql` - Seed de unidades iniciais (opcional - ajuste conforme necessário)
 - ... (outras migrations)
 
 ### 4. Seed de Processos (Opcional)
@@ -194,15 +211,23 @@ node approve_user.js
 2. Veja lista de usuários pendentes de aprovação
 3. Aprove ou rejeite usuários conforme necessário
 4. Crie novos usuários se necessário
+5. Associe usuários a unidades (obrigatório para moradores, síndicos, subsíndicos e conselheiros)
 
-### 5. Explorar Processos Pré-cadastrados
+### 5. Gerenciar Unidades e Veículos
+
+1. Acesse "Veículos" no menu
+2. Cadastre unidades (apartamentos) do condomínio
+3. Cadastre veículos associados às unidades
+4. Gerencie informações de veículos (marca, modelo, placa, cor, ano)
+
+### 6. Explorar Processos Pré-cadastrados
 
 1. Acesse "Processos" no menu
 2. Explore os 35 processos pré-cadastrados organizados por categoria
 3. Visualize detalhes de um processo
 4. Teste workflow de aprovação
 
-### 6. Usar o Chat (Gabi - Síndica Virtual)
+### 7. Usar o Chat (Gabi - Síndica Virtual)
 
 1. Acesse "Chat" no menu
 2. Converse com a Gabi, Síndica Virtual
@@ -210,13 +235,36 @@ node approve_user.js
 
 ## 📚 Documentação
 
-Documentação completa disponível em `/specs/003-app-gestao-processos-aprovacao/`:
+### Documentação Principal
 
-- `spec.md`: Especificação completa da feature
-- `plan.md`: Plano de implementação
-- `data-model.md`: Modelo de dados do banco
-- `quickstart.md`: Guia de início rápido
-- `research.md`: Decisões técnicas e pesquisa
+- **Descrição Completa do Sistema**: [`docs/DESCRICAO_SISTEMA.md`](docs/DESCRICAO_SISTEMA.md) - Descrição detalhada do sistema
+- **Estado Atual do Projeto**: [`docs/ESTADO_ATUAL_PROJETO.md`](docs/ESTADO_ATUAL_PROJETO.md) - Análise completa do estado atual
+- **Roadmap**: [`docs/ROADMAP.md`](docs/ROADMAP.md) - Próximas features e melhorias planejadas
+- **Escopo Final**: [`docs/ESCOPO_FINAL.md`](docs/ESCOPO_FINAL.md) - Escopo definitivo do sistema
+- **Escopo Financeiro**: [`docs/ESCOPO_FINANCEIRO.md`](docs/ESCOPO_FINANCEIRO.md) - Detalhes do módulo financeiro (futuro)
+- **Base de Conhecimento**: [`docs/IMPLEMENTACAO_BASE_CONHECIMENTO.md`](docs/IMPLEMENTACAO_BASE_CONHECIMENTO.md) - Guia de implementação da base de conhecimento
+- **Guia Rápido Base de Conhecimento**: [`docs/README_BASE_CONHECIMENTO.md`](docs/README_BASE_CONHECIMENTO.md) - Setup rápido da base de conhecimento
+- **Plano de Desenvolvimento**: [`docs/PLANO_DESENVOLVIMENTO_MODULOS.md`](docs/PLANO_DESENVOLVIMENTO_MODULOS.md) - Plano detalhado dos módulos restantes
+- **Quickstart**: [`specs/003-app-gestao-processos-aprovacao/quickstart.md`](specs/003-app-gestao-processos-aprovacao/quickstart.md) - Guia de início rápido
+
+### Especificações
+
+Documentação completa disponível em `/specs/`:
+
+- **Spec 001**: Sistema de Gestão de Processos Condominiais (✅ Implementado)
+- **Spec 002**: Workflow de Aprovação e Gestão de Processos (✅ Implementado)
+- **Spec 003**: App Gestão Processos Aprovação (✅ Implementado)
+  - `spec.md`: Especificação completa da feature
+  - `plan.md`: Plano de implementação
+  - `data-model.md`: Modelo de dados do banco
+  - `quickstart.md`: Guia de início rápido
+  - `research.md`: Decisões técnicas e pesquisa
+- **Spec 004**: Validação de Entidades em Processos (⚠️ Pendente)
+- **Spec 005**: Base de Conhecimento de Processos (✅ Implementado)
+  - `IMPLEMENTATION_PLAN.md`: Plano detalhado de implementação
+  - Ver: [`docs/IMPLEMENTACAO_BASE_CONHECIMENTO.md`](docs/IMPLEMENTACAO_BASE_CONHECIMENTO.md)
+- **Spec 006**: Chatbot Inteligente para Moradores (✅ Implementado - com RAG)
+- **Spec 007**: Ingestão de Contratos de Fornecedores (⚠️ Pendente)
 
 ## 🛠️ Comandos Úteis
 
