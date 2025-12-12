@@ -51,16 +51,20 @@ serve(async (req) => {
     }
 
     // Construir prompt para gerar diagrama Mermaid
-    let prompt = `Você é um especialista em criar diagramas de fluxo usando a sintaxe Mermaid.
+    const workflowText = workflow.map((step, index) => `${index + 1}. ${step}`).join('\n')
+    const entitiesText = entities && entities.length > 0 ? `Entidades Envolvidas: ${entities.join(', ')}\n\n` : ''
+    const descriptionText = description ? `Descrição: ${description}\n\n` : ''
+    
+    const prompt = `Você é um especialista em criar diagramas de fluxo usando a sintaxe Mermaid.
 
 Crie um diagrama flowchart TD (top-down) que represente o seguinte processo:
 
 Nome do Processo: ${process_name || 'Processo'}
 
-${description ? `Descrição: ${description}\n\n` : ''}Fluxo do Processo:
-${workflow.map((step, index) => `${index + 1}. ${step}`).join('\n')}
+${descriptionText}Fluxo do Processo:
+${workflowText}
 
-${entities && entities.length > 0 ? `Entidades Envolvidas: ${entities.join(', ')}\n\n` : ''}Requisitos:
+${entitiesText}Requisitos:
 1. Use sintaxe Mermaid flowchart TD (top-down)
 2. Cada passo do workflow deve ser um nó no diagrama
 3. Use setas (-->) para conectar os passos sequencialmente
@@ -69,7 +73,7 @@ ${entities && entities.length > 0 ? `Entidades Envolvidas: ${entities.join(', ')
 6. Inclua as entidades responsáveis entre parênteses quando relevante (ex: "Passo<br/>(Entidade)")
 7. Use cores: azul (#1e3a8a) para passos normais, verde (#166534) para ações finais/aprovações
 8. Mantenha o código limpo e bem formatado
-9. NÃO inclua markdown code blocks (```mermaid), apenas o código puro
+9. NÃO inclua markdown code blocks, apenas o código puro
 10. Use quebras de linha <br/> dentro dos nós para textos longos
 
 Exemplo de formato esperado:
