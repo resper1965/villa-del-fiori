@@ -12,6 +12,7 @@ import {
   Truck,
   ClipboardList,
   Database,
+  User,
 } from "lucide-react"
 import {
   Sidebar,
@@ -19,10 +20,12 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/contexts/AuthContext"
@@ -33,38 +36,66 @@ import { useRouter } from "next/navigation"
 export function AppSidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
   const { canAccessDashboard, canAccessChat, canApproveUsers } = useRBAC()
   const { state } = useSidebar()
   const isCollapsed = state === "collapsed"
+
+  // Mapear roles para labels mais amigáveis
+  const roleLabels: Record<string, string> = {
+    admin: "Administrador",
+    syndic: "Síndico",
+    subsindico: "Subsíndico",
+    council: "Conselheiro",
+    staff: "Staff",
+    resident: "Morador",
+  }
 
   const handleLogout = () => {
     logout()
     router.push("/login")
   }
 
-  // Construir menu baseado em permissões
-  const menuItems: Array<{
+  // Análise de UX: Organização do menu por frequência de uso e hierarquia
+  // Grupo 1: Navegação Principal (mais usado, sempre visível)
+  const mainMenuItems: Array<{
     href: string
     label: string
     icon: React.ComponentType<{ className?: string }>
   }> = []
 
   if (canAccessDashboard()) {
-    menuItems.push({ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard })
-    menuItems.push({ href: "/cadastros", label: "Cadastros", icon: ClipboardList })
-    menuItems.push({ href: "/processes", label: "Processos", icon: FileText })
-    menuItems.push({ href: "/entities", label: "Entidades", icon: Users })
-    menuItems.push({ href: "/suppliers", label: "Fornecedores", icon: Truck })
+    mainMenuItems.push({ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard })
+    mainMenuItems.push({ href: "/processes", label: "Processos", icon: FileText })
   }
 
   if (canAccessChat()) {
-    menuItems.push({ href: "/chat", label: "Chat", icon: MessageSquare })
+    mainMenuItems.push({ href: "/chat", label: "Chat", icon: MessageSquare })
   }
 
+  // Grupo 2: Cadastros (agrupamento lógico de dados)
+  const cadastroMenuItems: Array<{
+    href: string
+    label: string
+    icon: React.ComponentType<{ className?: string }>
+  }> = []
+
+  if (canAccessDashboard()) {
+    cadastroMenuItems.push({ href: "/cadastros", label: "Cadastros", icon: ClipboardList })
+    cadastroMenuItems.push({ href: "/entities", label: "Entidades", icon: Users })
+    cadastroMenuItems.push({ href: "/suppliers", label: "Fornecedores", icon: Truck })
+  }
+
+  // Grupo 3: Administração (menos frequente, no final)
+  const adminMenuItems: Array<{
+    href: string
+    label: string
+    icon: React.ComponentType<{ className?: string }>
+  }> = []
+
   if (canApproveUsers()) {
-    menuItems.push({ href: "/admin/users", label: "Usuários", icon: Users })
-    menuItems.push({ href: "/admin/knowledge-base", label: "Base de Conhecimento", icon: Database })
+    adminMenuItems.push({ href: "/admin/users", label: "Usuários", icon: Users })
+    adminMenuItems.push({ href: "/admin/knowledge-base", label: "Base de Conhecimento", icon: Database })
   }
 
   return (
@@ -92,10 +123,11 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="flex-1 min-h-0">
+        {/* Grupo 1: Navegação Principal */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => {
+              {mainMenuItems.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
                 return (
@@ -112,9 +144,84 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Grupo 2: Cadastros */}
+        {cadastroMenuItems.length > 0 && (
+          <>
+            <SidebarSeparator />
+            <SidebarGroup>
+              {!isCollapsed && <SidebarGroupLabel>Cadastros</SidebarGroupLabel>}
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {cadastroMenuItems.map((item) => {
+                    const Icon = item.icon
+                    const isActive = pathname === item.href
+                    return (
+                      <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
+                          <Link href={item.href}>
+                            <Icon className="h-5 w-5" />
+                            <span>{item.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </>
+        )}
+
+        {/* Grupo 3: Administração */}
+        {adminMenuItems.length > 0 && (
+          <>
+            <SidebarSeparator />
+            <SidebarGroup>
+              {!isCollapsed && <SidebarGroupLabel>Administração</SidebarGroupLabel>}
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {adminMenuItems.map((item) => {
+                    const Icon = item.icon
+                    const isActive = pathname === item.href
+                    return (
+                      <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
+                          <Link href={item.href}>
+                            <Icon className="h-5 w-5" />
+                            <span>{item.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </>
+        )}
       </SidebarContent>
       <SidebarFooter className="shrink-0 border-t border-sidebar-border">
         <SidebarMenu>
+          {!isCollapsed && user && (
+            <SidebarMenuItem>
+              <div className="px-2 py-2">
+                <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-sidebar-accent/50">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                    <User className="h-4 w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-sidebar-foreground truncate">
+                      {user.name || user.email}
+                    </p>
+                    <p className="text-xs text-sidebar-foreground/70 truncate">
+                      {roleLabels[user.user_role] || user.user_role}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </SidebarMenuItem>
+          )}
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} tooltip="Sair">
               <LogOut className="h-5 w-5" />
