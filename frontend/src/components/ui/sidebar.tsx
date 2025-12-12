@@ -192,7 +192,7 @@ const Sidebar = React.forwardRef<
       <div
         data-sidebar="sidebar"
         className={cn(
-          "duration-200 relative flex h-full w-[--sidebar-width] flex-col bg-sidebar/90 backdrop-blur-md border-r border-sidebar-border transition-[width] ease-linear",
+          "duration-200 relative flex h-full w-[--sidebar-width] flex-col bg-sidebar border-r border-sidebar-border transition-[width] ease-linear",
           "group-data-[collapsible=icon]:w-[--sidebar-width-icon]",
           className
         )}

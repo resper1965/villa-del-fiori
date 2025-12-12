@@ -27,11 +27,11 @@
     --radius: 0.5rem;
     
     /* Sidebar variables - usando cores globais */
-    --sidebar-background: 0 0% 14.9%;        /* igual ao --card (gray-800/90) */
+    --sidebar-background: 0 0% 17%;          /* gray-800 (#1f2937) - rgb(31, 41, 55) */
     --sidebar-foreground: 0 0% 90%;          /* igual ao --foreground (gray-300) */
     --sidebar-primary: 197 100% 45%;         /* igual ao --primary (#00ade8) */
     --sidebar-primary-foreground: 0 0% 100%; /* branco */
-    --sidebar-accent: 0 0% 14.9%;            /* igual ao --accent (gray-800) */
+    --sidebar-accent: 0 0% 17%;              /* gray-800 */
     --sidebar-accent-foreground: 0 0% 90%;   /* igual ao --accent-foreground (gray-300) */
     --sidebar-border: 0 0% 27.5%;            /* igual ao --border (gray-700/50) */
     --sidebar-ring: 197 100% 45%;            /* igual ao --ring (#00ade8) */
