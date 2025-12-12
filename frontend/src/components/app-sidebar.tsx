@@ -13,6 +13,10 @@ import {
   ClipboardList,
   Database,
   User,
+  MoreVertical,
+  UserCircle,
+  CreditCard,
+  Bell,
 } from "lucide-react"
 import {
   Sidebar,
@@ -32,6 +36,20 @@ import { useAuth } from "@/contexts/AuthContext"
 import { useRBAC } from "@/lib/hooks/useRBAC"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function AppSidebar() {
   const pathname = usePathname()
@@ -202,33 +220,97 @@ export function AppSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter className="shrink-0 border-t border-sidebar-border">
-        <SidebarMenu>
-          {!isCollapsed && user && (
+        {user ? (
+          <SidebarMenu>
             <SidebarMenuItem>
-              <div className="px-2 py-2">
-                <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-sidebar-accent/50">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                    <User className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-sidebar-foreground truncate">
-                      {user.name || user.email}
-                    </p>
-                    <p className="text-xs text-sidebar-foreground/70 truncate">
-                      {roleLabels[user.user_role] || user.user_role}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton
+                    size="lg"
+                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  >
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage src="" alt={user.name || user.email} />
+                      <AvatarFallback className="rounded-lg bg-primary/10 text-primary">
+                        {(user.name || user.email).charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    {!isCollapsed && (
+                      <>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                          <span className="truncate font-medium text-sidebar-foreground">
+                            {user.name || user.email}
+                          </span>
+                          <span className="truncate text-xs text-sidebar-foreground/70">
+                            {roleLabels[user.user_role] || user.user_role}
+                          </span>
+                        </div>
+                        <MoreVertical className="ml-auto h-4 w-4" />
+                      </>
+                    )}
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                  side={isCollapsed ? "right" : "top"}
+                  align="end"
+                  sideOffset={4}
+                >
+                  <DropdownMenuLabel className="p-0 font-normal">
+                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                      <Avatar className="h-8 w-8 rounded-lg">
+                        <AvatarImage src="" alt={user.name || user.email} />
+                        <AvatarFallback className="rounded-lg bg-primary/10 text-primary">
+                          {(user.name || user.email).charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-medium">{user.name || user.email}</span>
+                        <span className="truncate text-xs text-muted-foreground">
+                          {user.email}
+                        </span>
+                        <span className="truncate text-xs text-muted-foreground">
+                          {roleLabels[user.user_role] || user.user_role}
+                          {user.unit && ` • ${user.unit.number}${user.unit.block ? ` - Bloco ${user.unit.block}` : ""}`}
+                        </span>
+                        {user.type && user.type !== user.user_role && (
+                          <span className="truncate text-xs text-muted-foreground/70">
+                            {user.type}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <UserCircle className="mr-2 h-4 w-4" />
+                      <span>Perfil</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Bell className="mr-2 h-4 w-4" />
+                      <span>Notificações</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </SidebarMenuItem>
-          )}
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} tooltip="Sair">
-              <LogOut className="h-5 w-5" />
-              <span>Sair</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+          </SidebarMenu>
+        ) : (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={handleLogout} tooltip="Sair">
+                <LogOut className="h-5 w-5" />
+                <span>Sair</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
       </SidebarFooter>
     </Sidebar>
   )
