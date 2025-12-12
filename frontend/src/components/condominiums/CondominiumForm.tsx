@@ -143,6 +143,19 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
       setIsLoading(true)
       setError(null)
 
+      // Obter usuário atual para definir owner_id (preparado para SaaS)
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      // Gerar slug a partir do nome (preparado para SaaS)
+      const generateSlug = (name: string): string => {
+        return name
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "")
+      }
+
       if (isEditing && condominiumId) {
         const { error } = await supabase
           .from("condominiums")
@@ -150,6 +163,8 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
             ...values,
             email: values.email || null,
             cnpj: values.cnpj || null,
+            slug: generateSlug(values.name),
+            updated_at: new Date().toISOString(),
           })
           .eq("id", condominiumId)
 
@@ -161,6 +176,8 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
             ...values,
             email: values.email || null,
             cnpj: values.cnpj || null,
+            owner_id: user?.id || null,
+            slug: generateSlug(values.name),
           })
 
         if (error) throw error

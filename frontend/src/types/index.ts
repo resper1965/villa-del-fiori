@@ -142,6 +142,8 @@ export interface Condominium {
   is_active: boolean
   created_at: string
   updated_at: string
+  owner_id?: string | null // Para SaaS - multi-tenancy
+  slug?: string | null // Para SaaS - URLs amigáveis
 }
 
 export interface Pet {
