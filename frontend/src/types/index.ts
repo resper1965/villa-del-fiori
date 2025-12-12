@@ -26,6 +26,7 @@ export interface ProcessVersion {
   version_number: number
   content: Record<string, any>
   content_text?: string
+  natural_description?: string
   variables_applied?: Record<string, any>
   entities_involved?: string[]
   status: string

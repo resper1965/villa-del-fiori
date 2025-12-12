@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase/client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle, XCircle, History, User, Loader2, GitBranch, GitCompare } from "lucide-react"
+import { ArrowLeft, CheckCircle, Clock, FileText, AlertCircle, XCircle, History, User, Loader2, GitBranch, GitCompare, Eye } from "lucide-react"
 import { MermaidDiagram } from "@/components/processes/MermaidDiagram"
 import { RACIMatrix } from "@/components/processes/RACIMatrix"
 import { useProcess, useSubmitProcess, useRefactorProcess } from "@/lib/hooks/useProcesses"
@@ -17,6 +17,7 @@ import { VersionHistory } from "@/components/processes/VersionHistory"
 import { RejectionDetails } from "@/components/processes/RejectionDetails"
 import { ApprovalProgress } from "@/components/processes/ApprovalProgress"
 import { VersionComparison } from "@/components/processes/VersionComparison"
+import { OriginalDescriptionDialog } from "@/components/processes/OriginalDescriptionDialog"
 import { useAuth } from "@/contexts/AuthContext"
 import { Send, RotateCcw } from "lucide-react"
 import { approvalsApiSupabase } from "@/lib/api/approvals-supabase"
@@ -40,6 +41,7 @@ export default function ProcessDetailPage() {
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false)
   const [refactorDialogOpen, setRefactorDialogOpen] = useState(false)
   const [showVersionComparison, setShowVersionComparison] = useState(false)
+  const [showOriginalDescription, setShowOriginalDescription] = useState(false)
   const [currentStakeholderId, setCurrentStakeholderId] = useState<string | null>(null)
 
   const displayProcess = process
@@ -292,7 +294,28 @@ export default function ProcessDetailPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-foreground leading-relaxed">{displayProcess.description || "Sem descrição"}</p>
+              <div className="space-y-3">
+                {/* Descrição Natural (como se escrita por usuário comum) */}
+                <div className="flex items-start justify-between gap-4">
+                  <p className="text-foreground leading-relaxed whitespace-pre-line flex-1">
+                    {process?.current_version?.natural_description || displayProcess.description || "Sem descrição"}
+                  </p>
+                  
+                  {/* Botão para ver descrição original */}
+                  {process?.current_version?.content_text && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowOriginalDescription(true)}
+                      className="flex-shrink-0 text-muted-foreground hover:text-foreground"
+                      title="Ver descrição original completa"
+                    >
+                      <Eye className="h-4 w-4 mr-1.5 stroke-1" />
+                      <span className="text-xs hidden sm:inline">Original</span>
+                    </Button>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -631,6 +654,12 @@ export default function ProcessDetailPage() {
             processName={displayProcess.name}
             onRefactor={handleRefactor}
             isLoading={refactorMutation.isPending}
+          />
+          <OriginalDescriptionDialog
+            open={showOriginalDescription}
+            onOpenChange={setShowOriginalDescription}
+            contentText={process?.current_version?.content_text}
+            processName={displayProcess.name}
           />
         </>
       )}
