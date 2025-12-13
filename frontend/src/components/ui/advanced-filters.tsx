@@ -106,14 +106,14 @@ export function AdvancedFilters({
                   )}
                   {filter.type === "select" && filter.options && (
                     <Select
-                      value={activeFilters[filter.id] || ""}
-                      onValueChange={(value) => onFilterChange(filter.id, value)}
+                      value={activeFilters[filter.id] || "all"}
+                      onValueChange={(value) => onFilterChange(filter.id, value === "all" ? "" : value)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder={filter.placeholder || `Selecione ${filter.label.toLowerCase()}`} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Todos</SelectItem>
+                        <SelectItem value="all">Todos</SelectItem>
                         {filter.options.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}

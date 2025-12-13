@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabase/client"
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://obyrjbhomqtepebykavb.supabase.co'
+
 export type NotificationType =
   | 'approval_pending'
   | 'approved'
@@ -45,27 +47,39 @@ export const notificationsApi = {
     offset?: number
     unread_only?: boolean
   }): Promise<NotificationsResponse> {
-    const queryParams = new URLSearchParams()
-    if (params?.limit) queryParams.set('limit', params.limit.toString())
-    if (params?.offset) queryParams.set('offset', params.offset.toString())
-    if (params?.unread_only) queryParams.set('unread_only', 'true')
+    // Construir URL com query params
+    const url = new URL(`${SUPABASE_URL}/functions/v1/notifications`)
+    if (params?.limit) url.searchParams.set('limit', params.limit.toString())
+    if (params?.offset) url.searchParams.set('offset', params.offset.toString())
+    if (params?.unread_only) url.searchParams.set('unread_only', 'true')
 
-    const { data, error } = await supabase.functions.invoke(
-      `notifications?${queryParams.toString()}`,
-      {
-        method: "GET",
-      }
-    )
+    const session = await supabase.auth.getSession()
+    const token = session.data.session?.access_token
 
-    if (error) {
-      throw new Error(`Erro ao buscar notificações: ${error.message}`)
+    if (!token) {
+      throw new Error('Usuário não autenticado')
     }
 
-    if (!data || !data.success) {
-      throw new Error(data?.error || "Erro desconhecido ao buscar notificações")
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Erro ao buscar notificações: ${response.statusText}`)
     }
 
-    return data
+    const result = await response.json()
+
+    if (!result || !result.success) {
+      throw new Error(result?.error || "Erro desconhecido ao buscar notificações")
+    }
+
+    return result
   },
 
   // Obter contador de não lidas

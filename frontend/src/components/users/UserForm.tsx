@@ -626,13 +626,14 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
                     </FormLabel>
                     <Select 
                       onValueChange={(value) => {
-                        field.onChange(value || null)
+                        const finalValue = value === "none" ? null : value
+                        field.onChange(finalValue)
                         // Reset owner_id quando mudar unidade
-                        if (value !== field.value) {
+                        if (finalValue !== field.value) {
                           form.setValue("owner_id", null)
                         }
                       }} 
-                      value={field.value || ""}
+                      value={field.value || "none"}
                       disabled={isLoading}
                     >
                       <FormControl>
@@ -641,7 +642,7 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Nenhuma (Staff/Administradora)</SelectItem>
+                        <SelectItem value="none">Nenhuma (Staff/Administradora)</SelectItem>
                         {units.map((unit) => (
                           <SelectItem key={unit.id} value={unit.id}>
                             {unit.number}
@@ -1045,8 +1046,8 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
                   <FormItem>
                     <FormLabel>Cargo no Condomínio</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
-                      value={field.value || ""}
+                      onValueChange={(value) => field.onChange(value === "none" ? null : value)}
+                      value={field.value || "none"}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -1054,7 +1055,7 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Nenhum</SelectItem>
+                        <SelectItem value="none">Nenhum</SelectItem>
                         <SelectItem value="syndic">Síndico</SelectItem>
                         <SelectItem value="subsindico">Subsíndico</SelectItem>
                         <SelectItem value="council">Conselheiro</SelectItem>
@@ -1118,8 +1119,8 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
                       <FormItem>
                         <FormLabel>Unidade de Trabalho</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
-                          value={field.value || ""}
+                          onValueChange={(value) => field.onChange(value === "none" ? null : value)}
+                          value={field.value || "none"}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -1127,7 +1128,7 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="">Nenhuma (trabalha em todas)</SelectItem>
+                            <SelectItem value="none">Nenhuma (trabalha em todas)</SelectItem>
                             {units.map((unit) => (
                               <SelectItem key={unit.id} value={unit.id}>
                                 {unit.number}

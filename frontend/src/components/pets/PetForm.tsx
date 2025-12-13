@@ -432,8 +432,8 @@ export function PetForm({ open, onOpenChange, petId, defaultUnitId, onSuccess }:
                   <FormItem>
                     <FormLabel>Proprietário</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
-                      value={field.value || ""}
+                      onValueChange={(value) => field.onChange(value === "none" ? null : value)}
+                      value={field.value || "none"}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -441,7 +441,7 @@ export function PetForm({ open, onOpenChange, petId, defaultUnitId, onSuccess }:
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Nenhum</SelectItem>
+                        <SelectItem value="none">Nenhum</SelectItem>
                         {owners.map((owner) => (
                           <SelectItem key={owner.id} value={owner.id}>
                             {owner.name}
