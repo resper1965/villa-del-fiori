@@ -273,6 +273,13 @@ export default function DocumentsPage() {
           </CardContent>
         </Card>
       )}
+
+      <DocumentForm
+        open={formOpen}
+        onOpenChange={handleFormClose}
+        documentId={editingDocumentId}
+        onSuccess={handleFormSuccess}
+      />
     </div>
   )
 }
