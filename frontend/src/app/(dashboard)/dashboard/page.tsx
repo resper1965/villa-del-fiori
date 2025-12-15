@@ -3,9 +3,10 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, CheckCircle, XCircle, Clock, Loader2, TrendingUp, Activity } from "lucide-react"
+import { FileText, CheckCircle, XCircle, Clock, Loader2, TrendingUp, Activity, Building2 } from "lucide-react"
 import { useProcessStatistics } from "@/lib/hooks/useProcesses"
 import { useRBAC } from "@/lib/hooks/useRBAC"
+import { useCondominium } from "@/lib/hooks/useCondominium"
 import Link from "next/link"
 
 export default function DashboardPage() {
@@ -14,6 +15,7 @@ export default function DashboardPage() {
 
   // Buscar apenas estatísticas (query otimizada, sem buscar dados completos)
   const { data: statistics, isLoading: isLoadingStats } = useProcessStatistics()
+  const { data: condominium, isLoading: isLoadingCondominium } = useCondominium()
 
   // Redirecionar se não tiver permissão
   useEffect(() => {
@@ -36,12 +38,36 @@ export default function DashboardPage() {
   const approvalRate = totalProcesses > 0 ? Math.round((approvedProcesses / totalProcesses) * 100) : 0
   const pendingRate = totalProcesses > 0 ? Math.round((pendingProcesses / totalProcesses) * 100) : 0
 
-  if (isLoadingStats) {
+  if (isLoadingStats || isLoadingCondominium) {
     return (
-      <div className="px-4 md:px-6 py-4 md:py-6 flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground">Carregando estatísticas...</p>
+      <div className="px-4 md:px-6 py-4 md:py-6">
+        {/* Skeleton do Condomínio */}
+        <Card className="card-elevated mb-6">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-12 w-12 rounded-lg" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-4 w-64" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Skeleton dos Cards de Estatísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="card-elevated">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-5 w-5 rounded" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-16 mb-1" />
+                <Skeleton className="h-3 w-32" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     )
@@ -49,6 +75,36 @@ export default function DashboardPage() {
 
   return (
     <div className="px-4 md:px-6 py-4 md:py-6">
+      {/* Card do Condomínio - Destaque no topo */}
+      {condominium && (
+        <Card className="card-elevated mb-6 border-primary/20 bg-primary/5">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-lg bg-primary/10">
+                <Building2 className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold text-foreground">{condominium.name}</h2>
+                {condominium.address_street && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {condominium.address_street}
+                    {condominium.address_number && `, ${condominium.address_number}`}
+                    {condominium.address_neighborhood && ` - ${condominium.address_neighborhood}`}
+                    {condominium.address_city && `, ${condominium.address_city}`}
+                    {condominium.address_state && `/${condominium.address_state}`}
+                  </p>
+                )}
+              </div>
+              <Link href="/condominiums">
+                <span className="text-sm text-primary hover:underline cursor-pointer">
+                  Editar
+                </span>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {/* Card Total - Span 2 em telas grandes */}

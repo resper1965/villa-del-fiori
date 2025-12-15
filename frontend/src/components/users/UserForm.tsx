@@ -35,6 +35,7 @@ import { supabase } from "@/lib/supabase/client"
 import { updateUserAppMetadata } from "@/lib/api/user-metadata"
 import { useQuery } from "@tanstack/react-query"
 import { Unit, Stakeholder } from "@/types"
+import { useToast } from "@/hooks/use-toast"
 
 const userFormSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -104,6 +105,7 @@ interface UserFormProps {
 export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId, onSuccess }: UserFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
   const isEditing = !!userId
 
   const form = useForm<UserFormValues>({
@@ -318,7 +320,13 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
       }
     } catch (err: any) {
       console.error("Erro ao carregar usuário:", err)
-      setError(err.message || "Erro ao carregar dados do usuário")
+      const errorMessage = err.message || "Erro ao carregar dados do usuário"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }
@@ -337,12 +345,26 @@ export function UserForm({ open, onOpenChange, userId, userEmail, defaultUnitId,
         await createUser(values)
       }
 
+      toast({
+        variant: "success",
+        title: isEditing ? "Usuário atualizado" : "Usuário criado",
+        description: isEditing
+          ? "As informações do usuário foram atualizadas com sucesso."
+          : "O usuário foi criado com sucesso.",
+      })
+
       onSuccess?.()
       onOpenChange(false)
       form.reset()
     } catch (err: any) {
       console.error("Erro ao salvar usuário:", err)
-      setError(err.message || "Erro ao salvar usuário")
+      const errorMessage = err.message || "Erro ao salvar usuário"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }

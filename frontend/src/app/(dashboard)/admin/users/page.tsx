@@ -10,9 +10,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useAuth } from "@/contexts/AuthContext"
 import { useRouter } from "next/navigation"
 import UsersDataTable from "./data-table"
-import { Loader2 } from "lucide-react"
+import { Loader2, Users } from "lucide-react"
 import { updateUserAppMetadata } from "@/lib/api/user-metadata"
 import { UserForm } from "@/components/users/UserForm"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function AdminUsersPage() {
   const router = useRouter()
@@ -315,9 +317,35 @@ export default function AdminUsersPage() {
         {/* Tabela de Usuários */}
         {isLoading ? (
           <Card>
-            <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">Carregando usuários...</p>
+            <CardContent className="py-12">
+              <div className="space-y-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        ) : (!allUsers || allUsers.length === 0) ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Lista de Usuários</CardTitle>
+              <CardDescription>
+                Visualize e gerencie todos os usuários do sistema.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EmptyState
+                icon={Users}
+                title="Nenhum usuário cadastrado"
+                description="Comece cadastrando o primeiro usuário do sistema. Usuários podem ser aprovados ou rejeitados após o cadastro."
+                action={
+                  <Button onClick={() => setFormOpen(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Cadastrar Primeiro Usuário
+                  </Button>
+                }
+              />
             </CardContent>
           </Card>
         ) : (

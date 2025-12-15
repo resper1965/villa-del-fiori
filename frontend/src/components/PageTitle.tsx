@@ -1,6 +1,8 @@
 "use client"
 
 import { usePathname } from "next/navigation"
+import { useCondominium } from "@/lib/hooks/useCondominium"
+import { Building2 } from "lucide-react"
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -22,17 +24,26 @@ const pageTitles: Record<string, string> = {
 
 export function PageTitle() {
   const pathname = usePathname()
+  const { data: condominium } = useCondominium()
   
   // Para rotas dinâmicas como /processes/[id], pegar o título base
   const basePath = pathname.split("/").slice(0, 3).join("/")
   const title = pageTitles[pathname] || pageTitles[basePath] || ""
   
-  if (!title) return null
-  
   return (
-    <h1 className="text-lg font-semibold text-foreground">
-      {title}
-    </h1>
+    <div className="flex items-center gap-3">
+      {condominium && (
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
+          <Building2 className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium text-foreground">{condominium.name}</span>
+        </div>
+      )}
+      {title && (
+        <h1 className="text-lg font-semibold text-foreground">
+          {title}
+        </h1>
+      )}
+    </div>
   )
 }
 

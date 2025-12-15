@@ -83,14 +83,30 @@ export default function CondominiumsPage() {
   }
 
   const activeCount = condominiums?.length || 0
+  const hasActiveCondominium = activeCount > 0
 
   return (
     <div className="px-4 md:px-6 py-4 md:py-6">
-      <div className="mb-4">
-        <Button onClick={() => {
-          setEditingId(null)
-          setFormOpen(true)
-        }}>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          {hasActiveCondominium && (
+            <p className="text-sm text-muted-foreground mb-2">
+              A aplicação é mono-tenant. Apenas um condomínio pode estar ativo por vez.
+            </p>
+          )}
+        </div>
+        <Button
+          onClick={() => {
+            setEditingId(null)
+            setFormOpen(true)
+          }}
+          disabled={hasActiveCondominium}
+          title={
+            hasActiveCondominium
+              ? "Já existe um condomínio cadastrado. A aplicação é mono-tenant."
+              : "Cadastrar novo condomínio"
+          }
+        >
           <Plus className="h-4 w-4 mr-2 stroke-1" />
           Novo Condomínio
         </Button>

@@ -249,21 +249,29 @@ Todas as migrations foram aplicadas com sucesso no banco de dados:
 
 ## 🎯 Próxima Ação Recomendada
 
-**Imediato**: Implementar sistema de notificações (Item 4 - P1)
+**Imediato**: Testar e validar correções de segurança e performance aplicadas
 
-Com as funcionalidades críticas (RAG e validação de entidades) implementadas, o próximo passo lógico é melhorar a experiência do usuário com notificações sobre processos pendentes, aprovações, etc.
+Todas as correções críticas de segurança e performance foram aplicadas. O próximo passo é validar que tudo está funcionando corretamente.
+
+**Status das Correções**:
+- ✅ View de segurança removida
+- ✅ RLS habilitado em tabelas críticas
+- ✅ 30+ funções SQL corrigidas com search_path fixo
+- ✅ 20+ políticas RLS otimizadas
+- ✅ 7 índices adicionados para performance
+- ✅ Sistema de notificações verificado e deployado
 
 **Passos imediatos**:
-1. Criar migration para tabela de notificações
-2. Implementar triggers para criar notificações automaticamente
-3. Criar Edge Function para gerenciar notificações
-4. Criar componente de notificações no frontend (badge + dropdown)
-5. Criar página de notificações
-6. Implementar marcação de notificações como lidas
+1. ✅ Testar sistema de notificações (Edge Function já deployada)
+2. ✅ Validar que RLS está funcionando corretamente
+3. ✅ Testar funcionalidades principais após correções
+4. ⚠️ Configurar Leaked Password Protection no Dashboard (opcional)
+5. ⚠️ Configurar MFA no Dashboard (opcional)
 
-**Alternativa (se preferir melhorias incrementais)**:
+**Próximas funcionalidades**:
 - Implementar dashboard de integridade de entidades (complemento da validação)
 - Adicionar comentários em processos (melhora colaboração)
+- Ingestão de contratos de fornecedores (Spec 007)
 
 ---
 

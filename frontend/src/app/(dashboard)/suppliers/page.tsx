@@ -10,6 +10,8 @@ import { SupplierForm } from "@/components/suppliers/SupplierForm"
 import { Supplier } from "@/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import SuppliersDataTable from "./data-table"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function SuppliersPage() {
   const router = useRouter()
@@ -118,9 +120,38 @@ export default function SuppliersPage() {
         {/* Tabela de Fornecedores */}
         {isLoading ? (
           <Card className="card-elevated">
-            <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">Carregando fornecedores...</p>
+            <CardContent className="py-12">
+              <div className="space-y-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        ) : (!suppliers || suppliers.length === 0) ? (
+          <Card className="card-elevated">
+            <CardHeader>
+              <CardTitle>Lista de Fornecedores</CardTitle>
+              <CardDescription>
+                Visualize e gerencie todos os fornecedores cadastrados.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EmptyState
+                icon={Truck}
+                title="Nenhum fornecedor cadastrado"
+                description="Comece cadastrando o primeiro fornecedor do condomínio. Fornecedores podem ser administradoras, portarias virtuais, serviços de elevador, gerador, limpeza, segurança e outros."
+                action={
+                  <Button onClick={() => {
+                    setEditingId(null)
+                    setFormOpen(true)
+                  }}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Cadastrar Primeiro Fornecedor
+                  </Button>
+                }
+              />
             </CardContent>
           </Card>
         ) : (

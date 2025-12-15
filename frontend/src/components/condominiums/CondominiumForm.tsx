@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
+import { useToast } from "@/hooks/use-toast"
 
 const condominiumFormSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -61,6 +62,7 @@ interface CondominiumFormProps {
 export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }: CondominiumFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
   const isEditing = !!condominiumId
 
   const form = useForm<CondominiumFormValues>({
@@ -132,7 +134,13 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
       })
     } catch (err: any) {
       console.error("Erro ao carregar condomínio:", err)
-      setError(err.message || "Erro ao carregar dados do condomínio")
+      const errorMessage = err.message || "Erro ao carregar dados do condomínio"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }
@@ -142,6 +150,26 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
     try {
       setIsLoading(true)
       setError(null)
+
+      // Verificar se já existe condomínio ativo (apenas para criação, não edição)
+      if (!isEditing) {
+        const { data: existingCondominium, error: checkError } = await supabase
+          .from("condominiums")
+          .select("id")
+          .eq("is_active", true)
+          .limit(1)
+          .maybeSingle()
+
+        if (checkError && checkError.code !== "PGRST116") {
+          throw checkError
+        }
+
+        if (existingCondominium) {
+          throw new Error(
+            "Já existe um condomínio cadastrado. A aplicação é mono-tenant e permite apenas um condomínio por vez."
+          )
+        }
+      }
 
       // Obter usuário atual para definir owner_id (preparado para SaaS)
       const { data: { user } } = await supabase.auth.getUser()
@@ -178,17 +206,40 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
             cnpj: values.cnpj || null,
             owner_id: user?.id || null,
             slug: generateSlug(values.name),
+            is_active: true, // Sempre ativo ao criar
           })
 
-        if (error) throw error
+        if (error) {
+          // Verificar se é erro de constraint de único condomínio ativo
+          if (error.message?.includes("mono-tenant") || error.message?.includes("único")) {
+            throw new Error(
+              "Já existe um condomínio cadastrado. A aplicação é mono-tenant e permite apenas um condomínio por vez."
+            )
+          }
+          throw error
+        }
       }
 
+      toast({
+        variant: "success",
+        title: isEditing ? "Condomínio atualizado" : "Condomínio criado",
+        description: isEditing 
+          ? "As informações do condomínio foram atualizadas com sucesso."
+          : "O condomínio foi cadastrado com sucesso.",
+      })
+      
       onSuccess?.()
       onOpenChange(false)
       form.reset()
     } catch (err: any) {
       console.error("Erro ao salvar condomínio:", err)
-      setError(err.message || "Erro ao salvar condomínio")
+      const errorMessage = err.message || "Erro ao salvar condomínio"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }

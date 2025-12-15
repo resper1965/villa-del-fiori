@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
 import { useCondominium } from "@/lib/hooks/useCondominium"
+import { useToast } from "@/hooks/use-toast"
 
 const supplierFormSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -78,6 +79,7 @@ interface SupplierFormProps {
 export function SupplierForm({ open, onOpenChange, supplierId, defaultCondominiumId, onSuccess }: SupplierFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
   const isEditing = !!supplierId
 
   // Single-tenant: buscar o único condomínio
@@ -159,7 +161,13 @@ export function SupplierForm({ open, onOpenChange, supplierId, defaultCondominiu
       })
     } catch (err: any) {
       console.error("Erro ao carregar fornecedor:", err)
-      setError(err.message || "Erro ao carregar dados do fornecedor")
+      const errorMessage = err.message || "Erro ao carregar dados do fornecedor"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }
@@ -188,12 +196,25 @@ export function SupplierForm({ open, onOpenChange, supplierId, defaultCondominiu
           .insert(dataToSave)
         if (error) throw error
       }
+      toast({
+        variant: "success",
+        title: isEditing ? "Fornecedor atualizado" : "Fornecedor criado",
+        description: isEditing
+          ? "As informações do fornecedor foram atualizadas com sucesso."
+          : "O fornecedor foi cadastrado com sucesso.",
+      })
       onSuccess?.()
       onOpenChange(false)
       form.reset()
     } catch (err: any) {
       console.error("Erro ao salvar fornecedor:", err)
-      setError(err.message || "Erro ao salvar fornecedor")
+      const errorMessage = err.message || "Erro ao salvar fornecedor"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }

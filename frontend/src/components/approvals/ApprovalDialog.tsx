@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { CheckCircle } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 interface ApprovalDialogProps {
   open: boolean
@@ -29,15 +30,26 @@ export function ApprovalDialog({
 }: ApprovalDialogProps) {
   const [comment, setComment] = useState("")
   const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
 
   const handleApprove = async () => {
     setLoading(true)
     try {
       await onApprove(comment || undefined)
+      toast({
+        variant: "success",
+        title: "Processo aprovado",
+        description: `O processo "${processName}" foi aprovado com sucesso.`,
+      })
       setComment("")
       onOpenChange(false)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao aprovar:", error)
+      toast({
+        variant: "destructive",
+        title: "Erro ao aprovar",
+        description: error?.message || "Ocorreu um erro ao aprovar o processo. Tente novamente.",
+      })
     } finally {
       setLoading(false)
     }

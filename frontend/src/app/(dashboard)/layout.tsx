@@ -1,12 +1,13 @@
 "use client"
 
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { useAuth } from "@/contexts/AuthContext"
 import { NotificationBell } from "@/components/notifications/NotificationBell"
 import { PageTitle } from "@/components/PageTitle"
+import { CondominiumGuard } from "@/components/condominium/CondominiumGuard"
 
 export default function DashboardLayout({
   children,
@@ -14,7 +15,9 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const { isAuthenticated, isLoading } = useAuth()
+  const isSetupPage = pathname === "/setup"
 
   // Se não autenticado, redirecionar para página de login (hooks devem vir antes de returns)
   useEffect(() => {
@@ -57,21 +60,28 @@ export default function DashboardLayout({
   // Não redirecionar moradores aqui - deixar cada página lidar com suas próprias permissões
   // O layout sempre será mostrado se o usuário estiver autenticado
 
+  // Se for página de setup, não mostrar layout completo
+  if (isSetupPage) {
+    return <CondominiumGuard>{children}</CondominiumGuard>
+  }
+
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="flex flex-col h-screen">
-        {/* Header com título e notificações - fixo no topo */}
-        <header className="h-[73px] shrink-0 border-b border-border bg-card backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-50">
-          <div className="flex items-center gap-4">
-            <SidebarTrigger />
-            <PageTitle />
-          </div>
-          <NotificationBell />
-        </header>
-        {/* Conteúdo principal com scroll */}
-        <main className="flex-1 overflow-y-auto bg-transparent">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
+    <CondominiumGuard>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset className="flex flex-col h-screen">
+          {/* Header com título e notificações - fixo no topo */}
+          <header className="h-[73px] shrink-0 border-b border-border bg-card backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-50">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger />
+              <PageTitle />
+            </div>
+            <NotificationBell />
+          </header>
+          {/* Conteúdo principal com scroll */}
+          <main className="flex-1 overflow-y-auto bg-transparent">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </CondominiumGuard>
   )
 }

@@ -35,6 +35,7 @@ import { Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
 import { useQuery } from "@tanstack/react-query"
 import { Unit } from "@/types"
+import { useToast } from "@/hooks/use-toast"
 
 const vehicleFormSchema = z.object({
   unit_id: z.string().min(1, "Unidade é obrigatória"),
@@ -69,6 +70,7 @@ export function VehicleForm({
 }: VehicleFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
   const isEditing = !!vehicleId
 
   // Buscar lista de unidades
@@ -144,7 +146,13 @@ export function VehicleForm({
       })
     } catch (err: any) {
       console.error("Erro ao carregar veículo:", err)
-      setError(err.message || "Erro ao carregar dados do veículo")
+      const errorMessage = err.message || "Erro ao carregar dados do veículo"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }
@@ -191,16 +199,28 @@ export function VehicleForm({
         if (createError) throw createError
       }
 
+      toast({
+        variant: "success",
+        title: isEditing ? "Veículo atualizado" : "Veículo criado",
+        description: isEditing
+          ? "As informações do veículo foram atualizadas com sucesso."
+          : "O veículo foi cadastrado com sucesso.",
+      })
       onSuccess?.()
       onOpenChange(false)
       form.reset()
     } catch (err: any) {
       console.error("Erro ao salvar veículo:", err)
+      let errorMessage = err.message || "Erro ao salvar veículo"
       if (err.code === "23505") {
-        setError("Esta placa já está cadastrada no sistema")
-      } else {
-        setError(err.message || "Erro ao salvar veículo")
+        errorMessage = "Esta placa já está cadastrada no sistema"
       }
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }

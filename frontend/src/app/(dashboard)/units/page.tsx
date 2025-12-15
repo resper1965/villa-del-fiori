@@ -4,12 +4,15 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, Home } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import UnitsDataTable from "./data-table"
 import { Loader2 } from "lucide-react"
 import { UnitForm } from "@/components/units/UnitForm"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent } from "@/components/ui/card"
 
 export default function UnitsPage() {
   const router = useRouter()
@@ -155,9 +158,40 @@ export default function UnitsPage() {
         {/* Tabela de Unidades */}
         {isLoading ? (
           <Card>
-            <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">Carregando unidades...</p>
+            <CardContent className="py-12">
+              <div className="space-y-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        ) : (!units || units.length === 0) ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Lista de Unidades</CardTitle>
+              <CardDescription>
+                Visualize e gerencie todas as unidades cadastradas no condomínio.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EmptyState
+                icon={Home}
+                title="Nenhuma unidade cadastrada"
+                description="Comece cadastrando a primeira unidade do condomínio. Você pode cadastrar unidades individualmente ou usar o cadastro completo."
+                action={
+                  <div className="flex gap-2">
+                    <Button onClick={() => setFormOpen(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Cadastrar Unidade
+                    </Button>
+                    <Button variant="outline" onClick={() => router.push("/units/new")}>
+                      Cadastro Completo
+                    </Button>
+                  </div>
+                }
+              />
             </CardContent>
           </Card>
         ) : (

@@ -9,6 +9,8 @@ import { useProcesses } from "@/lib/hooks/useProcesses"
 import { useApproveProcess, useRejectProcess } from "@/lib/hooks/useApprovals"
 import { ApprovalDialog } from "@/components/approvals/ApprovalDialog"
 import { RejectionDialog } from "@/components/approvals/RejectionDialog"
+import { Skeleton } from "@/components/ui/skeleton"
+import { EmptyState } from "@/components/ui/empty-state"
 
 export default function ApprovalsPage() {
   const router = useRouter()
@@ -75,12 +77,24 @@ export default function ApprovalsPage() {
   return (
     <div className="px-4 md:px-6 py-4 md:py-6">
       {isLoading ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground stroke-1" />
-              <p className="text-muted-foreground">Carregando processos pendentes...</p>
-            </CardContent>
-          </Card>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-6 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                    <Skeleton className="h-9 w-24" />
+                  </div>
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : pendingProcesses.length === 0 ? (
         <Card>
             <CardHeader>
@@ -90,10 +104,11 @@ export default function ApprovalsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <Clock className="h-12 w-12 mx-auto mb-4 text-muted-foreground stroke-1" />
-                <p>Nenhum processo pendente de aprovação.</p>
-              </div>
+              <EmptyState
+                icon={CheckCircle}
+                title="Nenhum processo pendente"
+                description="Todos os processos foram revisados. Quando houver novos processos aguardando aprovação, eles aparecerão aqui."
+              />
             </CardContent>
         </Card>
       ) : (

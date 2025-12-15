@@ -35,6 +35,7 @@ import { Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
 import { useQuery } from "@tanstack/react-query"
 import { Unit, Stakeholder } from "@/types"
+import { useToast } from "@/hooks/use-toast"
 
 const petFormSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -65,6 +66,7 @@ interface PetFormProps {
 export function PetForm({ open, onOpenChange, petId, defaultUnitId, onSuccess }: PetFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
   const isEditing = !!petId
 
   const form = useForm<PetFormValues>({
@@ -156,7 +158,13 @@ export function PetForm({ open, onOpenChange, petId, defaultUnitId, onSuccess }:
       })
     } catch (err: any) {
       console.error("Erro ao carregar pet:", err)
-      setError(err.message || "Erro ao carregar dados do pet")
+      const errorMessage = err.message || "Erro ao carregar dados do pet"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }
@@ -178,12 +186,25 @@ export function PetForm({ open, onOpenChange, petId, defaultUnitId, onSuccess }:
           .insert(values)
         if (error) throw error
       }
+      toast({
+        variant: "success",
+        title: isEditing ? "Pet atualizado" : "Pet criado",
+        description: isEditing
+          ? "As informações do pet foram atualizadas com sucesso."
+          : "O pet foi cadastrado com sucesso.",
+      })
       onSuccess?.()
       onOpenChange(false)
       form.reset()
     } catch (err: any) {
       console.error("Erro ao salvar pet:", err)
-      setError(err.message || "Erro ao salvar pet")
+      const errorMessage = err.message || "Erro ao salvar pet"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }

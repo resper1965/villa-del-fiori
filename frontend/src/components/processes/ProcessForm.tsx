@@ -27,6 +27,7 @@ import { Loader2, Plus, X, Sparkles } from "lucide-react"
 import { Process } from "@/types"
 import { EntityValidation } from "@/components/validation/EntityValidation"
 import { generateMermaidDiagram } from "@/lib/api/mermaid"
+import { useToast } from "@/hooks/use-toast"
 
 const processSchema = z.object({
   name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
@@ -93,6 +94,7 @@ const documentTypeMap: Record<string, string> = {
 export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit }: ProcessFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isGeneratingMermaid, setIsGeneratingMermaid] = useState(false)
+  const { toast } = useToast()
   const {
     register,
     handleSubmit,
@@ -170,10 +172,22 @@ export function ProcessForm({ open, onOpenChange, process, initialData, onSubmit
     setIsSubmitting(true)
     try {
       await onSubmit(data)
+      toast({
+        variant: "success",
+        title: process ? "Processo atualizado" : "Processo criado",
+        description: process
+          ? "O processo foi atualizado com sucesso."
+          : "O processo foi criado com sucesso.",
+      })
       onOpenChange(false)
       reset()
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao salvar processo:", error)
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar",
+        description: error?.message || "Ocorreu um erro ao salvar o processo. Tente novamente.",
+      })
     } finally {
       setIsSubmitting(false)
     }

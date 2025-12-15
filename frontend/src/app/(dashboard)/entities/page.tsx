@@ -15,32 +15,63 @@ import { Plus, Search, X, Loader2, Users, Phone, Mail, Building2, AlertCircle, E
 import { useEntities, useDeleteEntity } from "@/lib/hooks/useEntities"
 import { EntityType, EntityCategory, EntityTypeLabels, EntityCategoryLabels, CategoriesByType } from "@/types/entity"
 import { EntityForm } from "@/components/entities/EntityForm"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Pagination } from "@/components/ui/pagination"
+
+const DEFAULT_ITEMS_PER_PAGE = 20
+const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50, 100]
 
 export default function EntitiesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedType, setSelectedType] = useState<string>("all")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(DEFAULT_ITEMS_PER_PAGE)
   const [formOpen, setFormOpen] = useState(false)
   const [editingEntity, setEditingEntity] = useState<string | null>(null)
 
   const deleteMutation = useDeleteEntity()
 
-  // OTIMIZAÇÃO: Reduzir page_size de 100 para 50
+  // Paginação real implementada
   const { data, isLoading, error } = useEntities({
     type: selectedType !== "all" ? selectedType as EntityType : undefined,
     category: selectedCategory !== "all" ? selectedCategory as EntityCategory : undefined,
     search: searchQuery || undefined,
-    page: 1,
-    page_size: 50, // Reduzido de 100 para 50 - OTIMIZAÇÃO
+    page: currentPage,
+    page_size: itemsPerPage,
   })
 
   const entities = data?.items || []
+  const totalCount = data?.total || 0
+  const totalPages = Math.ceil(totalCount / itemsPerPage)
   const hasFilters = searchQuery !== "" || selectedType !== "all" || selectedCategory !== "all"
 
   const clearFilters = () => {
     setSearchQuery("")
     setSelectedType("all")
     setSelectedCategory("all")
+    setCurrentPage(1)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage)
+    setCurrentPage(1)
+  }
+
+  const handleTypeChange = (type: string) => {
+    setSelectedType(type)
+    setCurrentPage(1)
+  }
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category)
+    setCurrentPage(1)
   }
 
   const handleEdit = (id: string) => {
@@ -96,7 +127,7 @@ export default function EntitiesPage() {
             </div>
 
             {/* Filtro de Tipo */}
-            <Select value={selectedType} onValueChange={setSelectedType}>
+            <Select value={selectedType} onValueChange={handleTypeChange}>
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Todos os tipos" />
               </SelectTrigger>
@@ -152,18 +183,45 @@ export default function EntitiesPage() {
 
       {/* Lista de entidades - Bento Grid */}
       {isLoading ? (
-          <Card className="card-elevated">
-            <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground stroke-1" />
-              <p className="text-muted-foreground">Carregando entidades...</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <Card key={i} className="card-elevated">
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-5/6" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : entities.length === 0 ? (
         <Card className="card-elevated">
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">
-              Nenhuma entidade encontrada com os filtros aplicados.
-            </p>
+          <CardContent>
+            <EmptyState
+              icon={Building2}
+              title={hasFilters ? "Nenhuma entidade encontrada" : "Nenhuma entidade cadastrada"}
+              description={
+                hasFilters
+                  ? "Tente ajustar os filtros de busca para encontrar entidades."
+                  : "Comece cadastrando uma nova entidade clicando no botão acima."
+              }
+              action={
+                hasFilters ? (
+                  <Button variant="outline" size="sm" onClick={clearFilters}>
+                    <X className="h-4 w-4 mr-2" />
+                    Limpar Filtros
+                  </Button>
+                ) : (
+                  <Button onClick={() => setFormOpen(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Cadastrar Primeira Entidade
+                  </Button>
+                )
+              }
+            />
           </CardContent>
         </Card>
       ) : (
@@ -249,6 +307,21 @@ export default function EntitiesPage() {
               )
           })}
         </div>
+      )}
+
+      {/* Paginação */}
+      {!isLoading && entities.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalCount}
+          itemsPerPage={itemsPerPage}
+          itemsPerPageOptions={ITEMS_PER_PAGE_OPTIONS}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          showItemsPerPage={true}
+          showPageInfo={true}
+        />
       )}
 
       <EntityForm

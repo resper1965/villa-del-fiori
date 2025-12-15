@@ -25,6 +25,7 @@ import {
 import { useEntity, useCreateEntity, useUpdateEntity } from "@/lib/hooks/useEntities"
 import { EntityType, EntityCategory, EntityTypeLabels, EntityCategoryLabels, CategoriesByType } from "@/types/entity"
 import { Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 const entitySchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -53,6 +54,7 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
   const { data: entity, isLoading: isLoadingEntity } = useEntity(entityId || null)
   const createMutation = useCreateEntity()
   const updateMutation = useUpdateEntity()
+  const { toast } = useToast()
 
   const {
     register,
@@ -122,12 +124,27 @@ export function EntityForm({ open, onOpenChange, entityId }: EntityFormProps) {
 
       if (entityId) {
         await updateMutation.mutateAsync({ id: entityId, data: formData })
+        toast({
+          variant: "success",
+          title: "Entidade atualizada",
+          description: "As informações da entidade foram atualizadas com sucesso.",
+        })
       } else {
         await createMutation.mutateAsync(formData)
+        toast({
+          variant: "success",
+          title: "Entidade criada",
+          description: "A entidade foi cadastrada com sucesso.",
+        })
       }
       onOpenChange(false)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao salvar entidade:", error)
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar",
+        description: error?.message || "Ocorreu um erro ao salvar a entidade. Tente novamente.",
+      })
     }
   }
 

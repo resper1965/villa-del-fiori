@@ -4,13 +4,15 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, Car } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useAuth } from "@/contexts/AuthContext"
 import VehiclesDataTable from "./data-table"
 import { Loader2 } from "lucide-react"
 import { VehicleForm } from "@/components/vehicles/VehicleForm"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function VehiclesPage() {
   const router = useRouter()
@@ -126,9 +128,35 @@ export default function VehiclesPage() {
         {/* Tabela de Veículos */}
         {isLoading ? (
           <Card>
-            <CardContent className="py-12 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">Carregando veículos...</p>
+            <CardContent className="py-12">
+              <div className="space-y-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        ) : (!vehicles || vehicles.length === 0) ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Lista de Veículos</CardTitle>
+              <CardDescription>
+                Visualize e gerencie todos os veículos cadastrados no condomínio.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EmptyState
+                icon={Car}
+                title="Nenhum veículo cadastrado"
+                description="Comece cadastrando o primeiro veículo do condomínio. Você pode associar veículos às unidades e moradores."
+                action={
+                  <Button onClick={() => setFormOpen(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Cadastrar Primeiro Veículo
+                  </Button>
+                }
+              />
             </CardContent>
           </Card>
         ) : (

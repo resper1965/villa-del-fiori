@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { XCircle, AlertCircle } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 interface RejectionDialogProps {
   open: boolean
@@ -30,6 +31,7 @@ export function RejectionDialog({
   const [reason, setReason] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const { toast } = useToast()
 
   const handleReject = async () => {
     if (!reason.trim()) {
@@ -41,11 +43,22 @@ export function RejectionDialog({
     setError("")
     try {
       await onReject(reason)
+      toast({
+        variant: "success",
+        title: "Processo rejeitado",
+        description: `O processo "${processName}" foi rejeitado. O criador receberá o feedback para correção.`,
+      })
       setReason("")
       onOpenChange(false)
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao rejeitar:", err)
-      setError("Erro ao rejeitar processo. Tente novamente.")
+      const errorMessage = err?.message || "Erro ao rejeitar processo. Tente novamente."
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao rejeitar",
+        description: errorMessage,
+      })
     } finally {
       setLoading(false)
     }

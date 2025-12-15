@@ -28,6 +28,7 @@ import { Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
 import { Unit } from "@/types"
 import { useCondominium } from "@/lib/hooks/useCondominium"
+import { useToast } from "@/hooks/use-toast"
 
 const unitFormSchema = z.object({
   number: z.string().min(1, "Número da unidade é obrigatório"),
@@ -51,6 +52,7 @@ interface UnitFormProps {
 export function UnitForm({ open, onOpenChange, unitId, onSuccess }: UnitFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
   const isEditing = !!unitId
 
   // Single-tenant: buscar o único condomínio
@@ -110,7 +112,13 @@ export function UnitForm({ open, onOpenChange, unitId, onSuccess }: UnitFormProp
       })
     } catch (err: any) {
       console.error("Erro ao carregar unidade:", err)
-      setError(err.message || "Erro ao carregar dados da unidade")
+      const errorMessage = err.message || "Erro ao carregar dados da unidade"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }
@@ -161,18 +169,34 @@ export function UnitForm({ open, onOpenChange, unitId, onSuccess }: UnitFormProp
           throw createError
         }
 
+        toast({
+          variant: "success",
+          title: "Unidade criada",
+          description: "A unidade foi cadastrada com sucesso.",
+        })
         onSuccess?.(newUnit?.id)
         onOpenChange(false)
         form.reset()
         return
       }
 
+      toast({
+        variant: "success",
+        title: "Unidade atualizada",
+        description: "As informações da unidade foram atualizadas com sucesso.",
+      })
       onSuccess?.()
       onOpenChange(false)
       form.reset()
     } catch (err: any) {
       console.error("Erro ao salvar unidade:", err)
-      setError(err.message || "Erro ao salvar unidade")
+      const errorMessage = err.message || "Erro ao salvar unidade"
+      setError(errorMessage)
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar",
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }
