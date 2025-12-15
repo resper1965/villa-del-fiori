@@ -14,6 +14,8 @@ import {
   Database,
   User,
   MoreVertical,
+  Building2,
+  FileUp,
 } from "lucide-react"
 import {
   Sidebar,
@@ -97,6 +99,7 @@ export function AppSidebar() {
 
   if (canAccessDashboard()) {
     cadastroMenuItems.push({ href: "/cadastros", label: "Cadastros", icon: ClipboardList })
+    cadastroMenuItems.push({ href: "/documents", label: "Documentos", icon: FileUp })
     cadastroMenuItems.push({ href: "/entities", label: "Entidades", icon: Users })
     cadastroMenuItems.push({ href: "/suppliers", label: "Fornecedores", icon: Truck })
   }
@@ -109,6 +112,7 @@ export function AppSidebar() {
   }> = []
 
   if (canApproveUsers()) {
+    adminMenuItems.push({ href: "/condominiums", label: "Condomínio", icon: Building2 })
     adminMenuItems.push({ href: "/admin/users", label: "Usuários", icon: Users })
     adminMenuItems.push({ href: "/admin/knowledge-base", label: "Base de Conhecimento", icon: Database })
   }

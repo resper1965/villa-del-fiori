@@ -35,97 +35,65 @@ export default function AdminUsersPage() {
       )
       
       const queryFn = async () => {
-        // Buscar usuários do Supabase Auth via view
-        const { data, error } = await supabase
-          .from("auth_users_with_metadata")
-          .select("*")
-          .order("created_at", { ascending: false })
-
-        if (error) {
-          // Fallback: buscar da tabela stakeholders com join de unidades
-          const { data: fallbackData, error: fallbackError } = await supabase
-            .from("stakeholders")
-            .select(`
-              *,
-              unit:units(*),
-              owner:stakeholders!stakeholders_owner_id_fkey(id, name, email)
-            `)
-            .eq("is_active", true)
-            .order("created_at", { ascending: false })
-          
-          if (fallbackError) throw fallbackError
-          return (fallbackData || []).map((item: any) => ({
-            ...item,
-            unit: Array.isArray(item.unit) ? item.unit[0] : item.unit,
-            owner: Array.isArray(item.owner) ? item.owner[0] : item.owner,
-            auth_user_id: item.auth_user_id || item.id,
-          }))
-        }
+        // Buscar TODOS os usuários de auth.users via RPC ou função
+        // Como não temos acesso direto a auth.users via PostgREST, vamos buscar de stakeholders
+        // e também garantir que usuários sem stakeholder apareçam
         
-        // Buscar unidades separadamente para os usuários da view
-        const userIds = (data || []).map((u: any) => u.id)
-        const { data: stakeholdersData } = await supabase
+        // Primeiro, buscar todos os stakeholders (incluindo admin)
+        const { data: stakeholdersData, error: stakeholdersError } = await supabase
           .from("stakeholders")
           .select(`
-            auth_user_id,
-            unit_id,
-            relationship_type,
-            is_owner,
-            is_resident,
-            owner_id,
-            phone,
-            phone_secondary,
-            whatsapp,
-            has_whatsapp,
+            *,
             unit:units(*),
             owner:stakeholders!stakeholders_owner_id_fkey(id, name, email)
           `)
-          .in("auth_user_id", userIds)
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
         
+        if (stakeholdersError) throw stakeholdersError
+        
+        // Mapear stakeholders para o formato esperado
         const stakeholdersMap = new Map()
+        const result: any[] = []
+        
         stakeholdersData?.forEach((s: any) => {
-          stakeholdersMap.set(s.auth_user_id, {
-            unit: Array.isArray(s.unit) ? s.unit[0] : s.unit,
-            relationship_type: s.relationship_type,
-            is_owner: s.is_owner,
-            is_resident: s.is_resident,
-            owner_id: s.owner_id,
-            owner: Array.isArray(s.owner) ? s.owner[0] : s.owner,
-            phone: s.phone,
-            phone_secondary: s.phone_secondary,
-            whatsapp: s.whatsapp,
-            has_whatsapp: s.has_whatsapp,
-          })
+          const userData = {
+            id: s.auth_user_id || s.id,
+            auth_user_id: s.auth_user_id || s.id,
+            name: s.name || s.email?.split("@")[0] || "Usuário",
+            email: s.email,
+            type: s.type || "morador",
+            user_role: s.user_role || "resident",
+            unit_id: Array.isArray(s.unit) ? s.unit[0]?.id : s.unit?.id || null,
+            unit: Array.isArray(s.unit) ? s.unit[0] : s.unit || null,
+            relationship_type: s.relationship_type || null,
+            is_owner: s.is_owner ?? false,
+            is_resident: s.is_resident ?? true,
+            owner_id: s.owner_id || null,
+            owner: Array.isArray(s.owner) ? s.owner[0] : s.owner || null,
+            phone: s.phone || null,
+            phone_secondary: s.phone_secondary || null,
+            whatsapp: s.whatsapp || null,
+            has_whatsapp: s.has_whatsapp || false,
+            is_approved: s.is_approved ?? false,
+            approved_at: s.approved_at || null,
+            approved_by: s.approved_by || null,
+            is_active: s.is_active ?? true,
+            created_at: s.created_at,
+          }
+          
+          if (s.auth_user_id) {
+            stakeholdersMap.set(s.auth_user_id, userData)
+          }
+          result.push(userData)
         })
         
-        // Mapear dados da view para o formato esperado
-        return (data || []).map((user: any) => {
-          const stakeholderData = stakeholdersMap.get(user.id) || {}
-          return {
-            id: user.id,
-            auth_user_id: user.id,
-            name: user.name || user.email?.split("@")[0] || "Usuário",
-            email: user.email,
-            type: user.type || "morador",
-            user_role: user.user_role || "resident",
-            unit_id: stakeholderData.unit?.id || null,
-            unit: stakeholderData.unit || null,
-            relationship_type: stakeholderData.relationship_type || null,
-            is_owner: stakeholderData.is_owner ?? false,
-            is_resident: stakeholderData.is_resident ?? true,
-            owner_id: stakeholderData.owner_id || null,
-            owner: stakeholderData.owner || null,
-            phone: stakeholderData.phone || null,
-            phone_secondary: stakeholderData.phone_secondary || null,
-            whatsapp: stakeholderData.whatsapp || null,
-            has_whatsapp: stakeholderData.has_whatsapp || false,
-            is_approved: user.is_approved || false,
-            approved_at: user.approved_at,
-            approved_by: user.approved_by,
-            is_active: true,
-            created_at: user.created_at,
-          }
-        })
+        // Buscar usuários de auth.users que não estão em stakeholders
+        // Usar uma função RPC se disponível, ou buscar via Admin API
+        // Por enquanto, retornamos apenas os stakeholders (que incluem admin)
+        // O admin DEVE estar na tabela stakeholders para aparecer na lista
+        
+        return result
       }
       
       return Promise.race([queryFn(), timeoutPromise]) as Promise<any>

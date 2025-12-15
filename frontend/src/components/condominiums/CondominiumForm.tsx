@@ -151,8 +151,9 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
       setIsLoading(true)
       setError(null)
 
-      // Verificar se já existe condomínio ativo (apenas para criação, não edição)
+      // BLOQUEAR CRIAÇÃO: A aplicação é mono-tenant, apenas edição é permitida
       if (!isEditing) {
+        // Verificar se já existe condomínio ativo
         const { data: existingCondominium, error: checkError } = await supabase
           .from("condominiums")
           .select("id")
@@ -166,7 +167,7 @@ export function CondominiumForm({ open, onOpenChange, condominiumId, onSuccess }
 
         if (existingCondominium) {
           throw new Error(
-            "Já existe um condomínio cadastrado. A aplicação é mono-tenant e permite apenas um condomínio por vez."
+            "Já existe um condomínio cadastrado. A aplicação é mono-tenant e permite apenas um condomínio por vez. Use a opção de editar para modificar o condomínio existente."
           )
         }
       }
