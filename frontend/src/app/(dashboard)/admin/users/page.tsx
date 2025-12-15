@@ -45,7 +45,7 @@ export default function AdminUsersPage() {
           .select(`
             *,
             unit:units(*),
-            owner:stakeholders!stakeholders_owner_id_fkey(id, name, email)
+            owner:stakeholders!owner_id(id, name, email)
           `)
           .eq("is_active", true)
           .order("created_at", { ascending: false })
@@ -55,6 +55,21 @@ export default function AdminUsersPage() {
         // Mapear stakeholders para o formato esperado
         const stakeholdersMap = new Map()
         const result: any[] = []
+        
+        // Buscar owners separadamente se necessário
+        const ownerIds = stakeholdersData?.filter((s: any) => s.owner_id).map((s: any) => s.owner_id) || []
+        const ownersMap = new Map()
+        
+        if (ownerIds.length > 0) {
+          const { data: ownersData } = await supabase
+            .from("stakeholders")
+            .select("id, name, email")
+            .in("id", ownerIds)
+          
+          ownersData?.forEach((owner: any) => {
+            ownersMap.set(owner.id, owner)
+          })
+        }
         
         stakeholdersData?.forEach((s: any) => {
           const userData = {
@@ -70,7 +85,7 @@ export default function AdminUsersPage() {
             is_owner: s.is_owner ?? false,
             is_resident: s.is_resident ?? true,
             owner_id: s.owner_id || null,
-            owner: Array.isArray(s.owner) ? s.owner[0] : s.owner || null,
+            owner: s.owner_id ? ownersMap.get(s.owner_id) || null : null,
             phone: s.phone || null,
             phone_secondary: s.phone_secondary || null,
             whatsapp: s.whatsapp || null,

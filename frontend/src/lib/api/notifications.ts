@@ -84,56 +84,69 @@ export const notificationsApi = {
 
   // Obter contador de não lidas
   async getUnreadCount(): Promise<number> {
-    const { data, error } = await supabase.functions.invoke("notifications/unread-count", {
-      method: "GET",
-    })
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return 0
+    }
+
+    const { count, error } = await supabase
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("is_read", false)
 
     if (error) {
       throw new Error(`Erro ao buscar contador: ${error.message}`)
     }
 
-    if (!data || !data.success) {
-      throw new Error(data?.error || "Erro desconhecido ao buscar contador")
-    }
-
-    return data.count || 0
+    return count || 0
   },
 
   // Marcar notificação como lida
   async markAsRead(notificationId: string): Promise<boolean> {
-    const { data, error } = await supabase.functions.invoke(
-      `notifications/${notificationId}/read`,
-      {
-        method: "PUT",
-      }
-    )
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      throw new Error("Usuário não autenticado")
+    }
+
+    const { error } = await supabase
+      .from("notifications")
+      .update({
+        is_read: true,
+        read_at: new Date().toISOString(),
+      })
+      .eq("id", notificationId)
+      .eq("user_id", user.id)
 
     if (error) {
       throw new Error(`Erro ao marcar notificação como lida: ${error.message}`)
     }
 
-    if (!data || !data.success) {
-      throw new Error(data?.error || "Erro desconhecido ao marcar notificação")
-    }
-
-    return data.marked || false
+    return true
   },
 
   // Marcar todas como lidas
   async markAllAsRead(): Promise<number> {
-    const { data, error } = await supabase.functions.invoke("notifications/read-all", {
-      method: "PUT",
-    })
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      throw new Error("Usuário não autenticado")
+    }
+
+    const { count, error } = await supabase
+      .from("notifications")
+      .update({
+        is_read: true,
+        read_at: new Date().toISOString(),
+      })
+      .eq("user_id", user.id)
+      .eq("is_read", false)
+      .select("*", { count: "exact", head: false })
 
     if (error) {
       throw new Error(`Erro ao marcar todas como lidas: ${error.message}`)
     }
 
-    if (!data || !data.success) {
-      throw new Error(data?.error || "Erro desconhecido ao marcar todas como lidas")
-    }
-
-    return data.marked_count || 0
+    return count || 0
   },
 }
 
