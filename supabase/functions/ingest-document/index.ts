@@ -148,18 +148,25 @@ serve(async (req) => {
     }
 
     // Inserir novos chunks na base de conhecimento
-    const chunksToInsert = validChunks.map((chunk, index) => ({
-      process_id: null,
-      process_version_id: null,
-      chunk_index: chunk.metadata.chunk_index,
-      chunk_type: "content",
-      content: chunk.content,
-      metadata: {
-        ...chunk.metadata,
-        source: "document",
-      },
-      embedding: `[${validEmbeddings[index].join(",")}]`,
-    }))
+    // Converter embeddings para formato PostgreSQL vector
+    const chunksToInsert = validChunks.map((chunk, index) => {
+      const embedding = validEmbeddings[index]
+      // Formato: [0.1,0.2,0.3,...] para PostgreSQL vector
+      const embeddingString = `[${embedding.join(",")}]`
+      
+      return {
+        process_id: null,
+        process_version_id: null,
+        chunk_index: chunk.metadata.chunk_index,
+        chunk_type: "content",
+        content: chunk.content,
+        metadata: {
+          ...chunk.metadata,
+          source: "document",
+        },
+        embedding: embeddingString,
+      }
+    })
 
     if (chunksToInsert.length > 0) {
       const { error: insertError } = await supabase
