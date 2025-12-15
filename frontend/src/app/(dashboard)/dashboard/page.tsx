@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { FileText, CheckCircle, XCircle, Clock, Loader2, TrendingUp, Activity, Building2 } from "lucide-react"
 import { useProcessStatistics } from "@/lib/hooks/useProcesses"
 import { useRBAC } from "@/lib/hooks/useRBAC"
