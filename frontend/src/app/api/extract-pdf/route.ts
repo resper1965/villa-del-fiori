@@ -21,19 +21,8 @@ export async function POST(request: NextRequest) {
 
     // Tentar usar pdf-parse se disponível, senão retornar erro
     try {
-      // Dynamic import para evitar erro se não estiver instalado
-      const pdfParse = await import("pdf-parse").catch(() => null)
-
-      if (!pdfParse) {
-        return NextResponse.json(
-          {
-            error:
-              "Extração de PDF não disponível. Por favor, instale pdf-parse: npm install pdf-parse",
-          },
-          { status: 501 }
-        )
-      }
-
+      // pdf-parse não tem default export, usar require
+      const pdfParse = require("pdf-parse")
       const data = await pdfParse(buffer)
       return NextResponse.json({ content: data.text })
     } catch (error: any) {
