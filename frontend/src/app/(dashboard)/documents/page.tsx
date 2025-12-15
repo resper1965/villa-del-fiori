@@ -3,13 +3,14 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, FileUp, Loader2, FileText, CheckCircle, XCircle, Clock } from "lucide-react"
+import { Plus, FileUp, Loader2, FileText, CheckCircle, XCircle, Clock, Edit } from "lucide-react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase/client"
 import { useAuth } from "@/contexts/AuthContext"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
+import { DocumentForm } from "@/components/documents/DocumentForm"
 
 interface Document {
   id: string
@@ -52,6 +53,7 @@ export default function DocumentsPage() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
   const [formOpen, setFormOpen] = useState(false)
+  const [editingDocumentId, setEditingDocumentId] = useState<string | null>(null)
 
   const { data: documents = [], isLoading } = useQuery<Document[]>({
     queryKey: ["documents"],
@@ -99,6 +101,21 @@ export default function DocumentsPage() {
     if (confirm("Tem certeza que deseja remover este documento?")) {
       await deleteMutation.mutateAsync(id)
     }
+  }
+
+  const handleEdit = (id: string) => {
+    setEditingDocumentId(id)
+    setFormOpen(true)
+  }
+
+  const handleFormClose = () => {
+    setFormOpen(false)
+    setEditingDocumentId(null)
+  }
+
+  const handleFormSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["documents"] })
+    handleFormClose()
   }
 
   const pendingCount = documents.filter((d) => d.ingestion_status === "pending").length
