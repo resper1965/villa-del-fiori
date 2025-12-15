@@ -132,7 +132,15 @@ export const notificationsApi = {
       throw new Error("Usuário não autenticado")
     }
 
-    const { count, error } = await supabase
+    // Primeiro, contar quantas não lidas existem
+    const { count: unreadCount } = await supabase
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("is_read", false)
+
+    // Depois, atualizar todas
+    const { error } = await supabase
       .from("notifications")
       .update({
         is_read: true,
@@ -140,13 +148,12 @@ export const notificationsApi = {
       })
       .eq("user_id", user.id)
       .eq("is_read", false)
-      .select("*", { count: "exact", head: false })
 
     if (error) {
       throw new Error(`Erro ao marcar todas como lidas: ${error.message}`)
     }
 
-    return count || 0
+    return unreadCount || 0
   },
 }
 
