@@ -1,13 +1,13 @@
 # Status do Extrator de Processos
 
-**Data**: 2025-01-15  
-**Status**: ⚠️ **PARCIALMENTE FUNCIONAL**
+**Última Atualização**: 2025-01-15
 
 ---
 
 ## ✅ O que está funcionando
 
 ### 1. **Edge Function `ingest-process`**
+
 - ✅ Deployada e ativa no Supabase
 - ✅ Processa processos aprovados
 - ✅ Gera chunks e embeddings
@@ -15,11 +15,13 @@
 - ✅ Atualiza status de ingestão
 
 ### 2. **Triggers no Banco de Dados**
+
 - ✅ `trigger_process_approved_for_ingestion`: Marca processos aprovados como `pending`
 - ✅ `trigger_process_version_approved_for_ingestion`: Marca novas versões aprovadas como `pending`
 - ✅ Triggers estão ativos e funcionando
 
 ### 3. **Página de Knowledge Base**
+
 - ✅ Interface em `/admin/knowledge-base`
 - ✅ Permite ingerir processos manualmente
 - ✅ Mostra status de ingestão
@@ -27,120 +29,71 @@
 
 ---
 
-## ❌ Problemas Identificados
+## ⚠️ Requisitos
 
-### Problema 1: OPENAI_API_KEY não configurada
+### OPENAI_API_KEY
 
-**Status**: Todos os 9 processos aprovados falharam com erro `"OPENAI_API_KEY não configurada"`
+**Status**: Necessário configurar manualmente
 
-**Solução**: Configurar a variável de ambiente `OPENAI_API_KEY` na Edge Function `ingest-process` no Supabase Dashboard.
+**O que é**: Chave da API da OpenAI necessária para gerar embeddings
 
-**Como configurar**:
-1. Acesse Supabase Dashboard → Edge Functions → `ingest-process`
-2. Vá em "Settings" → "Secrets"
-3. Adicione: `OPENAI_API_KEY` = sua chave da OpenAI
-4. Salve e redeploy a função
+**Onde configurar**:
+- Supabase Dashboard → Edge Functions → `ingest-process` → Settings → Secrets
+- Supabase Dashboard → Edge Functions → `ingest-document` → Settings → Secrets
 
-### Problema 2: Ingestão não é automática
+**Impacto**:
+- Sem a chave, processos e documentos não podem ser indexados
+- O sistema funciona normalmente, mas a base de conhecimento não é populada
+- Chat com Gabi não terá informações dos processos/documentos
 
-**O trigger apenas marca processos como `pending`, mas NÃO chama automaticamente a Edge Function.**
+**Documentação**: Ver [`CONFIGURAR_OPENAI_API_KEY.md`](CONFIGURAR_OPENAI_API_KEY.md)
 
-**Fluxo Atual**:
+---
+
+## 🔄 Fluxo de Ingestão
+
+### Fluxo Atual
+
 1. Processo é aprovado → Trigger marca como `pending` em `knowledge_base_ingestion_status`
 2. **Usuário precisa ir em `/admin/knowledge-base` e clicar em "Ingerir Processos"**
 3. Sistema busca processos `pending` e chama Edge Function para cada um
+4. Edge Function processa:
+   - Divide em chunks
+   - Gera embeddings
+   - Salva na base de conhecimento
+5. Status é atualizado para `completed` ou `failed`
 
-**Fluxo Ideal (Automático)**:
-1. Processo é aprovado → Trigger marca como `pending`
-2. **Sistema automaticamente chama Edge Function** (via webhook ou job)
-3. Processo é ingerido sem intervenção manual
+### Ingestão Manual
 
----
+A ingestão atualmente é **manual**:
 
-## 🔧 Soluções Possíveis
-
-### Opção 1: Webhook/HTTP Request no Trigger (Recomendado)
-
-Criar uma função PostgreSQL que chama a Edge Function via HTTP quando um processo é marcado como `pending`.
-
-**Prós**:
-- Totalmente automático
-- Processa imediatamente após aprovação
-
-**Contras**:
-- Requer extensão `http` ou `pg_net` no Supabase
-- Pode falhar se Edge Function estiver indisponível
-
-### Opção 2: Job/Cron Automático
-
-Criar um job que roda periodicamente (ex: a cada 5 minutos) e processa processos `pending`.
-
-**Prós**:
-- Mais confiável (retry automático)
-- Não depende de triggers HTTP
-
-**Contras**:
-- Não é imediato (atraso de até 5 minutos)
-- Requer configuração de cron no Supabase
-
-### Opção 3: Manter Manual (Atual)
-
-Manter como está, com botão manual na interface.
-
-**Prós**:
-- Controle total pelo usuário
-- Sem dependências adicionais
-
-**Contras**:
-- Requer ação manual
-- Pode esquecer de ingerir processos
+1. Acesse `/admin/knowledge-base`
+2. Clique em **"Ingerir Processos"**
+3. Sistema processa todos os processos aprovados que ainda não foram ingeridos
+4. Aguarde conclusão (mostra sucesso/erros)
+5. Verifique o status na lista abaixo
 
 ---
 
-## 📊 Status Atual no Banco
+## 📊 Status de Ingestão
 
-**Última verificação**: 2025-01-15
+### Estados
 
-- ✅ **9 processos aprovados** encontrados
-- ✅ **9 processos** com status de ingestão criado
-- ❌ **0 processos ingeridos** com sucesso
-- ❌ **9 processos falharam** (erro: `OPENAI_API_KEY não configurada`)
+1. **`pending`**: Aguardando processamento
+   - Ação: Será processado quando usuário clicar em "Ingerir Processos"
 
-**Query para verificar**:
-```sql
-SELECT 
-  COUNT(*) as total_processos_aprovados,
-  COUNT(CASE WHEN EXISTS (
-    SELECT 1 FROM knowledge_base_ingestion_status 
-    WHERE knowledge_base_ingestion_status.process_id = processes.id
-  ) THEN 1 END) as processos_com_status_ingestao,
-  COUNT(CASE WHEN EXISTS (
-    SELECT 1 FROM knowledge_base_ingestion_status 
-    WHERE knowledge_base_ingestion_status.process_id = processes.id
-    AND knowledge_base_ingestion_status.status = 'completed'
-  ) THEN 1 END) as processos_ingeridos
-FROM processes
-WHERE status = 'aprovado';
-```
+2. **`processing`**: Em processamento
+   - Ação: Aguardar conclusão
+
+3. **`completed`**: Indexado com sucesso
+   - Ação: Disponível na base de conhecimento
+
+4. **`failed`**: Erro na indexação
+   - Ação: Ver erro e reprocessar
 
 ---
 
-## 🎯 Recomendação
-
-**Implementar Opção 2 (Job/Cron Automático)** por ser:
-- Mais confiável
-- Não depende de extensões adicionais
-- Processa automaticamente sem intervenção
-- Retry automático em caso de falha
-
-**Próximos Passos**:
-1. Criar Edge Function `process-pending-ingestions` que processa todos os `pending`
-2. Configurar cron job no Supabase para chamar essa função a cada 5 minutos
-3. Manter botão manual como fallback
-
----
-
-## ✅ Como Usar Atualmente
+## 🔧 Como Usar
 
 ### Passo 1: Configurar OPENAI_API_KEY (OBRIGATÓRIO)
 
@@ -151,7 +104,7 @@ WHERE status = 'aprovado';
    - **Name**: `OPENAI_API_KEY`
    - **Value**: sua chave da OpenAI (formato: `sk-...`)
 5. Clique em **Save**
-6. (Opcional) Faça redeploy da função para garantir que a variável seja carregada
+6. Repita para a função **`ingest-document`**
 
 ### Passo 2: Ingerir Processos
 
@@ -164,6 +117,7 @@ WHERE status = 'aprovado';
 ### Passo 3: Reprocessar Processos com Erro
 
 Se houver processos com status `failed`:
+
 1. Na página `/admin/knowledge-base`, veja a lista de processos
 2. Processos com erro aparecem com badge vermelho
 3. Clique em **"Ingerir Processos"** novamente para reprocessar
@@ -171,5 +125,57 @@ Se houver processos com status `failed`:
 
 ---
 
-**Última Atualização**: 2025-01-15
+## 📈 Monitoramento
 
+### Verificar Status
+
+```sql
+SELECT 
+  p.name as process_name,
+  pv.version_number,
+  ibs.status,
+  ibs.chunks_count,
+  ibs.error_message,
+  ibs.completed_at
+FROM knowledge_base_ingestion_status ibs
+JOIN processes p ON p.id = ibs.process_id
+JOIN process_versions pv ON pv.id = ibs.process_version_id
+ORDER BY ibs.created_at DESC;
+```
+
+### Estatísticas
+
+- **Total de processos aprovados**: `SELECT COUNT(*) FROM processes WHERE status = 'aprovado';`
+- **Processos ingeridos**: `SELECT COUNT(*) FROM knowledge_base_ingestion_status WHERE status = 'completed';`
+- **Processos pendentes**: `SELECT COUNT(*) FROM knowledge_base_ingestion_status WHERE status = 'pending';`
+- **Processos com erro**: `SELECT COUNT(*) FROM knowledge_base_ingestion_status WHERE status = 'failed';`
+
+---
+
+## 🎯 Benefícios
+
+### Para Usuários
+
+- ✅ **Indexação Automática**: Processos aprovados são marcados para ingestão
+- ✅ **Controle Manual**: Usuário decide quando processar
+- ✅ **Rastreabilidade**: Status de ingestão sempre visível
+- ✅ **Reprocessamento**: Pode reprocessar processos com erro
+
+### Para Administradores
+
+- ✅ **Monitoramento**: Status de ingestão sempre visível
+- ✅ **Controle**: Decide quando processar processos
+- ✅ **Debugging**: Erros são registrados e visíveis
+
+---
+
+## 📚 Referências
+
+- **Edge Function**: `ingest-process`
+- **Tabela**: `knowledge_base_ingestion_status`
+- **Tabela**: `knowledge_base_documents`
+- **Página**: `/admin/knowledge-base`
+
+---
+
+**Última Atualização**: 2025-01-15

@@ -1,11 +1,16 @@
 # Como Configurar OPENAI_API_KEY no Supabase
 
-**Data**: 2025-01-15  
-**Motivo**: Edge Functions `ingest-process` e `ingest-document` precisam da chave da OpenAI para gerar embeddings
+**Última Atualização**: 2025-01-15
 
 ---
 
-## 🔑 Passo a Passo
+## 🔑 Visão Geral
+
+As Edge Functions `ingest-process` e `ingest-document` precisam da chave da OpenAI para gerar embeddings de processos e documentos. Sem esta configuração, a indexação na base de conhecimento não funcionará.
+
+---
+
+## 📋 Passo a Passo
 
 ### 1. Obter Chave da OpenAI
 
@@ -79,5 +84,22 @@ Após configurar, você pode testar:
 
 ---
 
-**Última Atualização**: 2025-01-15
+## 📊 Impacto
 
+### Sem a Chave
+
+- ❌ Processos aprovados não são indexados
+- ❌ Documentos não são indexados
+- ❌ Chat não tem informações para responder perguntas
+- ✅ Sistema funciona normalmente para outras funcionalidades
+
+### Com a Chave
+
+- ✅ Processos aprovados são automaticamente indexados
+- ✅ Documentos são automaticamente indexados
+- ✅ Chat pode responder perguntas sobre processos e documentos
+- ✅ Base de conhecimento é populada e funcional
+
+---
+
+**Última Atualização**: 2025-01-15

@@ -1,7 +1,6 @@
 # Base de Conhecimento - Como Funciona
 
-**Data**: 2025-01-15  
-**Sistema**: Gabi - Síndica Virtual
+**Última Atualização**: 2025-01-15
 
 ---
 
@@ -56,10 +55,10 @@ Armazena os documentos indexados com seus embeddings:
 ```sql
 CREATE TABLE knowledge_base_documents (
     id UUID PRIMARY KEY,
-    process_id UUID,                    -- ID do processo relacionado
-    process_version_id UUID,            -- ID da versão específica
+    process_id UUID,                    -- ID do processo relacionado (NULL para documentos gerais)
+    process_version_id UUID,            -- ID da versão específica (NULL para documentos gerais)
     chunk_index INTEGER,                -- Índice sequencial do chunk
-    chunk_type VARCHAR,                 -- Tipo: name, description, workflow, etc.
+    chunk_type VARCHAR,                 -- Tipo: name, description, workflow, content, etc.
     content TEXT,                       -- Texto do chunk
     metadata JSONB,                     -- Metadados adicionais
     embedding VECTOR(1536),             -- Embedding vetorial (OpenAI text-embedding-3-small)
@@ -70,9 +69,10 @@ CREATE TABLE knowledge_base_documents (
 
 **Campos Importantes**:
 - **`embedding`**: Vetor de 1536 dimensões gerado pela OpenAI
-- **`chunk_type`**: Tipo do chunk (name, description, workflow, etc.)
+- **`chunk_type`**: Tipo do chunk (name, description, workflow, content, etc.)
 - **`content`**: Texto que será usado para busca e exibição
 - **`metadata`**: Informações adicionais em JSON (categoria, tipo de documento, etc.)
+- **`process_id`**: NULL para documentos gerais, UUID para processos
 
 ### Tabela: `knowledge_base_ingestion_status`
 
@@ -139,7 +139,7 @@ CREATE TABLE knowledge_base_ingestion_status (
    FOR SELECT
    TO authenticated
    USING (
-     EXISTS (
+     process_id IS NULL OR EXISTS (
        SELECT 1 FROM processes p
        JOIN process_versions pv ON pv.process_id = p.id
        WHERE pv.id = knowledge_base_documents.process_version_id
@@ -154,6 +154,7 @@ CREATE TABLE knowledge_base_ingestion_status (
 
 - ✅ Processos em rascunho ou rejeitados **não aparecem** na base de conhecimento
 - ✅ Apenas processos **aprovados** são indexados
+- ✅ Documentos gerais são sempre visíveis para usuários autenticados
 - ✅ Usuários só veem documentos de processos que têm permissão de visualizar
 
 ---
@@ -253,7 +254,8 @@ ORDER BY ibs.created_at DESC;
 
 - **Total de documentos indexados**: `SELECT COUNT(*) FROM knowledge_base_documents;`
 - **Documentos por tipo**: `SELECT chunk_type, COUNT(*) FROM knowledge_base_documents GROUP BY chunk_type;`
-- **Processos indexados**: `SELECT COUNT(DISTINCT process_id) FROM knowledge_base_documents;`
+- **Processos indexados**: `SELECT COUNT(DISTINCT process_id) FROM knowledge_base_documents WHERE process_id IS NOT NULL;`
+- **Documentos gerais indexados**: `SELECT COUNT(DISTINCT metadata->>'document_id') FROM knowledge_base_documents WHERE process_id IS NULL;`
 
 ---
 
@@ -314,18 +316,6 @@ Chunks de versões antigas podem ser mantidos para histórico ou removidos:
 
 ---
 
-## 🚀 Próximos Passos
-
-### Melhorias Futuras
-
-1. **Re-indexação Automática**: Re-indexar processos quando entidades são atualizadas
-2. **Busca Híbrida**: Combinar busca vetorial com busca textual
-3. **Cache de Embeddings**: Cachear embeddings de perguntas frequentes
-4. **Análise de Uso**: Rastrear quais chunks são mais utilizados
-5. **Feedback Loop**: Permitir feedback dos usuários para melhorar resultados
-
----
-
 ## 📚 Referências
 
 - **Tabela**: `knowledge_base_documents`
@@ -337,4 +327,3 @@ Chunks de versões antigas podem ser mantidos para histórico ou removidos:
 ---
 
 **Última Atualização**: 2025-01-15
-

@@ -1,7 +1,6 @@
-# Features Principais - Gabi - Síndica Virtual
+# Funcionalidades Principais - Gabi - Síndica Virtual
 
-**Data**: 2025-01-15  
-**Status**: ✅ Implementado
+**Última Atualização**: 2025-01-15
 
 ---
 
@@ -11,7 +10,7 @@
 
 ---
 
-## 🎯 Features Principais
+## 🎯 Funcionalidades Principais
 
 ### 1. 📄 Gestão de Processos Condominiais
 
@@ -31,6 +30,8 @@
   - Variáveis aplicadas
   - Entidades envolvidas
   - Histórico de versões
+  - Diagramas Mermaid
+  - Matriz RACI
 - ✅ **Status de Processos**:
   - Rascunho
   - Em Revisão
@@ -283,6 +284,7 @@
   - Acesso a processos aprovados
   - Informações do condomínio
   - Entidades e contatos
+  - Documentos gerais indexados
 - ✅ **RAG (Retrieval-Augmented Generation)**:
   - Busca semântica em documentos
   - Respostas contextuais
@@ -295,7 +297,38 @@
 
 ---
 
-### 11. 🔐 Autenticação e Segurança
+### 11. 📄 Documentos Gerais
+
+**Descrição**: Sistema de upload e indexação de documentos que não são processos aprovados.
+
+**Funcionalidades**:
+- ✅ **Upload de Arquivos**:
+  - Suporte a PDF, DOCX, TXT, MD
+  - Extração automática de conteúdo
+  - Validação de tipo e tamanho (máx. 10MB)
+- ✅ **Cadastro Manual**:
+  - Copiar e colar conteúdo diretamente
+  - Edição do conteúdo extraído
+- ✅ **Tipos de Documento**:
+  - Regulamentos
+  - Convenções
+  - Atas
+  - Assembleias
+  - Editais
+  - Comunicados
+- ✅ **Indexação Automática**:
+  - Documentos são indexados na base de conhecimento
+  - Disponíveis para busca no chat
+  - Status de ingestão rastreado
+
+**Benefícios**:
+- Centraliza documentação do condomínio
+- Facilita busca e consulta
+- Integra com chat assistente
+
+---
+
+### 12. 🔐 Autenticação e Segurança
 
 **Descrição**: Sistema robusto de autenticação e controle de acesso.
 
@@ -324,7 +357,7 @@
 
 ---
 
-### 12. 📊 Dashboard e Visualizações
+### 13. 📊 Dashboard e Visualizações
 
 **Descrição**: Interface central que exibe informações importantes e status do sistema.
 
@@ -350,9 +383,37 @@
 
 ---
 
+### 14. 🔔 Sistema de Notificações
+
+**Descrição**: Sistema de notificações em tempo real para alertar sobre eventos importantes.
+
+**Funcionalidades**:
+- ✅ **Tipos de Notificações**:
+  - Aprovação pendente
+  - Processo aprovado/rejeitado
+  - Usuário aprovado/rejeitado
+  - Processo atualizado
+  - Lembretes
+- ✅ **Interface de Notificações**:
+  - Badge com contador de não lidas
+  - Lista de notificações recentes
+  - Marcar como lida
+  - Marcar todas como lidas
+- ✅ **Notificações em Tempo Real**:
+  - Atualização automática
+  - Indicadores visuais
+
+**Benefícios**:
+- Mantém usuários informados
+- Facilita acompanhamento de processos
+- Melhora comunicação
+
+---
+
 ## 🎨 Interface e Experiência do Usuário
 
 ### Design System
+
 - ✅ **Design System "ness"**:
   - Filosofia: "Invisível quando funciona, Presente quando importa"
   - Paleta refinada de cinzas profundos
@@ -361,16 +422,21 @@
   - Espaçamento baseado em múltiplos de 4px
 
 ### Componentes
+
 - ✅ **shadcn/ui**: Componentes modernos e acessíveis
 - ✅ **Tailwind CSS**: Estilização utilitária
 - ✅ **Responsivo**: Mobile, tablet e desktop
 - ✅ **Acessibilidade**: Componentes a11y-friendly
+- ✅ **Loading States**: Skeleton loaders em todas as páginas
+- ✅ **Empty States**: Estados vazios informativos
+- ✅ **Toast Notifications**: Feedback visual de ações
 
 ---
 
 ## 📈 Estatísticas do Sistema
 
 ### Dados Atuais
+
 - ✅ **35 Processos** pré-cadastrados
 - ✅ **7 Categorias** de processos
 - ✅ **6 Roles** de usuários
@@ -378,6 +444,7 @@
 - ✅ **Múltiplas versões** por processo (histórico completo)
 
 ### Escala
+
 - ~20 stakeholders (moradores + síndico + conselho + administradora)
 - 35 processos pré-cadastrados
 - Múltiplas versões por processo (média estimada: 2-3 versões)
@@ -388,11 +455,14 @@
 ## 🔧 Tecnologias Utilizadas
 
 ### Backend
+
 - **Supabase**: PostgreSQL, Auth, Storage, Edge Functions
 - **PostgreSQL 15+**: Banco de dados relacional
 - **Row Level Security**: Políticas de segurança
+- **pgvector**: Extensão para busca vetorial
 
 ### Frontend
+
 - **Next.js 14**: Framework React com App Router
 - **React 18**: Biblioteca UI
 - **TypeScript**: Tipagem estática
@@ -402,33 +472,20 @@
 - **Tailwind CSS**: Estilização
 
 ### Deploy
+
 - **Vercel**: Frontend
 - **Supabase**: Backend
-
----
-
-## 🚀 Status de Implementação
-
-### ✅ Implementado
-- Todas as features principais estão implementadas e funcionais
-- Sistema mono-tenant configurado
-- Correções de segurança e performance aplicadas
-- Interface moderna e responsiva
-
-### 🚧 Planejado
-- Notificações por email
-- Testes automatizados
-- Melhorias de performance contínuas
-- Busca avançada de processos
 
 ---
 
 ## 📝 Notas Importantes
 
 ### Escopo Atual
+
 O sistema foca em **gestão documental de processos**, não em operação direta do condomínio. Ele permite documentar, revisar e aprovar processos, mas não executa ou automatiza processos.
 
 ### Fora do Escopo
+
 - Geração automática de documentos para publicação
 - Execução ou automação dos processos
 - Integração com sistemas externos (portaria, câmeras, etc.)
@@ -438,10 +495,4 @@ O sistema foca em **gestão documental de processos**, não em operação direta
 
 ---
 
-## 🔗 Referências
-
-- **Spec**: `specs/003-app-gestao-processos-aprovacao/spec.md`
-- **Plan**: `specs/003-app-gestao-processos-aprovacao/plan.md`
-- **Data Model**: `specs/003-app-gestao-processos-aprovacao/data-model.md`
-- **Tasks**: `specs/003-app-gestao-processos-aprovacao/tasks.md`
-
+**Última Atualização**: 2025-01-15

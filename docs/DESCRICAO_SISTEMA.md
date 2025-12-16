@@ -1,7 +1,9 @@
 # Descrição do Sistema - Gabi - Síndica Virtual
 
 **Versão**: 1.0  
-**Data**: 2025-01-09
+**Última Atualização**: 2025-01-15
+
+---
 
 ## 🎯 Visão Geral
 
@@ -17,7 +19,7 @@ O sistema é uma plataforma de **documentação e conhecimento**, não uma plata
 - ✅ **Responde** perguntas sobre processos via chat assistente inteligente
 - ❌ **NÃO opera** sistemas físicos (segurança, portaria, etc.)
 - ❌ **NÃO integra** com sistemas externos operacionais
-- ❌ **NÃO gerencia** finanças operacionalmente (apenas acompanhamento orçamentário, se implementado no futuro)
+- ❌ **NÃO gerencia** finanças operacionalmente
 
 ## 🏗️ Arquitetura
 
@@ -38,10 +40,11 @@ O sistema é uma plataforma de **documentação e conhecimento**, não uma plata
 4. **Chat Assistente (RAG)**: Chat inteligente que responde perguntas baseado em processos aprovados
 5. **Gestão de Entidades**: Cadastro de pessoas, empresas, serviços e infraestrutura
 6. **Sistema de Usuários**: Autenticação e autorização com RBAC
+7. **Documentos Gerais**: Upload e indexação de regulamentos, convenções, atas, etc.
 
 ## 📋 Funcionalidades Principais
 
-### 1. Gestão de Processos Documentados ✅
+### 1. Gestão de Processos Documentados
 
 O sistema permite criar, editar e gerenciar processos condominiais documentados com:
 
@@ -49,8 +52,9 @@ O sistema permite criar, editar e gerenciar processos condominiais documentados 
 - **Categorias**: Governança, Operação, Áreas Comuns, Convivência, Eventos, Emergências
 - **Versionamento**: Histórico completo de versões com rastreabilidade
 - **Status**: Rascunho, Em Revisão, Aprovado, Rejeitado
+- **35 Processos Pré-cadastrados**: Processos comuns já documentados e prontos para uso
 
-### 2. Workflow de Aprovação ✅
+### 2. Workflow de Aprovação
 
 Sistema completo de aprovação por stakeholders:
 
@@ -60,7 +64,7 @@ Sistema completo de aprovação por stakeholders:
 - **Refazer Processos**: Criadores podem refazer processos baseado em feedback
 - **Rastreabilidade**: Histórico completo de todas as aprovações e rejeições
 
-### 3. Base de Conhecimento e RAG ✅ (Em Implementação)
+### 3. Base de Conhecimento e RAG
 
 Sistema de base de conhecimento com busca semântica:
 
@@ -70,7 +74,7 @@ Sistema de base de conhecimento com busca semântica:
 - **Busca Híbrida**: Combina busca vetorial e full-text search
 - **RAG**: Retrieval-Augmented Generation para respostas precisas
 
-### 4. Chat Assistente Inteligente ✅ (Em Implementação)
+### 4. Chat Assistente Inteligente
 
 Chat com a Gabi (Síndica Virtual) que:
 
@@ -79,16 +83,15 @@ Chat com a Gabi (Síndica Virtual) que:
 - **Citações**: Inclui referências aos processos usados como fonte
 - **Contexto**: Usa RAG para gerar respostas precisas e contextualizadas
 
-### 5. Gestão de Entidades ✅
+### 5. Gestão de Entidades
 
 Cadastro e gestão de entidades envolvidas nos processos:
 
 - **Tipos**: Pessoas, Empresas, Serviços de Emergência, Infraestrutura
 - **Informações Completas**: Contatos, endereços, CNPJ, descrições
 - **Relacionamentos**: Entidades podem ser referenciadas em processos
-- **Entidade do Condomínio**: Cadastro completo do condomínio (CNPJ, endereço, etc.)
 
-### 6. Sistema de Usuários e RBAC ✅
+### 6. Sistema de Usuários e RBAC
 
 Autenticação e autorização robusta:
 
@@ -96,6 +99,29 @@ Autenticação e autorização robusta:
 - **Aprovação de Usuários**: Novos usuários precisam ser aprovados
 - **RBAC**: Roles (admin, syndic, subsindico, council, staff, resident)
 - **CRUD Completo**: Criar, editar, aprovar, deletar usuários
+
+### 7. Gestão de Condomínio (Mono-Tenant)
+
+Sistema mono-tenant que gerencia um único condomínio:
+
+- **Cadastro Obrigatório**: Setup inicial obrigatório do condomínio
+- **Apenas Um Ativo**: Constraint de banco garante apenas um condomínio ativo
+- **Exibição no Dashboard**: Nome e informações do condomínio sempre visíveis
+
+### 8. Gestão de Unidades, Veículos e Pets
+
+- **Unidades**: Cadastro de apartamentos/casas do condomínio
+- **Veículos**: Cadastro de veículos dos moradores (marca, modelo, placa)
+- **Pets**: Cadastro de animais de estimação
+
+### 9. Documentos Gerais
+
+Sistema de upload e indexação de documentos:
+
+- **Tipos**: Regulamentos, Convenções, Atas, Assembleias, Editais, Comunicados
+- **Upload de Arquivos**: Suporte a PDF, DOCX, TXT, MD
+- **Extração Automática**: Conteúdo extraído automaticamente de arquivos
+- **Indexação**: Documentos são indexados na base de conhecimento
 
 ## 🎯 Categorias de Processos
 
@@ -107,8 +133,6 @@ Os processos são organizados nas seguintes categorias:
 4. **Convivência**: Processos de convivência entre moradores
 5. **Eventos**: Processos sobre eventos do condomínio
 6. **Emergências**: Processos de emergência e procedimentos de segurança
-
-**Nota**: A categoria "Acesso e Segurança" pode existir para documentar processos sobre esses temas, mas o sistema **não opera** sistemas de segurança física ou portaria online.
 
 ## 🔐 Sistema de Permissões (RBAC)
 
@@ -127,30 +151,7 @@ Os processos são organizados nas seguintes categorias:
 - **Aprovar Usuários**: admin, syndic, subsindico
 - **Chat**: Todos os roles (incluindo resident)
 - **Gestão de Entidades**: admin, syndic, subsindico, council, staff
-
-## 📊 Estado Atual
-
-### Implementado ✅
-
-- ✅ Sistema completo de gestão de processos
-- ✅ Workflow de aprovação
-- ✅ Versionamento e histórico
-- ✅ CRUD de usuários e entidades
-- ✅ 35 processos pré-cadastrados
-- ✅ Interface de chat
-- ✅ Base de conhecimento (infraestrutura criada)
-- ✅ RAG system (infraestrutura criada)
-
-### Em Implementação ⚠️
-
-- ⚠️ Integração completa do chat com RAG (backend pronto, precisa configurar API keys)
-- ⚠️ Ingestão de processos existentes (quando houver processos aprovados)
-
-### Planejado 🔮
-
-- 🔮 Validação de entidades em processos
-- 🔮 Ingestão de contratos de fornecedores
-- 🔮 Acompanhamento orçamentário (módulo futuro)
+- **Documentos Gerais**: admin, syndic, subsindico
 
 ## ❌ O Que o Sistema NÃO Faz
 
@@ -177,8 +178,6 @@ Os processos são organizados nas seguintes categorias:
    - Reservas operacionais de áreas comuns
    - Gestão operacional de manutenção
    - Operação de sistemas de emergência
-
-**Nota**: O sistema pode **acompanhar** execução orçamentária no futuro, mas não gerencia finanças operacionalmente.
 
 ## 🎯 Casos de Uso Principais
 
@@ -224,15 +223,16 @@ Os processos são organizados nas seguintes categorias:
 3. Criar novos usuários
 4. Editar informações de usuários existentes
 
-## 📊 Métricas e Estatísticas
+### 5. Upload de Documentos
 
-O sistema fornece:
+**Ator**: Admin, Síndico, Subsíndico
 
-- Total de processos cadastrados
-- Processos aprovados vs em revisão
-- Taxa de aprovação
-- Histórico de versões
-- Status de ingestão na base de conhecimento
+**Fluxo**:
+1. Acessar página de Documentos
+2. Fazer upload de arquivo (PDF, DOCX, TXT, MD) ou colar conteúdo
+3. Preencher informações (título, tipo, categoria)
+4. Salvar documento
+5. Documento é automaticamente indexado na base de conhecimento
 
 ## 🔧 Tecnologias e Integrações
 
@@ -240,7 +240,7 @@ O sistema fornece:
 
 - **PostgreSQL**: Banco de dados relacional
 - **Auth**: Autenticação e autorização
-- **Storage**: Armazenamento de arquivos (se necessário)
+- **Storage**: Armazenamento de arquivos
 - **Edge Functions**: Funções serverless (RAG, embeddings, ingestão)
 - **pgvector**: Extensão para busca vetorial
 
@@ -263,11 +263,6 @@ O sistema fornece:
 - **Backend**: Supabase (PostgreSQL, Auth, Edge Functions)
 - **Base de Conhecimento**: Supabase (pgvector)
 
-## 📚 Documentação Adicional
+---
 
-- **Estado Atual**: `docs/ESTADO_ATUAL_PROJETO.md`
-- **Roadmap**: `docs/ROADMAP.md`
-- **Escopo Final**: `docs/ESCOPO_FINAL.md`
-- **Escopo Financeiro**: `docs/ESCOPO_FINANCEIRO.md`
-- **Quickstart**: `specs/003-app-gestao-processos-aprovacao/quickstart.md`
-
+**Última Atualização**: 2025-01-15
