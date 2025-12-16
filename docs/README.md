@@ -48,6 +48,13 @@ Esta documentação descreve o estado atual do sistema **Gabi - Síndica Virtual
    - Constraints e validações
    - Setup inicial
 
+### Avaliações e Análises
+
+9. **[Avaliação: AI Gateway da Vercel](AVALIACAO_AI_GATEWAY.md)**
+   - Análise completa do AI Gateway da Vercel
+   - Benefícios e considerações
+   - Recomendação de implementação
+
 ---
 
 ## 🎯 Sobre Esta Documentação
