@@ -7,12 +7,12 @@ import { NextRequest, NextResponse } from 'next/server'
 const AI_GATEWAY_URL = process.env.VERCEL_AI_GATEWAY_URL || 'https://gateway.vercel.ai/v1'
 const AI_GATEWAY_KEY = process.env.VERCEL_AI_GATEWAY_KEY
 
-// Configuração do Supabase
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-// Cliente Supabase com service role (para acesso completo)
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+// Configuração do Supabase (será inicializado dentro da função)
+const getSupabaseAdmin = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  return createClient(supabaseUrl, supabaseServiceKey)
+}
 
 // Modelos
 const EMBEDDING_MODEL = 'text-embedding-3-small'
@@ -57,6 +57,8 @@ async function searchKnowledgeBase(
   matchCount: number = 5,
   queryText?: string
 ) {
+  const supabaseAdmin = getSupabaseAdmin()
+  
   // Tentar busca híbrida primeiro (se disponível)
   if (queryText) {
     try {
@@ -81,7 +83,7 @@ async function searchKnowledgeBase(
   }
 
   // Fallback para busca vetorial simples
-  const { data, error } = await supabaseAdmin.rpc('match_knowledge_base_documents', {
+  const { data, error } = await getSupabaseAdmin().rpc('match_knowledge_base_documents', {
     query_embedding: queryEmbedding,
     match_threshold: 0.7,
     match_count: matchCount,
@@ -99,6 +101,7 @@ export async function POST(req: NextRequest) {
   try {
     // Verificar autenticação via Supabase
     // Criar cliente Supabase para validar sessão
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
     const supabaseAuth = createClient(
       supabaseUrl,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -196,9 +199,16 @@ ${context ? `\nCONTEXTO DISPONÍVEL:\n${context}` : '\nNenhum contexto específi
     // 5. Configurar OpenAI com AI Gateway
     // Usar AI Gateway URL como base URL customizada
     // Nota: AI SDK suporta baseURL customizada
+    if (!AI_GATEWAY_KEY) {
+      return new Response(
+        JSON.stringify({ error: 'AI Gateway não configurado' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+    
     const openaiProvider = createOpenAI({
       baseURL: AI_GATEWAY_URL,
-      apiKey: AI_GATEWAY_KEY || '',
+      apiKey: AI_GATEWAY_KEY,
     })
 
     // 6. Stream resposta
