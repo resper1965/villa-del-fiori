@@ -16,10 +16,11 @@ Este plano detalha a transformação do sistema de chat atual em:
 
 **Benefícios Esperados**:
 - ✅ Chat sempre acessível (widget flutuante)
-- ✅ Uso em totem digital sem login
+- ✅ Página standalone para uso dedicado
 - ✅ Experiência mobile nativa (PWA)
 - ✅ Sistema de mensageria completo
 - ✅ Funciona offline (PWA)
+- ✅ Segurança com autenticação obrigatória
 
 **Tempo Estimado**: 20-30 horas
 
@@ -270,11 +271,12 @@ export default function RootLayout({ children }) {
 - URL pública (ex: `/chat` ou `/chat/:token`)
 
 **Características**:
-- **Autenticação Opcional**: 
-  - Modo público: Acesso sem login (para totem)
-  - Modo autenticado: Acesso com login (para usuários)
-- **Token de Acesso**: Para totem, usar token temporário
-- **Layout**: Apenas o chat, sem elementos da aplicação
+- **Autenticação Obrigatória**: 
+  - Requer login para acessar
+  - Usa autenticação atual (Supabase Auth)
+  - Redireciona para login se não autenticado
+- **Token de Acesso**: Token JWT da sessão do usuário
+- **Layout**: Apenas o chat, sem elementos da aplicação (sidebar, header)
 
 **Código Estrutural**:
 
@@ -287,14 +289,25 @@ import { useChatStandalone } from '@/lib/chat/useChatStandalone'
 
 export default function ChatStandalonePage() {
   const { isAuthenticated, isLoading } = useChatStandalone()
+  const router = useRouter()
 
-  // Modo totem: não requer autenticação
-  // Modo usuário: requer autenticação
-  const requireAuth = process.env.NEXT_PUBLIC_CHAT_REQUIRE_AUTH !== 'false'
+  // Autenticação obrigatória
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login?redirect=/chat')
+    }
+  }, [isAuthenticated, isLoading, router])
 
-  if (requireAuth && !isAuthenticated && !isLoading) {
-    // Redirecionar para login ou mostrar mensagem
-    return <div>Redirecionando para login...</div>
+  if (isLoading) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return null // Será redirecionado
   }
 
   return (
@@ -320,63 +333,60 @@ export default function ChatStandalonePage() {
 - Meta tags para PWA
 - Viewport otimizado
 
-### 2.3. Sistema de Token para Totem
+### 2.3. Autenticação e Segurança
 
-**Tempo**: 3-4 horas
+**Tempo**: 2 horas
 
 **Funcionalidades**:
-- Gerar tokens temporários para totem
-- Validar tokens na API
-- Limitar acesso por token (apenas chat)
-- Expiração de tokens
-- Rotação de tokens
+- Verificar autenticação do usuário
+- Redirecionar para login se não autenticado
+- Validar permissões (RBAC)
+- Usar token JWT da sessão
+- Proteger rotas da API
 
-**Arquivo**: `frontend/src/app/chat/[token]/page.tsx`
+**Arquivo**: `frontend/src/lib/chat/useChatStandalone.ts`
 
 **Código Estrutural**:
 
 ```typescript
-// frontend/src/app/chat/[token]/page.tsx
+// frontend/src/lib/chat/useChatStandalone.ts
 "use client"
 
-import { useParams } from 'next/navigation'
-import { ChatWindow } from '@/components/chat/ChatWindow'
-import { useChatToken } from '@/lib/chat/useChatToken'
+import { useEffect, useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRBAC } from '@/lib/hooks/useRBAC'
 
-export default function ChatTokenPage() {
-  const params = useParams()
-  const token = params.token as string
-  const { isValid, isLoading } = useChatToken(token)
+export function useChatStandalone() {
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth()
+  const { canAccessChat } = useRBAC()
+  const [isAuthorized, setIsAuthorized] = useState(false)
 
-  if (isLoading) {
-    return <div>Validando acesso...</div>
+  useEffect(() => {
+    if (!authLoading) {
+      setIsAuthorized(isAuthenticated && canAccessChat())
+    }
+  }, [isAuthenticated, authLoading, canAccessChat])
+
+  return {
+    isAuthenticated,
+    isAuthorized,
+    isLoading: authLoading,
+    user,
   }
-
-  if (!isValid) {
-    return <div>Token inválido ou expirado</div>
-  }
-
-  return (
-    <div className="w-screen h-screen bg-background">
-      <ChatWindow
-        standalone={true}
-        fullscreen={true}
-        token={token}
-      />
-    </div>
-  )
 }
 ```
 
 **Resultado Esperado**:
 - ✅ Página standalone funcionando
-- ✅ Acesso público para totem
+- ✅ Autenticação obrigatória
 - ✅ Layout minimalista
-- ✅ Sistema de tokens
+- ✅ Validação de permissões
 
 ---
 
 ## 🎯 Fase 3: Sistema de Mensageria Autônomo
+
+**Nota**: Esta fase requer autenticação. Todas as funcionalidades de mensageria são vinculadas ao usuário autenticado.
 
 ### 3.1. Persistência Local (IndexedDB)
 
@@ -397,6 +407,7 @@ export default function ChatTokenPage() {
 
 ```typescript
 interface ChatStorage {
+  userId: string  // ID do usuário autenticado
   conversations: Conversation[]
   messages: Message[]
   syncQueue: SyncItem[]
@@ -405,8 +416,7 @@ interface ChatStorage {
 
 interface Conversation {
   id: string
-  userId?: string
-  token?: string
+  userId: string  // Sempre vinculado ao usuário autenticado
   title: string
   lastMessage: Date
   unreadCount: number
@@ -431,30 +441,42 @@ interface Message {
 **Arquivo**: `frontend/src/lib/chat/chatService.ts`
 
 **Funcionalidades**:
-- Enviar mensagens
-- Receber mensagens (WebSocket ou polling)
-- Sincronização bidirecional
-- Notificações push
-- Histórico de conversas
-- Busca em conversas
-- Múltiplas conversas
+- Enviar mensagens (com autenticação)
+- Receber mensagens (WebSocket ou polling com auth)
+- Sincronização bidirecional (por usuário)
+- Notificações push (vinculadas ao usuário)
+- Histórico de conversas (do usuário autenticado)
+- Busca em conversas (do usuário)
+- Múltiplas conversas (por usuário)
 
 **Arquitetura**:
-- **WebSocket**: Para mensagens em tempo real
-- **REST API**: Para sincronização e histórico
-- **Service Worker**: Para notificações push
+- **WebSocket**: Para mensagens em tempo real (com autenticação)
+- **REST API**: Para sincronização e histórico (com JWT)
+- **Service Worker**: Para notificações push (vinculadas ao usuário)
+- **Autenticação**: Todas as requisições incluem token JWT
+
+**Segurança**:
+- Validar token JWT em todas as requisições
+- Filtrar conversas/mensagens por userId
+- RLS (Row Level Security) no banco de dados
+- Validação de permissões no backend
 
 ### 3.3. Múltiplas Conversas
 
 **Tempo**: 3-4 horas
 
 **Funcionalidades**:
-- Lista de conversas
-- Criar nova conversa
+- Lista de conversas (do usuário autenticado)
+- Criar nova conversa (vinculada ao usuário)
 - Alternar entre conversas
-- Buscar conversas
-- Arquivar conversas
-- Deletar conversas
+- Buscar conversas (do usuário)
+- Arquivar conversas (do usuário)
+- Deletar conversas (do usuário)
+
+**Segurança**:
+- Todas as conversas são filtradas por userId
+- Validação de propriedade antes de ações
+- RLS no banco garante isolamento de dados
 
 **UI**:
 - Sidebar com lista de conversas (modo desktop)
@@ -466,11 +488,16 @@ interface Message {
 **Tempo**: 3-4 horas
 
 **Funcionalidades**:
-- Notificações quando app está fechado
+- Notificações quando app está fechado (vinculadas ao usuário)
 - Notificações quando app está em background
 - Som de notificação
-- Badge no ícone do app
-- Configurações de notificação
+- Badge no ícone do app (contador de não lidas do usuário)
+- Configurações de notificação (por usuário)
+
+**Segurança**:
+- Notificações apenas para o usuário autenticado
+- Validação de subscription no backend
+- Filtro por userId nas notificações
 
 **Resultado Esperado**:
 - ✅ Mensageria completa funcionando
@@ -792,34 +819,48 @@ export function InstallPrompt() {
 
 ## 🔐 Segurança e Autenticação
 
-### Widget e Standalone Autenticado
+### Autenticação Obrigatória
 
+**Widget e Standalone**:
 - Usar autenticação atual (Supabase Auth)
 - Token JWT para requisições
 - RLS (Row Level Security) no banco
+- Validação de permissões (RBAC)
+- Redirecionamento para login se não autenticado
 
-### Modo Totem (Token)
+**Sistema de Mensageria**:
+- Todas as conversas vinculadas ao userId
+- Validação de token JWT em todas as requisições
+- Filtro por userId no frontend e backend
+- RLS garante isolamento de dados no banco
+- Validação de propriedade antes de ações (editar, deletar)
 
-- Gerar tokens temporários no backend
-- Validar tokens na API
-- Limitar escopo (apenas chat)
-- Expiração configurável (ex: 24h)
-- Rotação de tokens
+**API Endpoints Protegidos**:
+- Todas as rotas de chat requerem autenticação
+- Validação de token JWT no middleware
+- Verificação de permissões (canAccessChat)
 
-**API Endpoint**: `/api/chat/token`
+**Exemplo de Proteção**:
 
 ```typescript
-// Gerar token para totem
-POST /api/chat/token
-{
-  "expiresIn": 86400, // 24 horas em segundos
-  "scope": "chat"
-}
+// API Route protegida
+export async function POST(req: NextRequest) {
+  // Verificar autenticação
+  const supabase = createRouteHandlerClient({ cookies })
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error || !user) {
+    return new Response('Não autorizado', { status: 401 })
+  }
 
-// Resposta
-{
-  "token": "chat_token_abc123...",
-  "expiresAt": "2025-01-16T12:00:00Z"
+  // Verificar permissões
+  const { canAccessChat } = await checkPermissions(user.id)
+  if (!canAccessChat) {
+    return new Response('Sem permissão', { status: 403 })
+  }
+
+  // Processar requisição...
+  // Todas as operações são filtradas por userId
 }
 ```
 
@@ -850,17 +891,16 @@ POST /api/chat/token
 ### Variáveis de Ambiente
 
 ```env
-# Chat Standalone
-NEXT_PUBLIC_CHAT_REQUIRE_AUTH=true  # Requer autenticação
-NEXT_PUBLIC_CHAT_PUBLIC_URL=/chat   # URL pública do chat
+# Chat Standalone (sempre requer autenticação)
+NEXT_PUBLIC_CHAT_URL=/chat   # URL do chat standalone
 
 # PWA
 NEXT_PUBLIC_PWA_ENABLED=true
 NEXT_PUBLIC_PWA_NAME="Gabi - Síndica Virtual"
 
-# Tokens Totem
-CHAT_TOKEN_SECRET=...  # Secret para gerar tokens
-CHAT_TOKEN_EXPIRES_IN=86400  # 24 horas
+# Autenticação (já existentes)
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 ```
 
 ### Build e Deploy
@@ -883,10 +923,11 @@ CHAT_TOKEN_EXPIRES_IN=86400  # 24 horas
 
 ### Standalone
 
-- ✅ Acessível via URL pública
-- ✅ Funciona sem autenticação (modo totem)
+- ✅ Acessível via URL `/chat`
+- ✅ Requer autenticação obrigatória
 - ✅ Layout minimalista
 - ✅ Responsivo
+- ✅ Redireciona para login se não autenticado
 
 ### Mensageria
 
@@ -920,7 +961,8 @@ CHAT_TOKEN_EXPIRES_IN=86400  # 24 horas
 ### Fase 3: Standalone
 
 - Adicionar página standalone
-- Testar em totem
+- Implementar autenticação obrigatória
+- Testar fluxo de login/redirecionamento
 - Ajustar conforme feedback
 
 ### Fase 4: PWA
@@ -955,10 +997,11 @@ CHAT_TOKEN_EXPIRES_IN=86400  # 24 horas
 
 ### Privacidade
 
-- Tokens de totem com expiração
-- Limpar dados locais quando necessário
+- Dados locais vinculados ao usuário autenticado
+- Limpar dados locais ao fazer logout
 - Consentimento para notificações
 - Política de privacidade
+- Isolamento de dados por usuário (RLS)
 
 ---
 
