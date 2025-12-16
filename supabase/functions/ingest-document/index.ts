@@ -5,9 +5,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
-const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")
+// AI Gateway (prioridade) ou OpenAI direto (fallback)
+const AI_GATEWAY_URL = Deno.env.get('VERCEL_AI_GATEWAY_URL') || 'https://gateway.vercel.ai/v1'
+const AI_GATEWAY_KEY = Deno.env.get('VERCEL_AI_GATEWAY_KEY')
+const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") // Fallback
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+
+// Usar AI Gateway se configurado, senão usar OpenAI direto
+const EMBEDDING_API_URL = AI_GATEWAY_KEY ? `${AI_GATEWAY_URL}/embeddings` : 'https://api.openai.com/v1/embeddings'
+const EMBEDDING_API_KEY = AI_GATEWAY_KEY || OPENAI_API_KEY
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -91,19 +98,28 @@ serve(async (req) => {
       }
     }
 
+    // Verificar API key (AI Gateway ou OpenAI)
+    if (!EMBEDDING_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "VERCEL_AI_GATEWAY_KEY ou OPENAI_API_KEY não configurada" }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      )
+    }
+
     // Gerar embeddings para cada chunk
     const embeddings: number[][] = []
     for (const chunk of chunks) {
       try {
-        const response = await fetch("https://api.openai.com/v1/embeddings", {
+        const response = await fetch(EMBEDDING_API_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${OPENAI_API_KEY}`,
+            Authorization: `Bearer ${EMBEDDING_API_KEY}`,
           },
           body: JSON.stringify({
             model: "text-embedding-3-small",
             input: chunk.content,
+            dimensions: 1536,
           }),
         })
 

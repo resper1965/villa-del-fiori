@@ -1,26 +1,48 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 import { useRBAC } from "@/lib/hooks/useRBAC"
+import { useChat } from 'ai/react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Send, Loader2, Bot, User } from "lucide-react"
 import ReactMarkdown from "react-markdown"
-
-interface Message {
-  id: string
-  role: "user" | "bot"
-  content: string
-  timestamp: Date
-}
+import { supabase } from '@/lib/supabase/client'
 
 export default function ChatPage() {
   const router = useRouter()
-  const { isAuthenticated, isLoading: authLoading } = useAuth()
-  const { canAccessChat, canAccessDashboard } = useRBAC()
-  
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth()
+  const { canAccessChat } = useRBAC()
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Usar useChat do AI SDK UI
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
+    api: '/api/chat',
+    // Headers para autenticação
+    headers: async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      return {
+        'Authorization': `Bearer ${session?.access_token || ''}`,
+      }
+    },
+    body: {
+      conversationId: `conv-${user?.id || 'anonymous'}-${Date.now()}`,
+      userId: user?.id,
+    },
+    initialMessages: [
+      {
+        id: '1',
+        role: 'assistant',
+        content: 'Olá! Sou a Gabi, Síndica Virtual do Condomínio Villa Dei Fiori. Como posso ajudá-lo hoje?',
+      },
+    ],
+    onError: (error) => {
+      console.error('Erro no chat:', error)
+    },
+  })
+
   // Redirecionar se não pode acessar chat
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || !canAccessChat())) {
@@ -30,110 +52,12 @@ export default function ChatPage() {
         router.push("/auth/unauthorized")
       }
     }
-  }, [authLoading, isAuthenticated, canAccessChat, canAccessDashboard, router])
-  
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "bot",
-      content: "Olá! Sou a Gabi, Síndica Virtual do Condomínio Villa Dei Fiori. Como posso ajudá-lo hoje?",
-      timestamp: new Date(),
-    },
-  ])
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [suggestions, setSuggestions] = useState<string[]>([])
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  }, [authLoading, isAuthenticated, canAccessChat, router])
 
   // Auto-scroll para última mensagem
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
-
-  // Focar no input ao carregar
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      inputRef.current?.focus()
-    }
-  }, [authLoading, isAuthenticated])
-
-  const sendMessage = async (messageText?: string) => {
-    const text = messageText || input.trim()
-    if (!text || isLoading) return
-
-    // Adicionar mensagem do usuário
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: text,
-      timestamp: new Date(),
-    }
-    setMessages((prev) => [...prev, userMessage])
-    setInput("")
-    setIsLoading(true)
-    setSuggestions([])
-
-    try {
-      // Importar função de chat dinamicamente para evitar erro de importação circular
-      const { sendChatMessage } = await import('@/lib/api/chat')
-      
-      // Chamar API de chat com RAG
-      const response = await sendChatMessage(text)
-
-      if (response.success && response.message) {
-        // Resposta do bot com RAG
-        const botMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: "bot",
-          content: response.message,
-          timestamp: new Date(),
-        }
-        setMessages((prev) => [...prev, botMessage])
-
-        // Se houver fontes, adicionar como informação adicional
-        if (response.sources && response.sources.length > 0) {
-          const sourcesText = `\n\n*Fontes: ${response.sources.map(s => s.process_name).join(', ')}*`
-          setMessages((prev) => {
-            const lastMessage = prev[prev.length - 1]
-            if (lastMessage && lastMessage.role === 'bot') {
-              return [
-                ...prev.slice(0, -1),
-                { ...lastMessage, content: lastMessage.content + sourcesText }
-              ]
-            }
-            return prev
-          })
-        }
-      } else {
-        // Erro ou resposta vazia
-        const errorMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: "bot",
-          content: response.message || "Desculpe, não consegui processar sua mensagem. Tente novamente.",
-          timestamp: new Date(),
-        }
-        setMessages((prev) => [...prev, errorMessage])
-      }
-    } catch (error) {
-      console.error("Erro ao enviar mensagem:", error)
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "bot",
-        content: "Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, errorMessage])
-    } finally {
-      setIsLoading(false)
-      inputRef.current?.focus()
-    }
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    sendMessage()
-  }
 
   if (authLoading || !isAuthenticated || !canAccessChat()) {
     return (
@@ -167,7 +91,7 @@ export default function ChatPage() {
               message.role === "user" ? "justify-end" : "justify-start"
             }`}
           >
-            {message.role === "bot" && (
+            {message.role === "assistant" && (
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                 <Bot className="h-4 w-4 text-primary stroke-1" />
               </div>
@@ -180,7 +104,7 @@ export default function ChatPage() {
                   : "bg-muted text-foreground"
               }`}
             >
-              {message.role === "bot" ? (
+              {message.role === "assistant" ? (
                 <div className="prose prose-sm dark:prose-invert max-w-none">
                   <ReactMarkdown>{message.content}</ReactMarkdown>
                 </div>
@@ -208,36 +132,23 @@ export default function ChatPage() {
           </div>
         )}
 
+        {error && (
+          <div className="flex gap-3 justify-start">
+            <div className="bg-destructive/10 text-destructive rounded-2xl px-4 py-2">
+              <p className="text-sm">Erro: {error.message}</p>
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Suggestions */}
-      {suggestions.length > 0 && (
-        <div className="flex-shrink-0 px-4 py-2 border-t border-border bg-card">
-          <div className="flex flex-wrap gap-2">
-            {suggestions.map((suggestion, idx) => (
-              <Button
-                key={idx}
-                variant="outline"
-                size="sm"
-                onClick={() => sendMessage(suggestion)}
-                className="text-xs"
-                disabled={isLoading}
-              >
-                {suggestion}
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Input Area */}
       <div className="flex-shrink-0 border-t border-border bg-card p-4">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
-            ref={inputRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInputChange}
             placeholder="Digite sua mensagem..."
             disabled={isLoading}
             className="flex-1 min-h-[44px]"
@@ -259,4 +170,3 @@ export default function ChatPage() {
     </div>
   )
 }
-
