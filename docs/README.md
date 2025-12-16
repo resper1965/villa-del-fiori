@@ -67,6 +67,13 @@ Esta documentação descreve o estado atual do sistema **Gabi - Síndica Virtual
     - Cronograma e estimativas
     - Checklist de validação
 
+12. **[Plano: Chat Widget e Sistema Standalone](PLANO_CHAT_WIDGET_STANDALONE.md)**
+    - Widget flutuante para chat
+    - Página standalone para totem digital
+    - Sistema de mensageria autônomo
+    - PWA (Progressive Web App)
+    - Cronograma e arquitetura detalhada
+
 ---
 
 ## 🎯 Sobre Esta Documentação
