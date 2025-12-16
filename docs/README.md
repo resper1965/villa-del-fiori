@@ -55,6 +55,12 @@ Esta documentação descreve o estado atual do sistema **Gabi - Síndica Virtual
    - Benefícios e considerações
    - Recomendação de implementação
 
+10. **[Avaliação: AI SDK UI da Vercel](AVALIACAO_AI_SDK_UI.md)**
+    - Análise do AI SDK UI para chat
+    - Comparação com implementação atual
+    - Benefícios de streaming e código mais limpo
+    - Recomendação de implementação
+
 ---
 
 ## 🎯 Sobre Esta Documentação
