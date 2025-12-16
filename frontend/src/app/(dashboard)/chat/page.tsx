@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 import { useRBAC } from "@/lib/hooks/useRBAC"
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Send, Loader2, Bot, User } from "lucide-react"
@@ -17,31 +18,51 @@ export default function ChatPage() {
   const { canAccessChat } = useRBAC()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  // Estado local para input
+  const [input, setInput] = useState('')
+
   // Usar useChat do AI SDK UI
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
-    api: '/api/chat',
-    // Headers para autenticação
-    headers: async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      return {
-        'Authorization': `Bearer ${session?.access_token || ''}`,
-      }
-    },
-    body: {
-      conversationId: `conv-${user?.id || 'anonymous'}-${Date.now()}`,
-      userId: user?.id,
-    },
-    initialMessages: [
+  const { messages, sendMessage, status, error } = useChat({
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+      // Headers para autenticação
+      headers: async () => {
+        const { data: { session } } = await supabase.auth.getSession()
+        return {
+          'Authorization': `Bearer ${session?.access_token || ''}`,
+        }
+      },
+      body: {
+        conversationId: `conv-${user?.id || 'anonymous'}-${Date.now()}`,
+        userId: user?.id,
+      },
+    }),
+    messages: [
       {
         id: '1',
         role: 'assistant',
-        content: 'Olá! Sou a Gabi, Síndica Virtual do Condomínio Villa Dei Fiori. Como posso ajudá-lo hoje?',
+        parts: [{ type: 'text', text: 'Olá! Sou a Gabi, Síndica Virtual do Condomínio Villa Dei Fiori. Como posso ajudá-lo hoje?' }],
       },
     ],
     onError: (error) => {
       console.error('Erro no chat:', error)
     },
   })
+
+  const isLoading = status === 'streaming' || status === 'submitted'
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!input.trim() || isLoading) return
+    
+    const messageToSend = input.trim()
+    setInput('')
+    await sendMessage({ parts: [{ type: 'text', text: messageToSend }] })
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value)
+  }
 
   // Redirecionar se não pode acessar chat
   useEffect(() => {
@@ -84,42 +105,48 @@ export default function ChatPage() {
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex gap-3 ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
-            {message.role === "assistant" && (
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Bot className="h-4 w-4 text-primary stroke-1" />
-              </div>
-            )}
-
+        {messages.map((message: any) => {
+          const isUser = message.role === "user"
+          const isAssistant = message.role === "assistant"
+          const textContent = message.parts?.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('') || ''
+          
+          return (
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-2 ${
-                message.role === "user"
-                  ? "bg-primary text-white"
-                  : "bg-muted text-foreground"
+              key={message.id}
+              className={`flex gap-3 ${
+                isUser ? "justify-end" : "justify-start"
               }`}
             >
-              {message.role === "assistant" ? (
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <ReactMarkdown>{message.content}</ReactMarkdown>
+              {isAssistant && (
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Bot className="h-4 w-4 text-primary stroke-1" />
                 </div>
-              ) : (
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              )}
+
+              <div
+                className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                  isUser
+                    ? "bg-primary text-white"
+                    : "bg-muted text-foreground"
+                }`}
+              >
+                {isAssistant ? (
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <ReactMarkdown>{textContent}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <p className="text-sm whitespace-pre-wrap">{textContent}</p>
+                )}
+              </div>
+
+              {isUser && (
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                  <User className="h-4 w-4 text-foreground stroke-1" />
+                </div>
               )}
             </div>
-
-            {message.role === "user" && (
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                <User className="h-4 w-4 text-foreground stroke-1" />
-              </div>
-            )}
-          </div>
-        ))}
+          )
+        })}
 
         {isLoading && (
           <div className="flex gap-3 justify-start">

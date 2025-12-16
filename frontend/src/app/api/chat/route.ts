@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai'
+import { createOpenAI } from '@ai-sdk/openai'
 import { streamText } from 'ai'
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
@@ -59,19 +59,24 @@ async function searchKnowledgeBase(
 ) {
   // Tentar busca híbrida primeiro (se disponível)
   if (queryText) {
-    const { data: hybridData, error: hybridError } = await supabaseAdmin.rpc(
-      'search_knowledge_base_hybrid',
-      {
-        query_embedding: queryEmbedding,
-        query_text: queryText,
-        match_threshold: 0.7,
-        match_count: matchCount,
-        filter_metadata: {},
-      }
-    ).catch(() => ({ data: null, error: { message: 'Function not found' } }))
+    try {
+      const { data: hybridData, error: hybridError } = await supabaseAdmin.rpc(
+        'search_knowledge_base_hybrid',
+        {
+          query_embedding: queryEmbedding,
+          query_text: queryText,
+          match_threshold: 0.7,
+          match_count: matchCount,
+          filter_metadata: {},
+        }
+      )
 
-    if (!hybridError && hybridData) {
-      return hybridData
+      if (!hybridError && hybridData) {
+        return hybridData
+      }
+    } catch (error) {
+      // Função não encontrada, continuar com fallback
+      console.log('Busca híbrida não disponível, usando busca vetorial simples')
     }
   }
 
@@ -191,27 +196,21 @@ ${context ? `\nCONTEXTO DISPONÍVEL:\n${context}` : '\nNenhum contexto específi
     // 5. Configurar OpenAI com AI Gateway
     // Usar AI Gateway URL como base URL customizada
     // Nota: AI SDK suporta baseURL customizada
-    const openaiClient = openai({
+    const openaiProvider = createOpenAI({
       baseURL: AI_GATEWAY_URL,
-      apiKey: AI_GATEWAY_KEY,
+      apiKey: AI_GATEWAY_KEY || '',
     })
 
     // 6. Stream resposta
     const result = await streamText({
-      model: openaiClient(CHAT_MODEL),
+      model: openaiProvider(CHAT_MODEL),
       messages: [systemMessage, ...recentMessages],
       temperature: 0.7,
-      maxTokens: 2000,
+      maxOutputTokens: 2000,
     })
 
     // 7. Retornar stream
-    return result.toDataStreamResponse({
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'authorization, content-type',
-      },
-    })
+    return result.toTextStreamResponse()
   } catch (error: any) {
     console.error('Erro no endpoint de chat:', error)
     return new Response(
