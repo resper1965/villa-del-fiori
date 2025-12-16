@@ -61,6 +61,12 @@ Esta documentação descreve o estado atual do sistema **Gabi - Síndica Virtual
     - Benefícios de streaming e código mais limpo
     - Recomendação de implementação
 
+11. **[Plano de Implementação: AI Gateway + AI SDK UI](PLANO_IMPLEMENTACAO_AI_GATEWAY_SDK.md)**
+    - Plano detalhado passo a passo
+    - Código de exemplo completo
+    - Cronograma e estimativas
+    - Checklist de validação
+
 ---
 
 ## 🎯 Sobre Esta Documentação
